@@ -1,0 +1,23 @@
+Package: traj
+Title: Clustering of Functional Data Based on Measures of Change
+Version: 2.1.0
+Authors@R: c(person("Marie-Pierre", "Sylvestre", role = "aut", email="marie-pierre.sylvestre@umontreal.ca"),
+              person("Laurence", "Boulanger", role = c("aut","cre"), email="laurence.boulanger@umontreal.ca"),
+              person("Gillis Delmas", "Tchouangue Dinkou", role = "ctb"),
+              person("Dan", "Vatnik", role = "ctb"))
+Description: Implements a three-step procedure in the spirit of Leffondree et al. (2004) to identify clusters of individual longitudinal trajectories. The procedure involves (1) computing a number of "measures of change"" capturing various features of the trajectories; (2) using a Principal Component Analysis based dimension reduction algorithm to select a subset of measures and (3) using the k-means clustering algorithm to identify clusters of trajectories.
+License: MIT + file LICENSE
+URL: https://CRAN.R-project.org/package=traj
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Imports: 
+    stats,
+    cluster,
+    psych
+Depends: 
+    R (>= 2.10)
+
