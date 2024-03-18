@@ -1,0 +1,324 @@
+---
+title: "Using the traj package"
+author: "Laurence Boulanger"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{traj_vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+The `traj` package implements a version of the clustering algorithm for functional data (henceforth referred to as trajectories) described in [1]. This algorithm can be conceptualized as being comprised of three steps. The first step is captured by the function `Step1Measures`. It computes, for each trajectory, a set of numerical measures, meant to capture its essential characteristics. They are as follows (see Appendix A for a precise description of how the measures are computed)
+
+1.  Maximum
+2.  Range (max - min)
+3.  Mean value
+4.  Standard deviation
+5.  Slope of the linear model
+6.  $R^2$: Proportion of variance explained by the linear model
+7.  Curve length (total variation)
+8.  Rate of intersection with the mean
+9.  Proportion of time spent under the mean
+10. Minimum of the first derivative
+11. Maximum of the first derivative
+12. Mean of the first derivative
+13. Standard deviation of the first derivative
+14. Minimum of the second derivative
+15. Maximum of the second derivative
+16. Mean of the second derivative
+17. Standard deviation of the second derivative
+18. Early change/Later change
+
+It is on the basis of these measures that the trajectories will be clustered. The second step is a dimension reduction step in which the most meaningful measures are selected and the rest are discarded. This second step is operationalized by the function `Step2Selection`. Specifically, the following actions are taken:
+
+1.  If any of the measures are constant, they are dropped, because such measures are not useful for discriminating.
+2.  A principal component analysis is conducted on the measures. Of the resulting principal components, those that contribute less to the total variance than any of the individual standardized measures are dropped.
+3.  A varimax rotation is applied to the remaining principal component.
+4.  Starting with the rotated component that explains the most variance, the measure which is most strongly correlated with said rotated component is assigned as its representative.
+5.  The measures that have not been selected in this way are discarded
+
+The third step is carried out by the function `Step3Clusters`. In it, the k-means algorithm is used to cluster the trajectories based on the measures selected in step 2.
+
+## An example
+
+Let us illustrate how to use these functions on the `trajdata` dataset. This is an artificially created data set with 130 trajectories split into four groups, labelled A, B, C, D according to the data generating process.
+
+```{r loadtraj}
+library(traj)
+data(trajdata) 
+head(trajdata)
+dat <- trajdata[, -c(1:2)]
+```
+
+```{r plottrajdata, echo=FALSE}
+wA <- which(trajdata$Group == "A")
+wB <- which(trajdata$Group == "B")
+wC <- which(trajdata$Group == "C")
+wD <- which(trajdata$Group == "D")
+
+plot(x = 0, y = 0, xlim = c(1, 6), ylim = c(min(dat), max(dat) + 30), type = "n", ylab = "", xlab = "")
+
+for(k in wA){
+  lines(x = 1:6, y = dat[k, ], type = "l", col = "black ")
+}
+
+for(k in wB){
+  lines(x = 1:6, y = dat[k, ], type = "l", col = "blue")
+}
+
+for(k in wC){
+  lines(x = 1:6, y = dat[k, ], type = "l", col = "red")
+}
+
+for(k in wD){
+  lines(x = 1:6, y = dat[k, ], type = "l", col = "green")
+}
+
+legend("topright",legend = c(paste("A (n = ", 50, ")", sep = ""), paste("B (n = ", 40, ")", sep = ""), paste("C (n = ", 30, ")", sep = ""), paste("D (n = ", 10, ")", sep = "")), col = c("black", "blue", "red", "green"), lty = 1)
+```
+
+By default, measure 18 (Early change/Later change) is not included in the analysis. This is because, depending on the situation (uneven observation times, attrition, missing values, etc.), there might not be, for each trajectory, a natural midpoint. In the present data set, there is no attrition, no missing values and it is understood that the six observation times are equidistant and the same for every trajectory, so we include measure 18. By leaving the 'midpoint' argument at its default of `NULL`, the third observation time will be taken as the midpoint.
+
+```{r ex1.step1}
+step1 <- Step1Measures(Data = dat, 
+                       ID = FALSE, 
+                       measures = 1:18, 
+                       midpoint = NULL) 
+
+summary(step1)
+```
+
+We see that for one trajectory, measure 17 (Standard deviation of the second derivative) has been capped from 43.7 down to 43.2. This is a negligible adjustment. However, for two trajectories, measure 18 (Early change/Later change) has been capped from -177 and -62.8 down to -33.4. By its nature as a quotient, measure 18 is prompt to produce extreme values when the denominator is close to 0.
+
+```{r ex1.step2a}
+step2 <- Step2Selection(trajMeasures = step1) 
+summary(step2)
+```
+
+By "perfectly or almost perfectly correlated", it is meant that the Pearson correlation coefficient is, in absolute value, greater than 0.98.
+
+```{r ex1.step2b}
+print(step2)
+```
+
+This tells us that measure 4 (Standard deviation) was dropped because it is perfectly or almost perfectly correlated with measure 2 (Range). When two measures meet the correlation threshold of 98%, the one that's lower on the above list of measures is dropped on the (subjective) basis that measures are listed in decreasing order of "ease of interpretation". At this stage, if there had been constant measures, i.e. measures that exhibit no variability at all, they would have been dropped as well. Let us move on to clustering. The `Step3Clusters` function will use the measures selected in step 3 to form clusters based on the k-means algorithm.
+
+```{r ex1.step3a}
+library(cluster)
+set.seed(141114)
+step3 <- Step3Clusters(trajSelection = step2, 
+            nclusters = 7)
+step3
+```
+
+Since we set to `NULL` the `nclusters` argument , the algorithm of Tibshirani et al. based on the GAP statistic was used to select the optimal number of clusters. Note that, by default, the argument `K.max` is set to 8, meaning that the optimal number of clusters between 1 and 8 is chosen. In the present case, the algorithm judged that the optimal number $k$ of clusters is 7 because this corresponds to the "elbow" in the graph of the GAP statistic, in the precise sense that $k=7$ is the first value of the argument in the function $GAP(k)$ for which the interval $GAP(k)\pm SE(k)$ overlaps with the interval $GAP(k+1)\pm SE(k+1)$. This can be inspected visually with the input
+
+```{r ex1.step3b}
+par(mfrow = c(1, 1))
+plot(step3, which.plots=1, ask = FALSE)
+```
+
+To visually inspect the classification, we write `plot(step3, ask = TRUE)`.
+
+The "Sample trajectories" plot tends to get cluttered when there are too many clusters. In any case, it is always a good idea to plot the *whole* clusters:
+
+```{r ex1.step3d}
+color.pal <- palette.colors(palette = "Okabe-Ito", alpha = 1)
+par(mfrow = c(1, 1))
+for(k in 1:7){
+  w <- which(step3$partition$Cluster == k)
+  dat.w <- dat[w, ]
+  plot(y = 0, x = 0, ylim = c(floor(min(dat)), ceiling(max(dat))), xlim = c(1,6), xlab="", ylab="", type="n", main = paste("Cluster ", k, " (n = ", step3$partition.summary[k], ")", sep = ""))
+  for(i in 1:length(w)){
+    lines(y = dat.w[i, ], x = 1:6, col = color.pal[k])
+  }
+}
+```
+
+By visual inspection, it is clear that clusters 1 & 4, 3 & 6 as well as 5 & 7 are more similar than dissimilar. In fact, it can be checked that clusters 1 & 4 contain 83% of group D, cluster 2 contains 100% of group C, clusters 3 & 6 contain 90% of group A and clusters 5 & 7 contain 100% of group D.
+
+It can happen that the clustering is not satisfying in the sense that it is not obvious what the curves that have been clustered together have in common. One possible cause of this is that the measures selected in step 2 are not particularly easy to interpret. Therefor, it is worthwhile to go back to step 2 and manually assign different representative to the rotate components. Let us summon the output of step 2 again.
+
+```{r ex1.step3e}
+print(step2)
+```
+
+In the "Loadings" table, the measure selected to represent RC2 (the second rotated component) is measure 17 because it has a Pearson correlation of 0.965 with it. It is notable that measure 13 and measure 14 also have a high correlation with RC2 (0.936 and -0.912 respectively). The measure selected to represent RC1 is measure 6 with a correlation of 0.913 but we note that measures 1, 2 and 3 have comparable correlations with RC1 (0.896, 0.899 and 0.911 respectively). The selected representative of RC3 is measure 12 with a correlation 0.872 but measure 11 and, to a lesser extent, measure 5 also are highly correlated with RC3 (0.8111 and 0.784 respectively). The selected representative of RC4 is measure 9 and there really aren't other contenders.
+
+Suppose we want to inspect the clustering that results from using the most readily interpretable measures from among those contenders. These are measures 13, 1, 5 and 9. We write
+
+```{r ex1.step3f}
+step2.bis <- Step2Selection(trajMeasures = step1, select = c(13, 1, 5, 9)) 
+step3.bis <- Step3Clusters(trajSelection = step2.bis, nclusters = 7)
+```
+
+In fact, provided clusters 1 & 3, 2 & 5 and 4 & 6 are bundled together, this classification is slightly more faithful to the original grouping that the "default" classification based on measures 17, 6, 12, 9.
+
+Finally, let us illustrate briefly what we might have done differently had there been missing values in our data.
+
+------------------------------------------------------------------------
+
+## Appendix A: The measures
+
+In this section, we expand on how the 18 measures are computed. Let $y=y(t)$ denote a continuous function $[a,b]\rightarrow \mathbb{R}$ and let $y(t_i)$ denote the trajectory obtained by measuring $y(t)$ at times $a\leq t_1<\ldots< t_N\leq b$, where $N\geq 3$. We do not assume that the times $t_i$ are equidistant from one another.
+
+-   **m1: Maximum.** This is $\max_i y(t_i)$, the maximum observed value of the trajectory.
+
+-   **m2: Range.** This is $\max_i y(t_i) - \min_i y(t_i)$, the difference between the maximum and the minimum value of the trajectory.\
+    [Remark]{.underline}: The list of measures cannot include any measure which is a linear combination of other measures, otherwise the correlation matrix will be singular or near singular and the the PCA-based dimensionality reduction step will fail. Therefor, although it is natural to include the Maximum, Minimum *and* Range in the list of measures, in reality we can only have two of those three.
+
+-   **m3: Mean value.** This measure is meant to approximate the mean value of the function $y(t)$ as defined by the integral $E[y(t)] = \frac{1}{t_N-t_1}\int_{t_1}^{t_N}y(t)\,dt$. It is defined by the formula
+
+    $$
+    \mathrm{m3}=\frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{y(t_i)+y(t_{i+1})}{2}(t_{i+1}-t_i),
+    $$
+
+    sometimes called the trapezoidal rule for numerical integration.
+
+-   **m4: Standard deviation.** This measure is meant to approximate the integral $\sqrt{E\left[\left(y(t) - E[y(t)]\right)^2\right]}=\sqrt{\frac{1}{t_N-t_1}\int_{t_1}^{t_N}(y(t) - E[y(t)])^2\,dt}$. Following the trapezoidal rule again, it is given by the formula
+
+    $$
+    \mathrm{m4} = \sqrt{\frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\left(y(t_i)-\mathrm{m3}\right)^2 + \left(y(t_{i+1})-\mathrm{m3}\right)^2}{2}(t_{i+1}-t_i)}.
+    $$
+
+    Just like the standard deviation of random variable, this measures how much $y(t)$ wanders away from its mean value. In particular, a small m4 is indicative of a function that's nearly constant.
+
+-   **m5: Slope of the linear model.** Here the $y(t_i)$ are regressed against the $t_i$ in the linear model $y(t_i) = \beta_0 + \beta_1t_i+\epsilon_i$ using the method of least squares and m5 is defined as $\hat{\beta}_1$. Therefor, this captures, to first order, the overall trend of the trajecory.
+
+-   **m6: Proportion of variance explained by the linear model (R squared)**. m6 is the coefficient of determination of linear model used to define m5. It measures how closely the trajectory sticks to its linear approximation.
+
+-   **m7: Curve length (total variation).** This uses a linear interpolation between the points $(t_i,y(t_i))$ to estimate the length of the planar curve $t\mapsto (t,y(t))$:
+
+    $$
+    \mathrm{m7} = \sum_{i=1}^{N-1}\sqrt{(t_{i+1} - t_i)^2 + (y(t_{i+1}) - y(t_i))^2}.
+    $$
+
+-   **m8: Rate of intersection with the mean.** This measures how fast $y(t)$ oscillates around its mean. For each $i=1,\ldots,N-1$, let $y_0(t_i) = y(t_i) -\mathrm{m3}$ and let $\chi_i$ indicate if the value of $y_0(t)$ changes sign between $t=t_i$ and its next (non zero) observed value.
+
+    $$
+    \chi_i=\left\{
+    \begin{array}{cc}
+    1 & \text{if $y_0(t_{i})\neq 0$ and $\mathrm{sgn}(y_0(t_{i})\times y_0(t_{j}))=-1$ for $j$ the smallest index with $j>i$ and $y_0(t_j)\neq 0$} \\
+    0 & \text{otherwise}
+    \end{array}
+    \right.
+    $$Thus, $\sum_{i=1}^{N-1}\chi_i$ is meant to count the number of times that $y(t)$ transversely intersects its mean $E[y(t)]$ and, by definition,
+
+    $$
+    \mathrm{m8} = \frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\chi_i.
+    $$
+
+-   **m9: Proportion of time spent below the mean.**
+
+    Again, let $y_0(t_i) =y(t_i)-\mathrm{m3}$ and set
+
+    $$
+    T^+=\frac{t_2 - t_1}{2}\mathbb{I}(y_0(t_1)>0) + \sum_{i=2}^{N-1}\frac{t_{i+1} - t_{i-1}}{2}\mathbb{I}(y_0(t_i)>0) + \frac{t_N - t_{N-1}}{2}\mathbb{I}(y_0(t_N)>0),
+    $$
+
+    $$
+    T^-=\frac{t_2 - t_1}{2}\mathbb{I}(y_0(t_1)<0) + \sum_{i=2}^{N-1}\frac{t_{i+1} -t_{i-1}}{2}\mathbb{I}(y_0(t_i)<0) + \frac{t_N - t_{N-1}}{2}\mathbb{I}(y_0(t_N)<0),
+    $$
+
+    $$
+    \mathrm{m9} = \frac{T^-}{T^- + T^+}.
+    $$
+
+    This measure has the potential to detect the presence of thin spikes because, the mean of $y_0$ being 0, if $T^-$ (the time spent below the mean) is small compared to $T^+$ (the time spent above the mean), the implication is that $y_0$ ventures *farther* away from the mean when it is negative than when it is positive. Thus, a small m9 is indicative of sharp negative spikes, while a large m9 is indicative of sharp positive spikes. Note that if both positive and negative spikes are present in equal amount, m9 will not detect them.
+
+-   **m10: Minimum of the first derivative.** Measures 10-13 concern $y'(t)$, the first derivative of $y(t)$. The trajectory, $y'(t_i)$ is approximated from the data as follows:$$\widehat{y'}(t_i)=
+    \left\{
+    \begin{array}{cc}
+    \Delta_i^+ & \text{if $i=1$} \\
+    w_i^-\Delta^-_i + w_i^+\Delta^+_i & \text{if $1<i<N$} \\
+    \Delta_i^- & \text{if $i=N$}
+    \end{array}
+    \right.$$
+
+    where $$\Delta^-_i = \frac{y(t_i)-y(t_{i-1})}{t_i-t_{i-1}},\quad \Delta_i^+=\frac{y(t_{i+1})-y(t_i)}{t_{i+1}-t_i}$$
+
+    approximate the left and right derivatives at $t=t_i$ and where $$
+    w^-_i = \frac{t_{i+1}-t_i}{t_{i+1} - t_{i-1}},\quad w^+_i = \frac{t_i-t_{i-1}}{t_{i+1}-t_{i-1}}.
+    $$ In other words, at $t=t_1$, the derivative is approximated by the right derivative $\Delta_1^+$; at $t=t_N$, the derivative is approximated by the left derivative $\Delta_N^-$; at $t=t_i$ ($1<i<N$), the derivative is approximated by a weighted average of the left and right derivatives $\Delta_i^{\pm}$. The idea behind the weighting is that the closer $t_{i-1}$ (resp. $t_{i+1}$) is to $t_i$, the better $\Delta_i^-$ (resp. $\Delta_i^+$) approximates $y'(t_i)$. Therefor, $\Delta_i^-$ should count more (resp. less) than $\Delta_i^+$ in the approximation of $y'(t_i)$ according to whether $t_{i-1}$ is closer to (resp. further away from) $t_i$ than $t_{i+1}$. At the same time, both $\Delta_i^{\pm}$ should partake in the approximation of $y'(t_i)$ in some measure because they both carry information.
+
+    By definition then,$$\mathrm{m10}=\min_{1\leq i\leq N}\widehat{y'}(t_i).$$
+
+-   **m11: Maximum of the first derivative.** This approximates the maximum value of the derivative $y'(t)$ by $$\mathrm{m11} = \max_{1\leq i\leq N}\widehat{y'}(t_i),$$where $\widehat{y'}(t_i)$ is the trajectory define in the discussion of m10.
+
+    [Remark:]{.underline} The same remark that we made in m2 applies: our list of measures cannot include all three of the maximum, minimum and range of the first derivative.
+
+-   **m12: Mean of the first derivative.** This approximates the mean value $\frac{1}{t_n-t_1}\int_{t_1}^{t_N}y'(t)\,dt$ of the derivative $y'(t)$ by (cf. m3) $$\mathrm{m12} = \frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\widehat{y'}(t_i)+\widehat{y'}(t_{i+1})}{2}(t_{i+1}-t_i),$$where $\widehat{y'}(t_i)$ is the trajectory define in the discussion of m10.
+
+    [Remark:]{.underline} Because of the fundamental theorem of calculus, $$\frac{1}{t_N-t_1}\int_{t_1}^{t_N}y'(t)\,dt=\frac{y(t_N)-y(t_1)}{t_N-t_1}$$and so, up to the factor $(t_N-t_1)^{-1}$, m12 also approximates the "net change" $y(t_N)-y(t_1)$.
+
+-   **m13: Standard deviation of the first derivative.** This is defined by the formula (cf. m4)
+
+    $$\mathrm{m13} = \sqrt{\frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\left(\widehat{y'}(t_i)-\mathrm{m12}\right)^2 + \left(\widehat{y'}(t_{i+1})-\mathrm{m12}\right)^2}{2}(t_{i+1}-t_i)}.
+    $$
+
+    This measures how far $y'(t)$ wanders away from its mean value. In particular, a small m13 is indicative of a function with constant speed, which suggests the affine form: $y(t) = at+b$. In this sense, the interpretation of m13 is similar to that of m6.
+
+-   **m14: Minimum of the second derivative.** Measures 14-17 concern $y''(t)$, the second derivative of $y(t)$. For this, a trajectory $\widehat{y''}(t_i)$ is constructed from the trajectory $\widehat{y'}(t_i)$ in the same way as $\widehat{y'}(t_i)$ is constructed from $y(t_i)$ (cf. m10):$$
+    \widehat{y''}(t_i) = 
+    \left\{
+    \begin{array}{cc}
+    \Delta'^-_{\,i} & \text{if $i=1$} \\
+    w_i^-\Delta'^-_{\,i} + w_i^+\Delta'^+_{\,i} & \text{if $1<i<N$} \\
+    \Delta'^+_{\,i} & \text{if $i=N$}
+    \end{array}
+    \right.
+    $$
+
+    where $w_i^{\pm}$ are defined as in the description of m10 and where $$
+    \Delta'^-_{\,i} =\frac{\widehat{y'}(t_i) - \widehat{y'}(t_{i-1})}{t_i-t_{i-1}},\quad \Delta'^+_{\,i} =\frac{\widehat{y'}(t_{i+1}) - \widehat{y'}(t_{i})}{t_{i+1}-t_{i}}
+    $$
+
+    respectively approximate the left and right derivatives of $y'(t)$ at $t=t_i$. By definition then,$$\mathrm{m14}=\min_{1\leq i\leq N}\widehat{y''}(t_i).$$
+
+-   **m15: Maximum of the second derivative.** This approximates the maximum value of the second derivative $y''(t)$ by $$\mathrm{m15} = \max_{1\leq i\leq N}\widehat{y''}(t_i),$$where $\widehat{y''}(t_i)$ is the trajectory defined in the discussion of m14.
+
+-   **m16: Mean of the second derivative.** This approximates the mean value $\frac{1}{t_n-t_1}\int_{t_1}^{t_N}y''(t)\,dt$ of the derivative $y''(t)$ by (cf. m3) $$\mathrm{m16} = \frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\widehat{y''}(t_i)+\widehat{y''}(t_{i+1})}{2}(t_{i+1}-t_i),$$where $\widehat{y''}(t_i)$ is the trajectory define in the discussion of m14.
+
+-   **m17: Standard deviation of the second derivative.** This is defined by the formula (cf. m4)
+
+    $$\mathrm{m17} = \sqrt{\frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\left(\widehat{y''}(t_i)-\mathrm{m16}\right)^2 + \left(\widehat{y''}(t_{i+1})-\mathrm{m16}\right)^2}{2}(t_{i+1}-t_i)}.
+    $$
+
+    This measures how far $y''(t)$ wanders away from its mean value. In particular, a small m17 is indicative of a function with constant acceleration, which suggests a quadratic form: $y(t) = at^2+bt+c$.
+
+-   **m18: Early change/Later change.** Given an observation time $t_m$ with $1<m<N$ which is to act as the "midpoint" of the trajectory, this measure compares the net change in the first half of the trajectory to the net change happening in the later half:$$\mathrm{m18} = \frac{y(t_m)-y(t_1)}{y(t_N)-y(t_m)}.$$
+
+    [Remark:]{.underline} In the event that both the numerator and denominator of m18 are 0, m18 is set to 1.
+
+## Appendix B: The capping procedure
+
+Extreme values in the measures can occur in the measures as a result of division by a number very close to 0 and even division by 0 in the case of m18. Since the k-means algorithm behaves poorly in the presence of extreme values, it is usually preferable to cap the extreme values (and lose some information in the process) rather than to be stuck with an unhelpful clustering. In this appendix we explain the capping procedure that is implemented by the `Step1Measures` function when its argument `cap.outliers` is set to TRUE (the default).
+
+In the presence of normally distributed data with mean $\mu$ and standard deviation $\sigma$, a common rule for capping is the $3\sigma$ rule whereby any value located at a distance greater than $3\sigma$ of the mean is considered "extreme" and is capped to $\mu\pm 3\sigma$. The probabilistic basis for this rule is that, for a random variable $X\sim N(\mu,\sigma^2)$, the probability of observing $|X-\mu|>3\sigma$ is very small (0.3%). In the case of our measures, there is no reason to believe that the normality assumption holds, even approximately. Therefor, the $3\sigma$ rule can't be used. Nevertheless, Chebychev's inequality gives a theoretical bound on the probability of observing $|X-\mu|>k\sigma$ valid for *any* probability distribution (of finite first two moments): $$P[|X-\mu|>k\sigma]<\frac{1}{k^2}.$$
+
+After rounding, we find that the smallest value of $k$ for which $1/k^2\leq 0.003$ is $k=18.3$. Now, the Chebychev bound is sharp in the class of *all* probability distribution but if we restrict to the class of *continuous* probability distributions (to which our measures belong), the bound can be improved. In a recent paper published on the arXiv [2], the author proves that for any continuous random variable $X$ with finite first two moments there holds $$
+P[|X-\mu|>k\sigma]<\sigma M(k)\alpha(k),
+$$where $M(k)$ is the least upper bound of the probability density function on $\{x \ | \ |x-\mu|>k\sigma\}$ and where $\alpha(k)$ is the unique real root of the cubic polynomial$$t^3 + 2\pi kt^2 + 2\pi e k^2t - \frac{2\pi e}{\sigma M(k)}.$$This root admits an explicit expression in terms of radicals (Cardano's method) which we won't write down. The idea then is to find, for a given measure $X$, the smallest value of $k$ such that $\sigma M(k)\alpha(k)<0.003$ and cap to $\mu\pm k\sigma$ any observation of $X$ with $|X-\mu|>k\sigma$.
+
+Suppose that our data set contains $n$ trajectories. This gives us a sample $X_1,\ldots,X_n$ from the distribution of $X$. Our capping procedure consists of the following steps.
+
+1.  First, we want to estimate the distribution of $X$ mean and variance of $X$ but if there are extreme values in our sample, those will bias our estimates, so we remove the top 1% most extreme values of $X$ beforehand. Specifically, after relabelling the observed values of $X$ so that $|X_1|\leq |X_2|\leq\ldots \leq |X_n|$, we remove the last $r=\min(1,n/100)$ observations.
+
+2.  From the remaining values $X_1,\ldots, X_{n-r}$, we compute estimates $\hat{\mu}$ and $\hat{\sigma}$ of the mean and standard deviation as usual.
+
+3.  Still using only $X_1,\ldots, X_{n-r}$, we approximate the probability density function of $X$ using a kernel density estimator (function `density` in R) and, for $k$ running from 0 to 18.3 by increments of 0.1, we find the value of $M(k)$ for this PDF and compute $\alpha(k)$.
+
+4.  Using these, we identify the smallest value of $k$ for which $\hat{\sigma}M(k)\alpha(k)<0.003$. If $k^*$ denotes this smallest value of $k$, we replace the value of any $X_i$ with $X_i<\hat{\mu}-k^*\hat{\sigma}$ by $\hat{\mu}-k^*\hat{\sigma}$ and we replace the value of any $X_i$ with $X_i>\hat{\mu}+k^*\hat{\sigma}$ by $\hat{\mu}+k^*\hat{\sigma}$ .
+
+## Bibliography
+
+[1] Leffondré K, Abrahamowicz M, Regeasse A, Hawker GA, Badley EM, McCusker J, Belzile E. Statistical measures were proposed for identifying longitudinal patterns of change in quantitative health indicators. J Clin Epidemiol. 2004 Oct; 57(10):1049-62. doi: 10.1016/j.jclinepi.2004.02.012. PMID: 15528056.
+
+[2] Nishiyama T. Improved Chebyshev inequality: new probability bounds with known supremum of PDF [arXiv:1808.10770v2](https://arxiv.org/abs/1808.10770v2)
