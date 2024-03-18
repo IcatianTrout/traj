@@ -4,12 +4,30 @@
 \name{traj-package}
 \alias{traj}
 \alias{traj-package}
-\title{traj: What the Package Does (One Line, Title Case)}
+\title{traj: Clustering of Functional Data Based on Measures of Change}
 \description{
-What the package does (one paragraph).
+Implements a three-step procedure in the spirit of Leffondree et al. (2004) to identify clusters of individual longitudinal trajectories. The procedure involves (1) computing a number of "measures of change"" capturing various features of the trajectories; (2) using a Principal Component Analysis based dimension reduction algorithm to select a subset of measures and (3) using the k-means clustering algorithm to identify clusters of trajectories.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://CRAN.R-project.org/package=traj}
+}
+
 }
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Laurence Boulanger \email{laurence.boulanger@umontreal.ca}
+
+Authors:
+\itemize{
+  \item Marie-Pierre Sylvestre \email{marie-pierre.sylvestre@umontreal.ca}
+}
+
+Other contributors:
+\itemize{
+  \item Gillis Delmas Tchouangue Dinkou [contributor]
+  \item Dan Vatnik [contributor]
+}
 
 }
 \keyword{internal}
