@@ -215,7 +215,7 @@ In this section, we expand on how the 18 measures are computed. Let $y=y(t)$ den
     \mathrm{m8} = \frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\chi_i.
     $$
 
--   **m9: Proportion of time spent below the mean.**
+-   **m9: Proportion of time spent above the mean.**
 
     Again, let $y_0(t_i) =y(t_i)-\mathrm{m3}$ and set
 
@@ -228,10 +228,12 @@ In this section, we expand on how the 18 measures are computed. Let $y=y(t)$ den
     $$
 
     $$
-    \mathrm{m9} = \frac{T^-}{T^- + T^+}.
+    \mathrm{m9} = \frac{T^+}{T^- + T^+}.
     $$
 
-    This measure has the potential to detect the presence of thin spikes because, the mean of $y_0$ being 0, if $T^-$ (the time spent below the mean) is small compared to $T^+$ (the time spent above the mean), the implication is that $y_0$ ventures *farther* away from the mean when it is negative than when it is positive. Thus, a small m9 is indicative of sharp negative spikes, while a large m9 is indicative of sharp positive spikes. Note that if both positive and negative spikes are present in equal amount, m9 will not detect them.
+    This measure has the potential to detect the presence of thin spikes because, the mean of $y_0$ being 0, if $T^+$ (the time spent above the mean) is small compared to $T^+$ (the time spent below the mean), the implication is that $y_0$ ventures *farther* away from the mean when it is positive than when it is negative. Thus, a small m9 is indicative of sharp positive spikes, while a large m9 is indicative of sharp negative spikes. Note that if both positive and negative spikes are present in equal amount, m9 will not detect them.
+
+    [Remark:]{.underline} In the event that both the numerator and denominator of m9 are 0, m9 is set to 1.
 
 -   **m10: Minimum of the first derivative.** Measures 10-13 concern $y'(t)$, the first derivative of $y(t)$. The trajectory, $y'(t_i)$ is approximated from the data as follows:$$\widehat{y'}(t_i)=
     \left\{
@@ -293,7 +295,7 @@ In this section, we expand on how the 18 measures are computed. Let $y=y(t)$ den
 
     This measures how far $y''(t)$ wanders away from its mean value. In particular, a small m17 is indicative of a function with constant acceleration, which suggests a quadratic form: $y(t) = at^2+bt+c$.
 
--   **m18: Early change/Later change.** Given an observation time $t_m$ with $1<m<N$ which is to act as the "midpoint" of the trajectory, this measure compares the net change in the first half of the trajectory to the net change happening in the later half:$$\mathrm{m18} = \frac{y(t_m)-y(t_1)}{y(t_N)-y(t_m)}.$$
+-   **m18: Later change/Early change.** Given an observation time $t_m$ with $1<m<N$ which is to act as the "midpoint" of the trajectory, this measure compares the net change in the later half of the trajectory to the net change happening in the first half:$$\mathrm{m18} = \frac{y(t_N)-y(t_m)}{y(t_m)-y(t_1)}.$$
 
     [Remark:]{.underline} In the event that both the numerator and denominator of m18 are 0, m18 is set to 1.
 
@@ -303,7 +305,7 @@ Extreme values in the measures can occur in the measures as a result of division
 
 In the presence of normally distributed data with mean $\mu$ and standard deviation $\sigma$, a common rule for capping is the $3\sigma$ rule whereby any value located at a distance greater than $3\sigma$ of the mean is considered "extreme" and is capped to $\mu\pm 3\sigma$. The probabilistic basis for this rule is that, for a random variable $X\sim N(\mu,\sigma^2)$, the probability of observing $|X-\mu|>3\sigma$ is very small (0.3%). In the case of our measures, there is no reason to believe that the normality assumption holds, even approximately. Therefor, the $3\sigma$ rule can't be used. Nevertheless, Chebychev's inequality gives a theoretical bound on the probability of observing $|X-\mu|>k\sigma$ valid for *any* probability distribution (of finite first two moments): $$P[|X-\mu|>k\sigma]<\frac{1}{k^2}.$$
 
-After rounding, we find that the smallest value of $k$ for which $1/k^2\leq 0.003$ is $k=18.3$. Now, the Chebychev bound is sharp in the class of *all* probability distribution but if we restrict to the class of *continuous* probability distributions (to which our measures belong), the bound can be improved. In a recent paper published on the arXiv [2], the author proves that for any continuous random variable $X$ with finite first two moments there holds $$
+After rounding, we find that the smallest value of $k$ for which $1/k^2\leq 0.003$ is $k=18.3$. Now, the Chebychev bound is sharp in the class of *all* probability distribution but if we restrict to the class of *continuous* probability distributions (to which our measures belong), the bound can be improved. In a recent paper published on the arXiv [3], the author proves that for any continuous random variable $X$ with finite first two moments there holds $$
 P[|X-\mu|>k\sigma]<\sigma M(k)\alpha(k),
 $$where $M(k)$ is the least upper bound of the probability density function on $\{x \ | \ |x-\mu|>k\sigma\}$ and where $\alpha(k)$ is the unique real root of the cubic polynomial$$t^3 + 2\pi kt^2 + 2\pi e k^2t - \frac{2\pi e}{\sigma M(k)}.$$This root admits an explicit expression in terms of radicals (Cardano's method) which we won't write down. The idea then is to find, for a given measure $X$, the smallest value of $k$ such that $\sigma M(k)\alpha(k)<0.003$ and cap to $\mu\pm k\sigma$ any observation of $X$ with $|X-\mu|>k\sigma$.
 
@@ -321,4 +323,6 @@ Suppose that our data set contains $n$ trajectories. This gives us a sample $X_1
 
 [1] Leffondré K, Abrahamowicz M, Regeasse A, Hawker GA, Badley EM, McCusker J, Belzile E. Statistical measures were proposed for identifying longitudinal patterns of change in quantitative health indicators. J Clin Epidemiol. 2004 Oct; 57(10):1049-62. doi: 10.1016/j.jclinepi.2004.02.012. PMID: 15528056.
 
-[2] Nishiyama T. Improved Chebyshev inequality: new probability bounds with known supremum of PDF [arXiv:1808.10770v2](https://arxiv.org/abs/1808.10770v2)
+[2] Tibshirani R, Walther G, Hastie T. Estimating the Number of Clusters in a Data Set Via the Gap Statistic, Journal of the Royal Statistical Society Series B: Statistical Methodology, Volume 63, Issue 2, July 2001, Pages 411–423, [<https://doi.org/10.1111/1467-98>]
+
+[3] Nishiyama T. Improved Chebyshev inequality: new probability bounds with known supremum of PDF [arXiv:1808.10770v2](https://arxiv.org/abs/1808.10770v2)

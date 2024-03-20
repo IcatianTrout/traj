@@ -23,14 +23,13 @@ Der <- function(x, y) {
   D[1] <- DR[1]
   D[m] <- DL[m]
   
-  lambdaR <- rep(NA, m)
-  lambdaL <- rep(NA, m)
+  wL <- rep(NA, m)
+  wR <- rep(NA, m)
   
   for (i in 2:(m - 1)) {
-    pR <- (x[i + 1] - x[i - 1]) / (x[i + 1] - x[i - 1])
-    lambdaR[i] <- 1 - pR
-    lambdaL[i] <- 1 - lambdaR[i]
-    D[i] <- lambdaL[i] * DL[i] + lambdaR[i] * DR[i]
+    wL[i] <- (x[i + 1] - x[i]) / (x[i + 1] - x[i - 1])
+    wR[i] <- 1 - wL[i]
+    D[i] <- wL[i] * DL[i] + wR[i] * DR[i]
   }
   
   return(D)

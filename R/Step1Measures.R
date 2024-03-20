@@ -428,60 +428,77 @@ Step1Measures <-
     }
     options(warn = defaultW)
     
-    #curve lenght:
+    #curve length:
     if (7 %in% measures) { 
       for (i in seq_len(nrow(data))) {
-        Lenght <- 0
-        for(k in seq_len(ncol(data))[-ncol(data)]){
-          Lenght <- Lenght + sqrt( (time[i, k+1] - time[i, k])^2 + (data[i, k+1] - data[i, k])^2 )
+        y <- data[i, complete.cases(data[i, ])]
+        x <- time[i, complete.cases(time[i, ])]
+        Length <- 0
+        for(k in seq_along(y)[-length(y)]){
+          Length <- Length + sqrt( (x[k+1] - x[k])^2 + (y[k+1] - y[k])^2 )
         }
-        output$m7[i] <- Lenght
+        output$m7[i] <- Length
       }
     }
     
     #rate of intersections with the mean
+    
     if (8 %in% measures) { 
       intersection.count <- c()
       for (i in seq_len(nrow(data))) {
-        norm <- data[i,] - m3[i]
+        norm <- data[i, ] - m3[i]
+        y <- norm[complete.cases(norm)]
+        x <- time[i, complete.cases(time[i, ])]
+        
         intersection.count[i] <- 0
-        for(k in  seq_along(norm)[-length(norm)]){
-          intersection.count[i] <- intersection.count[i] + (sign(norm[k+1])*sign(norm[k]) == -1)
+        for(k in  seq_along(y)[-length(y)]){
+          w <- which(sign(y[k] * y[(k+1):length(y)]) !=0)
+          if(length(w) > 0){
+            if(sign(y[k] * y[(k+1):length(y)])[w[1]] == -1){
+              intersection.count[i] <- intersection.count[i] + 1 
+            }
+          }
         }
-        output$m8[i] <- intersection.count[i] /( max(time[i, ]) - min(time[i, ]) )
+        output$m8[i] <- intersection.count[i] /( max(x) - min(x) )
       }
     }
-    
+
     #fraction of time spent under the mean (if this is large, then there are big sharp spikes)
     if (9 %in% measures) {
       for (i in seq_len(nrow(data))) {
         norm <- data[i, ] - m3[i]
+        y <- norm[complete.cases(norm)]
+        x <- time[i, complete.cases(time[i, ])]
         
-        wb <- which(norm > 0)
         blue.time <- 0
-        for (k in wb) {
-          if(k == 1){
-            blue.time <- blue.time + 0.5*(time[i, k+1] - time[i, k])
-          }
-          if (! (k %in% c(1, ncol(time)))) {
-            blue.time <- blue.time + 0.5*(time[i, k+1] - time[i, k-1])
-          }
-          if(k == ncol(time)){
-            blue.time <- blue.time + 0.5*(time[i, k] - time[i, k-1])
+        wb <- which(y > 0)
+        if(length(wb > 0)){
+          for (k in wb) {
+            if(k == 1){
+              blue.time <- blue.time + 0.5*(x[k+1] - x[k])
+            }
+            if (! (k %in% c(1, length(x)))) {
+              blue.time <- blue.time + 0.5*(x[k+1] - x[k-1])
+            }
+            if(k == length(x)){
+              blue.time <- blue.time + 0.5*(x[k] - x[k-1])
+            }
           }
         }
         
-        wr <- which(norm < 0)
         red.time <- 0
-        for (k in wr) {
-          if(k == 1){
-            red.time <- red.time + 0.5*(time[i, k+1] - time[i, k])
-          }
-          if (! (k %in% c(1, ncol(time)))) {
-            red.time <- red.time + 0.5*(time[i, k+1] - time[i, k-1])
-          }
-          if(k == ncol(time)){
-            red.time <- red.time + 0.5*(time[i, k] - time[i, k-1])
+        wr <- which(y < 0)
+        if(length(wr > 0)){
+          for (k in wr) {
+            if(k == 1){
+              red.time <- red.time + 0.5*(x[k+1] - x[k])
+            }
+            if (! (k %in% c(1, length(x)))) {
+              red.time <- red.time + 0.5*(x[k+1] - x[k-1])
+            }
+            if(k == length(x)){
+              red.time <- red.time + 0.5*(x[k] - x[k-1])
+            }
           }
         }
         output$m9[i] <- blue.time/(blue.time + red.time)
@@ -491,11 +508,13 @@ Step1Measures <-
     
     ### Measures on y'(t) ###
     
-    #if a measure involving the speed or the acceleration was requested, compute the derivative:
-    if (sum(measures > 9) > 0) {
+    # If a measure involving the speed or the acceleration was requested, compute the derivative:
+    if (sum(measures %in% 10:17) > 0) {
       speed.data <- data
       for (i in seq_len(nrow(data))) {
-        speed.data[i, ] <- Der(x = time[i, ], y = data[i, ])
+        y <- data[i, complete.cases(data[i, ])]
+        x <- time[i, complete.cases(time[i, ])]
+        speed.data[i, complete.cases(speed.data[i, ])] <- Der(x, y)
       }
     }
     
@@ -541,10 +560,14 @@ Step1Measures <-
     
     #if a measure involving the acceleration was requested, compute the derivative of the derivative:
     
-    if (sum(measures > 13) > 0) {
+    
+    
+    if (sum(measures %in% 14:17) > 0) {
       accel.data <- speed.data
-      for (i in seq_len(nrow(speed.data))) {
-        accel.data[i, ] <- Der(x = time[i, ], y = speed.data[i, ])
+      for (i in seq_len(nrow(accel.data))) {
+        y <- speed.data[i, complete.cases(speed.data[i, ])]
+        x <- time[i, complete.cases(time[i, ])]
+        accel.data[i, complete.cases(accel.data[i, ])] <- Der(x, y)
       }
     }
     
