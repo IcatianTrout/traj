@@ -57,7 +57,7 @@ head(trajdata)
 dat <- trajdata[, -c(1:2)]
 ```
 
-```{r plottrajdata, echo=FALSE}
+```{r plottrajdata, echo = FALSE}
 wA <- which(trajdata$Group == "A")
 wB <- which(trajdata$Group == "B")
 wC <- which(trajdata$Group == "C")
@@ -113,50 +113,111 @@ This tells us that measure 4 (Standard deviation) was dropped because it is perf
 ```{r ex1.step3a}
 library(cluster)
 set.seed(141114)
-step3 <- Step3Clusters(trajSelection = step2, 
-            nclusters = 7)
-step3
+step3 <- Step3Clusters(trajSelection = step2, B = 20, nclusters = NULL) # B = 20 is used for the purpose of speeding up the demonstration; the default is B = 500.
 ```
 
-Since we set to `NULL` the `nclusters` argument , the algorithm of Tibshirani et al. based on the GAP statistic was used to select the optimal number of clusters. Note that, by default, the argument `K.max` is set to 8, meaning that the optimal number of clusters between 1 and 8 is chosen. In the present case, the algorithm judged that the optimal number $k$ of clusters is 7 because this corresponds to the "elbow" in the graph of the GAP statistic, in the precise sense that $k=7$ is the first value of the argument in the function $GAP(k)$ for which the interval $GAP(k)\pm SE(k)$ overlaps with the interval $GAP(k+1)\pm SE(k+1)$. This can be inspected visually with the input
+Since the `nclusters` argument is set to `NULL` the algorithm of Tibshirani et al. [2] based on the GAP statistic is used to select the optimal number of clusters. In this paradigm, one seeks to balance parsimony and maximizing GAP(k) and there many possible approaches to this. In `Step3Clusters`, the GAP statistic is computed by the ``` cluster:::``clusGap ``` function and this plurality of possible approaches is represented by the `method` argument. The original proposal in [2] corresponds to `method = "Tibs2001SEmax"`. According to this rule, the optimal number of clusters is the smallest integer $k$ for which $GAP(k)\geq GAP(K+1)-SE(k+1)$. In our case, this gives $k=1$ as can be inspected visually with
 
 ```{r ex1.step3b}
 par(mfrow = c(1, 1))
-plot(step3, which.plots=1, ask = FALSE)
+plot(step3, which.plots = 1, ask = FALSE)
 ```
 
-To visually inspect the classification, we write `plot(step3, ask = TRUE)`.
+If we use instead any of the other four possible arguments for `method`, we find the optimal number of clusters to be 3 or 4, depending on the number `B` of bootstrap replications. In any case, this problem of finding the optimal number of clusters is a difficult one and there is no single method that works in every situation, so the best practice is to take input from various methodologies. Another simple to implement method is the elbow method, which consists in choosing the value of $k$ at which the slope of the following curve stabilizes:
+
+```{r ex1.step3c}
+
+scaled.selection <- scale(step2$selection[, -c(1)])
+
+tot.withinss <- c() 
+for(k in 1:8){ 
+  tot.withinss[k] <- kmeans(x = scaled.selection, centers = k)$tot.withinss 
+  }
+
+plot(x = 1:8, y = tot.withinss, type = "b", col = "red", xlab = "k")
+```
+
+Here again, the optimal number of clusters appear to be 3 or 4. Once we have settled on a number of clusters, say 4, we run `Step3Cluster` again, this time specifying `nclusters = 4`:
+
+```{r ex1.step3d}
+step3.4clust <- Step3Clusters(trajSelection = step2, nclusters = 4)
+```
+
+To visually inspect the classification, we write `plot(step3.4clust, ask = TRUE)`.
+
+```{r ex1.step3e, echo = FALSE}
+par(mfrow = c(1, 1))
+plot(step3.4clust, which.plots = 1, ask = FALSE)
+```
+
+```{r ex1.step3f, echo = FALSE}
+par(mfrow = c(1, 1))
+plot(step3.4clust, which.plots = 2, ask = FALSE)
+```
+
+```{r ex1.step3g, echo = FALSE}
+par(mfrow = c(1, 1))
+plot(step3.4clust, which.plots = 3, ask = FALSE)
+```
+
+```{r ex1.step3h, echo = FALSE}
+par(mfrow = c(1, 1))
+plot(step3.4clust, which.plots = 4, ask = FALSE)
+```
+
+```{r ex1.step3i, echo = FALSE}
+par(mfrow = c(1, 1))
+plot(step3.4clust, which.plots = 5, ask = FALSE)
+```
+
+```{r ex1.step3j, echo = FALSE}
+par(mfrow = c(1, 1))
+plot(step3.4clust, which.plots = 6, ask = FALSE)
+```
+
+```{r ex1.step3k, echo = FALSE}
+par(mfrow = c(1, 1))
+plot(step3.4clust, which.plots = 7, ask = FALSE)
+```
+
+```{r ex1.step3l, echo = FALSE}
+par(mfrow = c(1, 1))
+plot(step3.4clust, which.plots = 8, ask = FALSE)
+```
+
+```{r ex1.step3m, echo = FALSE}
+par(mfrow = c(1, 1))
+plot(step3.4clust, which.plots = 9, ask = FALSE)
+```
 
 The "Sample trajectories" plot tends to get cluttered when there are too many clusters. In any case, it is always a good idea to plot the *whole* clusters:
 
-```{r ex1.step3d}
+```{r ex1.step3n}
 color.pal <- palette.colors(palette = "Okabe-Ito", alpha = 1)
 par(mfrow = c(1, 1))
-for(k in 1:7){
-  w <- which(step3$partition$Cluster == k)
+for(k in 1:4){
+  w <- which(step3.4clust$partition$Cluster == k)
   dat.w <- dat[w, ]
-  plot(y = 0, x = 0, ylim = c(floor(min(dat)), ceiling(max(dat))), xlim = c(1,6), xlab="", ylab="", type="n", main = paste("Cluster ", k, " (n = ", step3$partition.summary[k], ")", sep = ""))
+  plot(y = 0, x = 0, ylim = c(floor(min(dat)), ceiling(max(dat))), xlim = c(1,6), xlab="", ylab="", type="n", main = paste("Cluster ", k, " (n = ", step3.4clust$partition.summary[k], ")", sep = ""))
   for(i in 1:length(w)){
     lines(y = dat.w[i, ], x = 1:6, col = color.pal[k])
   }
 }
 ```
 
-By visual inspection, it is clear that clusters 1 & 4, 3 & 6 as well as 5 & 7 are more similar than dissimilar. In fact, it can be checked that clusters 1 & 4 contain 83% of group D, cluster 2 contains 100% of group C, clusters 3 & 6 contain 90% of group A and clusters 5 & 7 contain 100% of group D.
-
 It can happen that the clustering is not satisfying in the sense that it is not obvious what the curves that have been clustered together have in common. One possible cause of this is that the measures selected in step 2 are not particularly easy to interpret. Therefor, it is worthwhile to go back to step 2 and manually assign different representative to the rotate components. Let us summon the output of step 2 again.
 
-```{r ex1.step3e}
+```{r ex1.step3o}
 print(step2)
 ```
 
-In the "Loadings" table, the measure selected to represent RC2 (the second rotated component) is measure 17 because it has a Pearson correlation of 0.965 with it. It is notable that measure 13 and measure 14 also have a high correlation with RC2 (0.936 and -0.912 respectively). The measure selected to represent RC1 is measure 6 with a correlation of 0.913 but we note that measures 1, 2 and 3 have comparable correlations with RC1 (0.896, 0.899 and 0.911 respectively). The selected representative of RC3 is measure 12 with a correlation 0.872 but measure 11 and, to a lesser extent, measure 5 also are highly correlated with RC3 (0.8111 and 0.784 respectively). The selected representative of RC4 is measure 9 and there really aren't other contenders.
+In the "Loadings" table, the measure selected to represent RC1 (the first rotated component) is measure 6 because it has a Pearson correlation of 0.919 with it. It is notable that measure 1, 2, 3 also has a high correlation with RC1 (0.856, 0.852 and 0.868 respectively). The measure selected to represent RC3 is measure 17 with a correlation of 0.955 but we note that measure 13 also has a high correlation (0.890) with RC3 . The selected representative of RC4 and RC2 are measure 11 (correlation 0.905) and measure 16 (correlation 0.951) respectively and there really aren't other contenders.
 
 Suppose we want to inspect the clustering that results from using the most readily interpretable measures from among those contenders. These are measures 13, 1, 5 and 9. We write
 
-```{r ex1.step3f}
-step2.bis <- Step2Selection(trajMeasures = step1, select = c(13, 1, 5, 9)) 
-step3.bis <- Step3Clusters(trajSelection = step2.bis, nclusters = 7)
+```{r ex1.step3p}
+step2.bis <- Step2Selection(trajMeasures = step1, select = c(3, 17, 11, 16)) 
+step3.4clust.bis <- Step3Clusters(trajSelection = step2.bis, nclusters = 4)
 ```
 
 In fact, provided clusters 1 & 3, 2 & 5 and 4 & 6 are bundled together, this classification is slightly more faithful to the original grouping that the "default" classification based on measures 17, 6, 12, 9.
