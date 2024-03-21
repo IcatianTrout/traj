@@ -211,13 +211,34 @@ It can happen that the clustering is not satisfying in the sense that it is not 
 print(step2)
 ```
 
+1,3,8
+
+13,17
+
+5
+
+16
+
 In the "Loadings" table, the measure selected to represent RC1 (the first rotated component) is measure 6 because it has a Pearson correlation of 0.919 with it. It is notable that measure 1, 2, 3 also has a high correlation with RC1 (0.856, 0.852 and 0.868 respectively). The measure selected to represent RC3 is measure 17 with a correlation of 0.955 but we note that measure 13 also has a high correlation (0.890) with RC3 . The selected representative of RC4 and RC2 are measure 11 (correlation 0.905) and measure 16 (correlation 0.951) respectively and there really aren't other contenders.
 
 Suppose we want to inspect the clustering that results from using the most readily interpretable measures from among those contenders. These are measures 13, 1, 5 and 9. We write
 
 ```{r ex1.step3p}
-step2.bis <- Step2Selection(trajMeasures = step1, select = c(3, 17, 11, 16)) 
+step2.bis <- Step2Selection(trajMeasures = step1, select = c(1, 13, 5, 15)) 
 step3.4clust.bis <- Step3Clusters(trajSelection = step2.bis, nclusters = 4)
+```
+
+```{r}
+color.pal <- palette.colors(palette = "Okabe-Ito", alpha = 1)
+par(mfrow = c(1, 1))
+for(k in 1:4){
+  w <- which(step3.4clust.bis$partition$Cluster == k)
+  dat.w <- dat[w, ]
+  plot(y = 0, x = 0, ylim = c(floor(min(dat)), ceiling(max(dat))), xlim = c(1,6), xlab="", ylab="", type="n", main = paste("Cluster ", k, " (n = ", step3.4clust.bis$partition.summary[k], ")", sep = ""))
+  for(i in 1:length(w)){
+    lines(y = dat.w[i, ], x = 1:6, col = color.pal[k])
+  }
+}
 ```
 
 In fact, provided clusters 1 & 3, 2 & 5 and 4 & 6 are bundled together, this classification is slightly more faithful to the original grouping that the "default" classification based on measures 17, 6, 12, 9.
