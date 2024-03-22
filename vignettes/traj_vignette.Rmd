@@ -95,7 +95,7 @@ step1 <- Step1Measures(Data = dat,
 summary(step1)
 ```
 
-We see that for one trajectory, measure 17 (Standard deviation of the second derivative) has been capped from 43.7 down to 43.2. This is a negligible adjustment. However, for two trajectories, measure 18 (Early change/Later change) has been capped from -177 and -62.8 down to -33.4. By its nature as a quotient, measure 18 is prompt to produce extreme values when the denominator is close to 0.
+We see that for two trajectories, measure 18 (Early change/Later change) has been capped from -177 down to 46.3 and from 95.2 down to 49.8. By its nature as a quotient, measure 18 is prompt to produce extreme values when the denominator is close to 0.
 
 ```{r ex1.step2a}
 step2 <- Step2Selection(trajMeasures = step1) 
@@ -108,7 +108,7 @@ By "perfectly or almost perfectly correlated", it is meant that the Pearson corr
 print(step2)
 ```
 
-This tells us that measure 4 (Standard deviation) was dropped because it is perfectly or almost perfectly correlated with measure 2 (Range). When two measures meet the correlation threshold of 98%, the one that's lower on the above list of measures is dropped on the (subjective) basis that measures are listed in decreasing order of "ease of interpretation". At this stage, if there had been constant measures, i.e. measures that exhibit no variability at all, they would have been dropped as well. Let us move on to clustering. The `Step3Clusters` function will use the measures selected in step 3 to form clusters based on the k-means algorithm.
+This tells us that measure 4 (Standard deviation) was dropped because it is perfectly or almost perfectly correlated with measure 2 (Range) and that measure 12 (Mean of the first derivative) was dropped because it is perfectly or almost perfectly correlated with measure 5 (Slope of the linear model). When two measures meet the correlation threshold of 98%, the one that's lower on the above list of measures is dropped on the (subjective) basis that measures are listed in decreasing order of "ease of interpretation". At this stage, if there had been constant measures, i.e. measures that exhibit no variability at all, they would have been dropped as well. Let us move on to clustering. The `Step3Clusters` function will use the measures selected in step 3 to form clusters based on the k-means algorithm.
 
 ```{r ex1.step3a}
 library(cluster)
@@ -116,14 +116,14 @@ set.seed(141114)
 step3 <- Step3Clusters(trajSelection = step2, B = 20, nclusters = NULL) # B = 20 is used for the purpose of speeding up the demonstration; the default is B = 500.
 ```
 
-Since the `nclusters` argument is set to `NULL` the algorithm of Tibshirani et al. [2] based on the GAP statistic is used to select the optimal number of clusters. In this paradigm, one seeks to balance parsimony and maximizing GAP(k) and there many possible approaches to this. In `Step3Clusters`, the GAP statistic is computed by the ``` cluster:::``clusGap ``` function and this plurality of possible approaches is represented by the `method` argument. The original proposal in [2] corresponds to `method = "Tibs2001SEmax"`. According to this rule, the optimal number of clusters is the smallest integer $k$ for which $GAP(k)\geq GAP(K+1)-SE(k+1)$. In our case, this gives $k=1$ as can be inspected visually with
+Since the `nclusters` argument is set to `NULL` the algorithm of Tibshirani et al. [2] based on the GAP statistic is used to select the optimal number of clusters. In this paradigm, one seeks to balance parsimony and maximizing GAP(k) and there many possible approaches to this. In `Step3Clusters`, the GAP statistic is computed by the `cluster:::clusGap` function and this plurality of possible approaches is represented by the `method` argument. The original proposal in [2] corresponds to `method = "Tibs2001SEmax"`. According to this rule, the optimal number of clusters is the smallest integer $k$ for which $GAP(k)\geq GAP(K+1)-SE(k+1)$. In our case, this gives $k=4$ as can be inspected visually with
 
 ```{r ex1.step3b}
 par(mfrow = c(1, 1))
 plot(step3, which.plots = 1, ask = FALSE)
 ```
 
-If we use instead any of the other four possible arguments for `method`, we find the optimal number of clusters to be 3 or 4, depending on the number `B` of bootstrap replications. In any case, this problem of finding the optimal number of clusters is a difficult one and there is no single method that works in every situation, so the best practice is to take input from various methodologies. Another simple to implement method is the elbow method, which consists in choosing the value of $k$ at which the slope of the following curve stabilizes:
+The problem of finding the optimal number of clusters is a difficult one and there is no single method that works in every situation, so the best practice is to take input from various methodologies. Another easy to implement method is the elbow method, which consists in choosing the value of $k$ at which the slope of the following curve stabilizes:
 
 ```{r ex1.step3c}
 
@@ -137,7 +137,7 @@ for(k in 1:8){
 plot(x = 1:8, y = tot.withinss, type = "b", col = "red", xlab = "k")
 ```
 
-Here again, the optimal number of clusters appear to be 3 or 4. Once we have settled on a number of clusters, say 4, we run `Step3Cluster` again, this time specifying `nclusters = 4`:
+Here again, the optimal number of clusters appear to be 4. Once we have settled on a number of clusters, we run `Step3Cluster` again, this time specifying `nclusters = 4`:
 
 ```{r ex1.step3d}
 step3.4clust <- Step3Clusters(trajSelection = step2, nclusters = 4)
@@ -205,23 +205,15 @@ for(k in 1:4){
 }
 ```
 
-It can happen that the clustering is not satisfying in the sense that it is not obvious what the curves that have been clustered together have in common. One possible cause of this is that the measures selected in step 2 are not particularly easy to interpret. Therefor, it is worthwhile to go back to step 2 and manually assign different representative to the rotate components. Let us summon the output of step 2 again.
+Here, is seems like the algorithm has, for the most part, successfully clustered the trajectory according to their generating process. Sometimes, it can happen that the clustering is not satisfying in the sense that it is not obvious what the curves that have been clustered together have in common. One possible cause of this is that the measures selected in step 2 are not particularly easy to interpret. Therefor, it is worthwhile to go back to step 2 and manually assign different representative to the rotated components. Let us summon the output of step 2 again.
 
 ```{r ex1.step3o}
 print(step2)
 ```
 
-1,3,8
+In the "Loadings" table, the measure selected to represent RC1 (the first rotated component) is measure 6 because it has a Pearson correlation of 0.863 with it. It is notable that measure 1, 3, 8 also are highly correlated with RC1 (0.807, 0.850 and -0.831 respectively). The measure selected to represent RC4 is measure 14 with a correlation of -0.871 but we note that measure 13 also has a high correlation (0.811) with RC3 and as does measure 17 (0.809). The selected representative of RC3 is measure 11 (0.952) but measure 5 is also strongly correlated (0.826) with RC3. Finally, RC2 is represented by measure 15 (0.969) and measure 16 is a contender (0.846)
 
-13,17
-
-5
-
-16
-
-In the "Loadings" table, the measure selected to represent RC1 (the first rotated component) is measure 6 because it has a Pearson correlation of 0.919 with it. It is notable that measure 1, 2, 3 also has a high correlation with RC1 (0.856, 0.852 and 0.868 respectively). The measure selected to represent RC3 is measure 17 with a correlation of 0.955 but we note that measure 13 also has a high correlation (0.890) with RC3 . The selected representative of RC4 and RC2 are measure 11 (correlation 0.905) and measure 16 (correlation 0.951) respectively and there really aren't other contenders.
-
-Suppose we want to inspect the clustering that results from using the most readily interpretable measures from among those contenders. These are measures 13, 1, 5 and 9. We write
+Suppose we want to inspect the clustering that results from using the most readily interpretable measures from among those contenders. These are measures 1, 13, 5 and 15. We write
 
 ```{r ex1.step3p}
 step2.bis <- Step2Selection(trajMeasures = step1, select = c(1, 13, 5, 15)) 
@@ -241,9 +233,7 @@ for(k in 1:4){
 }
 ```
 
-In fact, provided clusters 1 & 3, 2 & 5 and 4 & 6 are bundled together, this classification is slightly more faithful to the original grouping that the "default" classification based on measures 17, 6, 12, 9.
-
-Finally, let us illustrate briefly what we might have done differently had there been missing values in our data.
+Fortuitously, this looks to "improve" the classification slightly in that the clusters have less curves that seem "out of place".
 
 ------------------------------------------------------------------------
 
