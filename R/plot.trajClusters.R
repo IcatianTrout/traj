@@ -288,7 +288,9 @@ plot.trajClusters <-
         legend(
           "topright",
           col = color.pal[1:x$nclusters],
-          legend = paste(1:x$nclusters),
+          legend = paste(1:x$nclusters, " (n = ",
+                         x$partition.summary,
+                         ")", sep = ""),
           lty = rep(1, x$nclusters)
         )
         
@@ -343,7 +345,9 @@ plot.trajClusters <-
         legend(
           "topright",
           col = color.pal[1:x$nclusters],
-          legend = paste(1:x$nclusters),
+          legend = paste(1:x$nclusters, " (n = ",
+                         x$partition.summary,
+                         ")", sep = ""),
           lty = rep(1, x$nclusters)
         )
         
