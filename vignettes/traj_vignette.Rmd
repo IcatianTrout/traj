@@ -6,6 +6,7 @@ output:
   html_document:
     df_print: paged
   pdf_document: default
+  word_document: default
 vignette: "%\\VignetteIndexEntry{Using the traj package} %\\VignetteEngine{knitr::rmarkdown}
   %\\VignetteEncoding{UTF-8}"
 ---
@@ -98,14 +99,14 @@ step1 <- Step1Measures(Data = dat,
 summary(step1)
 ```
 
-Two outlying values were detected for measure m18 for trajectories ID23 and ID110 and were replaced by more likely values according to the distribution of m18. Once the measures are computed, we use the `Step2Selection` function to extract the measures that best characterize the trajectories.
+Two outlying values were detected in measure 18 of trajectories ID23 and ID110 and were capped to more likely values according to the distribution of m18 (see Appendix B). Once the measures are computed, we use the `Step2Selection` function to extract the measures that best characterize the trajectories.
 
 ```{r ex1.step2a}
 step2 <- Step2Selection(trajMeasures = step1) 
 summary(step2)
 ```
 
-Two measures are defined as '"perfectly or almost perfectly correlated" if the absolute value of their Pearson correlation coefficient is greater than 0.98. The print function provides more detailed informations:
+Two measures are defined as "perfectly or almost perfectly correlated" if the absolute value of their Pearson correlation coefficient is greater than 0.98. The print function provides more detailed information:
 
 ```{r ex1.step2b}
 print(step2)
@@ -126,7 +127,7 @@ par(mfrow = c(1, 1))
 plot(step3, which.plots = 1, ask = FALSE)
 ```
 
-To visually inspect the classification, we write `plot(step3.4clust, ask = TRUE)`.
+To visually inspect the classification, we write `plot(step3, ask = TRUE)`.
 
 ```{r ex1.step3e, echo = FALSE}
 par(mfrow = c(1, 1))
@@ -159,9 +160,9 @@ The "Sample trajectories" plot tends to get cluttered when there are too many cl
 color.pal <- palette.colors(palette = "Okabe-Ito", alpha = 1)
 par(mfrow = c(1, 1))
 for(k in 1:4){
-  w <- which(step3.4clust$partition$Cluster == k)
+  w <- which(step3$partition$Cluster == k)
   dat.w <- dat[w, ]
-  plot(y = 0, x = 0, ylim = c(floor(min(dat)), ceiling(max(dat))), xlim = c(1,6), xlab="", ylab="", type="n", main = paste("Cluster ", k, " (n = ", step3.4clust$partition.summary[k], ")", sep = ""))
+  plot(y = 0, x = 0, ylim = c(floor(min(dat)), ceiling(max(dat))), xlim = c(1,6), xlab="", ylab="", type="n", main = paste("Cluster ", k, " (n = ", step3$partition.summary[k], ")", sep = ""))
   for(i in 1:length(w)){
     lines(y = dat.w[i, ], x = 1:6, col = color.pal[k])
   }
@@ -176,7 +177,7 @@ In this section, we expand on how the eighteen measures are computed. Let $y=y(t
 
 -   **m1: Maximum.** This is $$\max_iy(t_i)$$
 
--   **m2: Range.** This is $$\max_iy(t_i) - \min_iy(t_i)$$\
+-   **m2: Range.** This is $$\max_iy(t_i) - \min_iy(t_i)$$
 
 -   **m3: Mean value.** This measure is defined by the formula
 
