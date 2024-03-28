@@ -3,7 +3,7 @@
 #'@description Up to 5 kinds of plots are currently available: a plot of the
 #'  cluster-specific median and mean trajectories, a random sample of
 #'  trajectories from each cluster and scatter plots of the measures on which
-#'  the clustering was based. When the GAP criterion was used in
+#'  the clustering was based. If the GAP criterion was used in
 #'  \code{Step3Clusters} to determine the optimal number of clusters, a plot of
 #'  the GAP statistic as a function of the number of clusters is provided.
 #'
@@ -11,14 +11,14 @@
 #'  \code{Step3Cluster}.
 #'@param sample.size the number of random trajectories to be randomly sampled
 #'  from each cluster. Defaults to 5.
-#'@param ask logical. If TRUE, the user is asked before each plot. Defaults to
-#'  TRUE.
-#'@param which.plots either NULL or a vector of integers. If NULL, every
+#'@param ask logical. If \code{TRUE}, the user is asked before each plot. Defaults to
+#'  \code{TRUE}.
+#'@param which.plots either \code{NULL} or a vector of integers. If \code{NULL}, every
 #'  available plot is displayed. If a vector is supplied, only the corresponding
 #'  plots will be displayed.
-#'@param spline logical. If TRUE, each trajectory will be smoothed using
+#'@param spline logical. If \code{TRUE}, each trajectory will be smoothed using
 #'  smoothing splines and the median and mean trajectories will be plotted from
-#'  the smoothed trajectories. Defaults to FALSE.
+#'  the smoothed trajectories. Defaults to \code{FALSE}
 #'@param ... other parameters to be passed through to plotting functions.
 #'
 #'@importFrom grDevices palette.colors
@@ -31,20 +31,17 @@
 #'@examples
 #' \dontrun{
 #'data("trajdata")
-#'trajdata.noGrp <- trajdata[, which(colnames(trajdata) == "Group")] #remove the Group column
+#'trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] #remove the Group column
 #'
 #'m = Step1Measures(trajdata.noGrp, ID = TRUE)
 #'s = Step2Selection(m)
 #'c3 = Step3Clusters(s, nclusters = 3)
 #'
-#'plot(c3)
-#'
-#'#The pointwise mean trajectories correspond to the third and fourth displayed plots.
+#'plot(c3) # The pointwise mean trajectories correspond to the third and fourth displayed plots.
 #'
 #'c4 = Step3Clusters(s, nclusters = 4)
 #'
 #'plot(c4, which.plots = 3:4)
-#'
 #'}
 #'
 #'

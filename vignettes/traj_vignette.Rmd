@@ -27,7 +27,7 @@ The `traj` package implements a clustering algorithm for functional data (hencef
 6.  $R^2$: Proportion of variance explained by the linear model
 7.  Curve length (total variation)
 8.  Rate of intersection with the mean
-9.  Proportion of time spent under the mean
+9.  Proportion of time spent above the mean
 10. Minimum of the first derivative
 11. Maximum of the first derivative
 12. Mean of the first derivative
@@ -36,7 +36,7 @@ The `traj` package implements a clustering algorithm for functional data (hencef
 15. Maximum of the second derivative
 16. Mean of the second derivative
 17. Standard deviation of the second derivative
-18. Early change/Later change
+18. Later change/Early change
 
 The second step performs dimensionality reduction on the 18 measures to extract the main features of the trajectories. Specifically,
 
