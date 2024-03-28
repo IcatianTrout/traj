@@ -7,8 +7,10 @@ output:
     df_print: paged
   pdf_document: default
   word_document: default
-vignette: "%\\VignetteIndexEntry{Using the traj package} %\\VignetteEngine{knitr::rmarkdown}
-  %\\VignetteEncoding{UTF-8}"
+vignette: >
+  %\VignetteIndexEntry{Using the traj package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
@@ -306,6 +308,6 @@ $$where $M(k)$ is the least upper bound of the probability density function on $
 
 [1] Leffondré K, Abrahamowicz M, Regeasse A, Hawker GA, Badley EM, McCusker J, Belzile E. Statistical measures were proposed for identifying longitudinal patterns of change in quantitative health indicators. J Clin Epidemiol. 2004 Oct; 57(10):1049-62. doi: 10.1016/j.jclinepi.2004.02.012. PMID: 15528056.
 
-[2] Tibshirani R, Walther G, Hastie T. Estimating the Number of Clusters in a Data Set Via the Gap Statistic, Journal of the Royal Statistical Society Series B: Statistical Methodology, Volume 63, Issue 2, July 2001, Pages 411–423, [<https://doi.org/10.1111/1467-98>]
+[2] Tibshirani R, Walther G, Hastie T. Estimating the Number of Clusters in a Data Set Via the Gap Statistic, Journal of the Royal Statistical Society Series B: Statistical Methodology, Volume 63, Issue 2, July 2001, Pages 411–423
 
 [3] Nishiyama T. Improved Chebyshev inequality: new probability bounds with known supremum of PDF [arXiv:1808.10770v2](https://arxiv.org/abs/1808.10770v2)

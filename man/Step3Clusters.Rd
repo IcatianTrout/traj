@@ -67,25 +67,24 @@ of the clustering, the output of the \code{clusGap} function, as well as a
 curated form of the arguments.
 }
 \description{
-Classifies the trajectories by applying the K-mean clustering
+Classifies the trajectories by applying the k-means clustering
 algorithm to the measures selected by \code{Step2Selection}.
 }
 \examples{
 \dontrun{
 data("trajdata")
-trajdata.noGrp <- trajdata[, which(colnames(trajdata) == "Group")] #remove the Group column
+trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] #remove the Group column
 
 m = Step1Measures(trajdata.noGrp, ID = TRUE, measures = 1:18)
 s = Step2Selection(m)
 
 s$RC$loadings
 
-s2 = Step2Selection(m, select = c(10, 12, 8, 4))
+s2 = Step2Selection(m, select = c(3, 13, 11, 15))
 
 c3.part <- Step3Clusters(s2, nclusters = 3)$partition
 c4.part <- Step3Clusters(s2, nclusters = 4)$partition
 c5.part <- Step3Clusters(s2, nclusters = 5)$partition
-
 }
 
 }

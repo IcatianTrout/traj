@@ -57,14 +57,14 @@ to the measures computed by \code{\link[traj]{Step1Measures}}:
 \examples{
 \dontrun{
 data("trajdata")
-trajdata.noGrp <- trajdata[, which(colnames(trajdata) == "Group")] #remove the Group column
+trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] #remove the Group column
 
 m = Step1Measures(trajdata.noGrp, measure = c(1:18), ID = TRUE)
 s = Step2Selection(m)
 
 print(s)
 
-s2 = Step2Selection(m, select = c(13, 3, 12, 9))
+s2 = Step2Selection(m, select = c(3, 13, 11, 15))
 }
 
 
