@@ -32,7 +32,6 @@
 #'Instead, if \code{"Calinski-Harabasz"} is the chosen \code{criterion}, the Calinski-Harabasz index is computed for each possible number of clusters between 2 and \code{K.max} and the optimal number of clusters is the maximizer of the Calinski-Harabasz index. Moreover, if \code{boot} is set to \code{TRUE}, then, following the guidelines suggested by Mesidor et al., a sampling distribution of the optimal number of clusters is obtained by bootstrap and the optimal number of clusters is chosen to be the (first) mode of this sampling distribution. 
 #'
 #'@import cluster
-#'@import boot
 #'@importFrom stats kmeans na.omit qt quantile
 #'
 #'@references Miceline Mésidor, Caroline Sirois, Marc Simard, Denis Talbot, A Bootstrap Approach for Evaluating Uncertainty in the Number of Groups Identified by Latent Class Growth Models, American Journal of Epidemiology, Volume 192, Issue 11, November 2023, Pages 1896–1903, https://doi.org/10.1093/aje/kwad148
@@ -108,7 +107,7 @@ Step3Clusters <-
       if (criterion == "GAP") {
         if (algorithm == "k-means") {
           
-          kmeans.nstart <- function (x, k, nstart = nstart, iter.max = iter.max) {
+          kmeans.nstart <- function (x, k) {
             return(kmeans(
               x = x,
               centers = k,
@@ -120,7 +119,7 @@ Step3Clusters <-
           FUNcluster <- kmeans.nstart
         } else {
           
-          pam.nstart <- function (x, k, metric = metric) {
+          pam.nstart <- function (x, k) {
             return(pam(
               x = x,
               k = k,
@@ -154,29 +153,27 @@ Step3Clusters <-
       if (criterion == "Calinski-Harabasz") {
         
         if (isTRUE(boot)) {
-          if (algorithm == "k-medoids"){
-            statistic.fun <- function(data, indices){
-              d <- data[indices, ]
-              CH <- c()
-              for(k in 2:K.max){
+          
+          CH.boot <- c()
+          for(i in 1:R){
+            s1 = trajMeasures
+            id = trajMeasures$measures$ID 
+            indices <- sample(nrow(trajMeasures$measures), replace=TRUE)
+            s1$measures <- trajMeasures$measures[indices, ]
+            s1$measures$ID <- id
+            s2.boot <- Step2Selection(trajMeasures = s1, num.select = trajMeasures$input$num.select, discard = trajMeasures$input$discard, select = trajMeasures$input$select)
+            d = data.frame(apply(data.frame(s2.boot$selection[,-c(1), drop = FALSE]), 2, scale))
+            CH <- c()
+            for(k in 2:K.max){
+              if(algorithm == "k-medoids"){
                 CH[k] <- CalinskiHarabasz(x = d, clustering = cluster::pam(x = d, k = k, cluster.only = TRUE))
               }
-              return(which(CH == max(CH, na.rm = T)))
-            }
-          }
-          
-          if (algorithm == "k-means"){
-            statistic.fun <- function(data, indices){
-              d <- data[indices, ]
-              CH <- c()
-              for(k in 2:K.max){
+              if(algorithm == "k-means"){
                 CH[k] <- CalinskiHarabasz(x = d, clustering = stats::kmeans(x = d, centers = k, iter.max = iter.max, nstart = nstart)$cluster)
               }
-              return(which(CH == max(CH, na.rm = T)))
             }
+            CH.boot[i] <- which(CH == max(CH, na.rm = T))
           }
-          
-          CH.boot <- as.vector(boot(data = trajSelection$selection[, -c(1), drop = FALSE], statistic = statistic.fun, R = R, stype = "i")$t)
           
           nclusters <- FirstMode(CH.boot)
           
