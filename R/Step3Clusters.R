@@ -107,8 +107,28 @@ Step3Clusters <-
       
       if (criterion == "GAP") {
         if (algorithm == "k-means") {
+          
+          kmeans.nstart <- function (x, k, nstart = nstart, iter.max = iter.max) {
+            return(kmeans(
+              x = x,
+              centers = k,
+              nstart = nstart,
+              iter.max = iter.max
+            ))
+          }
+          
           FUNcluster <- kmeans.nstart
         } else {
+          
+          pam.nstart <- function (x, k, metric = metric) {
+            return(pam(
+              x = x,
+              k = k,
+              diss = FALSE,
+              metric = metric
+            ))
+          }
+          
           FUNcluster <- pam.nstart
         }
         
