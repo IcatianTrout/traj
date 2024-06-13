@@ -225,8 +225,7 @@ Step2Selection <-
             data = trajMeasures$data,
             time = trajMeasures$time,
             input = input,
-            cap.outliers = trajMeasures$cap.outliers,
-            trajMeasures = trajMeasures
+            cap.outliers = trajMeasures$cap.outliers
           ),
           class = "trajSelection"
         )
