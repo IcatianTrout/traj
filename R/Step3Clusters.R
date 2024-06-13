@@ -135,7 +135,7 @@ Step3Clusters <-
         GAP <-
           cluster::clusGap(
             x = data,
-            FUNcluster = kmeans.nstart,
+            FUNcluster = FUNcluster,
             K.max = K.max,
             B = B,
             d.power = 2,
