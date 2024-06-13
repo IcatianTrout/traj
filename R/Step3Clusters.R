@@ -151,17 +151,15 @@ Step3Clusters <-
       }
       
       if (criterion == "Calinski-Harabasz") {
-        
         if (isTRUE(boot)) {
-          
           CH.boot <- c()
           for(i in 1:R){
-            s1 = trajMeasures
-            id = trajMeasures$measures$ID 
-            indices <- sample(nrow(trajMeasures$measures), replace=TRUE)
-            s1$measures <- trajMeasures$measures[indices, ]
+            s1 = trajSelection$trajMeasures
+            id = s1$measures$ID 
+            indices <- sample(nrow(s1$measures), replace=TRUE)
+            s1$measures <- s1$measures[indices, ]
             s1$measures$ID <- id
-            s2.boot <- Step2Selection(trajMeasures = s1, num.select = trajMeasures$input$num.select, discard = trajMeasures$input$discard, select = trajMeasures$input$select)
+            s2.boot <- Step2Selection(trajMeasures = s1, num.select = s1$input$num.select, discard = s1$input$discard, select = s1$input$select)
             d = data.frame(apply(data.frame(s2.boot$selection[,-c(1), drop = FALSE]), 2, scale))
             CH <- c()
             for(k in 2:K.max){
