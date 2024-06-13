@@ -3,14 +3,14 @@
 #'@description Up to 5 kinds of plots are currently available: a plot of the
 #'  cluster-specific median and mean trajectories, a random sample of
 #'  trajectories from each cluster and scatter plots of the measures on which
-#'  the clustering was based. If the GAP criterion was used in
+#'  the clustering was based. When the GAP criterion was used in
 #'  \code{Step3Clusters} to determine the optimal number of clusters, a plot of
 #'  the GAP statistic as a function of the number of clusters is provided.
 #'
 #'@param x object of class \code{trajClusters} as returned by
 #'  \code{Step3Cluster}.
 #'@param sample.size the number of random trajectories to be randomly sampled
-#'  from each cluster. Defaults to 5.
+#'  from each cluster. Defaults to \code{5}.
 #'@param ask logical. If \code{TRUE}, the user is asked before each plot. Defaults to
 #'  \code{TRUE}.
 #'@param which.plots either \code{NULL} or a vector of integers. If \code{NULL}, every
@@ -37,11 +37,14 @@
 #'s = Step2Selection(m)
 #'c3 = Step3Clusters(s, nclusters = 3)
 #'
-#'plot(c3) # The pointwise mean trajectories correspond to the third and fourth displayed plots.
+#'plot(c3)
+#'
+#'#The pointwise mean trajectories correspond to the third and fourth displayed plots.
 #'
 #'c4 = Step3Clusters(s, nclusters = 4)
 #'
 #'plot(c4, which.plots = 3:4)
+#'
 #'}
 #'
 #'
@@ -69,27 +72,33 @@ plot.trajClusters <-
     on.exit(devAskNewPage(ask = current.ask.status))  # Restore ask status on exit
     devAskNewPage(ask = ask)
     
-    color.pal <- palette.colors(palette = "Okabe-Ito", alpha = 1)
+    color.pal <- palette.colors(palette = "Polychrome 36", alpha = 1) 
     
     plot.counter <-
       0 # This labels the plots that appear when 'which.plots' is set to NULL
     
     ### GAP statistic ###
     
-    gap.condition <-
-      ((is.null(which.plots) |
-          (1 %in% which.plots)) & !is.null(x$GAP))
-    if (gap.condition) {
-      if (!is.null(x$GAP)) {
-        par(mfrow = c(1, 1))
-        plot(x$GAP, main = "Gap statistic up to one SE")
-      }
+    gapch.condition <- (is.null(which.plots) | (1 %in% which.plots))
+    
+    if (gapch.condition & !is.null(x$GAP)) {
+      par(mfrow = c(1, 1))
+      plot(x$GAP, main = "Gap statistic up to one SE")
     }
     
-    if (!is.null(x$GAP)) {
+    if (gapch.condition & !is.null(x$CH)) {
+      par(mfrow = c(1, 1))
+      plot(x$CH, type = "b", xlab = "k", ylab = "Index", main = "Calinski-Harabasz index")
+    }
+    
+    if (gapch.condition & !is.null(x$CH.boot)) {
+      par(mfrow = c(1, 1))
+      barplot(table(x$CH.boot), xlab = "k", ylab = "absolute frequency", main = "Sampling distribution of optimal k")
+    }
+    
+    if (!is.null(x$GAP) | !is.null(x$CH) | !is.null(x$CH.boot) ) {
       plot.counter <- plot.counter + 1
     }
-    
     
     ### Mean and median traj ###
     universal.time <- x$time[1,-1]
@@ -285,9 +294,7 @@ plot.trajClusters <-
         legend(
           "topright",
           col = color.pal[1:x$nclusters],
-          legend = paste(1:x$nclusters, " (n = ",
-                         x$partition.summary,
-                         ")", sep = ""),
+          legend = paste(1:x$nclusters),
           lty = rep(1, x$nclusters)
         )
         
@@ -342,9 +349,7 @@ plot.trajClusters <-
         legend(
           "topright",
           col = color.pal[1:x$nclusters],
-          legend = paste(1:x$nclusters, " (n = ",
-                         x$partition.summary,
-                         ")", sep = ""),
+          legend = paste(1:x$nclusters),
           lty = rep(1, x$nclusters)
         )
         

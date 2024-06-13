@@ -14,7 +14,7 @@
 #'  \code{Time} corresponds to an \code{ID} variable identifying the
 #'  trajectories. Defaults to \code{FALSE}.
 #'@param measures a vector containing the numerical identifiers of the measures
-#'  to compute (see "Details" section below). The default, 1:17, corresponds to
+#'  to compute. The default, 1:17, corresponds to
 #'  measures 1-17 and thus excludes the measures which require specifying a
 #'  midpoint.
 #'@param midpoint specifies which column of \code{Time} to use as the midpoint
@@ -22,9 +22,9 @@
 #'  the number of rows in \code{Time}. The default is \code{NULL}, in which case the
 #'  midpoint is the time closest to the median of the Time vector specific to
 #'  each trajectory.
-#'@param cap.outliers logical. If \code{TRUE}, extreme values of the measures will be caped (see details below). Defaults to \code{TRUE}.
-#'@param x object of class trajMeasures.
-#'@param object object of class trajMeasures.
+#'@param cap.outliers logical. If \code{TRUE}, extreme values of the measures will be capped. If \code{FALSE}, only the infinite values will be capped. Defaults to \code{FALSE}.
+#'@param x object of class \code{trajMeasures}.
+#'@param object object of class \code{trajMeasures}.
 #'@param ... further arguments passed to or from other methods.
 #'
 #'@return An object of class \code{trajMeasures}; a list containing the values
@@ -45,7 +45,7 @@
 #'\item  \eqn{R^2}: Proportion of variance explained by the linear model\cr
 #'\item  Curve length (total variation)\cr
 #'\item  Rate of intersection with the mean\cr
-#'\item  Proportion of time spent under the mean\cr
+#'\item  Proportion of time spent above the mean\cr
 #'\item  Minimum  of the first derivative\cr
 #'\item  Maximum of the first derivative\cr
 #'\item  Mean of the first derivative\cr
@@ -54,20 +54,14 @@
 #'\item  Maximum of the second derivative\cr
 #'\item  Mean of the second derivative\cr
 #'\item  Standard deviation of the second derivative\cr
-#'\item  Early change/Later change\cr
+#'\item  Later change/Early change\cr
 #'}
 #'
-#'  In the presence of highly correlated measures (Pearson correlation >
-#'  0.98), the function selects the highest-ranking measure on the list (see
-#'  \code{\link[traj]{Step1Measures}}) and discards the others. Because the
-#'  K-means algorithm is sensitive to outliers, the measures are prevented from taking extreme or
-#'  infinite values (caused by a possible division by 0 in m18). Nishiyama's improved Chebychev
-#'  bound is used to determine extreme values for each measure, corresponding to
+#'  If 'cap.outliers' is set to \code{TRUE}, or if some measures are infinite as a result of division by 0, Nishiyama's improved Chebychev bound for continuous distributions
+#'  is used to determine extreme values for each measure, corresponding to
 #'  a 0.3% probability threshold. Extreme values beyond the threshold are then capped
-#'  to the 0.3% probability threshold. If applicable, the values of m18 which
-#'  would be of the form 0/0 are set to 1. PCA is applied on the remaining
-#'  measures using the \code{\link[psych]{principal}} function from the
-#'  \code{psych} package.
+#'  to the 0.3% probability threshold (see vignette for more details). If applicable, the values which
+#'  would be of the form 0/0 are set to 1. 
 #'
 #'@importFrom stats complete.cases coefficients lm median sd density
 #'
@@ -84,7 +78,7 @@
 #'@examples
 #'\dontrun{
 #'data("trajdata")
-#'trajdata.noGrp <- trajdata[, which(colnames(trajdata) == "Group")] #remove the Group column
+#'trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] #remove the Group column
 #'
 #'m1 = Step1Measures(trajdata.noGrp, ID = TRUE, measures = 18, midpoint = NULL)
 #'m2 = Step1Measures(trajdata.noGrp, ID = TRUE, measures = 18, midpoint = 3)
@@ -101,7 +95,7 @@ Step1Measures <-
             ID = FALSE,
             measures = c(1:17),
             midpoint = NULL,
-            cap.outliers = TRUE) {
+            cap.outliers = FALSE) {
     
     ###############################################################
     ##         Perform checks and uniformization of data         ##
@@ -462,8 +456,8 @@ Step1Measures <-
         output$m8[i] <- intersection.count[i] /( max(x) - min(x) )
       }
     }
-
-    #fraction of time spent under the mean (if this is large, then there are big sharp spikes)
+    
+    #fraction of time spent above the mean (if this is small, then there are big sharp spikes)
     if (9 %in% measures) {
       for (i in seq_len(nrow(data))) {
         norm <- data[i, ] - m3[i]
@@ -617,7 +611,7 @@ Step1Measures <-
         output$m18[i] <- later/early
       }
     }
-
+    
     output[is.na(output)] <- 1 #  NAs correspond to quotient measures of the form 0/0
     
     
@@ -626,8 +620,94 @@ Step1Measures <-
     ######################################
     
     if (cap.outliers == FALSE) {
+      
       outliers <- NULL
-    } 
+      
+      if ("m18" %in% colnames(output)) {
+        
+        w.inf <- which(is.infinite(output$m18))
+        
+        if (length(w.inf) > 0) {
+          
+          
+          outliers <- data.frame(matrix(nrow = nrow(output), ncol = ncol(output)))
+          colnames(outliers) <- colnames(output)
+          outliers[, 1] <- output$ID
+          
+          y <- output$m18
+          y.TRUE <- y
+          n <- length(y)
+          which.inf <- which(is.infinite(y.TRUE))
+          
+          
+          if (length(which.inf) > 0) {
+            y.TRUE <- y.TRUE[-which.inf]
+          }
+          
+          if (length(y.TRUE) > 2) {
+            top <-
+              rev(order(abs(y.TRUE - median(y.TRUE))))[1:ceiling(n * 0.01)] #  if n < 100, remove 1 element, so this is never empty
+            y.TRUE <- y.TRUE[-top]
+          }
+          
+          mu <- mean(y.TRUE)
+          sigma <- sd(y.TRUE)
+          
+          k_Cheb <-
+            sqrt(100 / 0.3) #  The classical Chebychev bound. Approximately 18.26.
+          k <- seq(from = 0.1, to = 18.26, by = 0.1)
+          M <- c()
+          for (i in seq(length(k))) {
+            max.left <-
+              max(density(
+                y.TRUE,
+                from = (mu - 18.3 * sigma),
+                to = (mu + 18.3 * sigma)
+              )$y[density(y.TRUE,
+                          from = (mu - 18.3 * sigma),
+                          to = (mu + 18.3 * sigma))$x > mu + k[i] * sigma])
+            max.right <-
+              max(density(
+                y.TRUE,
+                from = (mu - 18.3 * sigma),
+                to = (mu + 18.3 * sigma)
+              )$y[density(y.TRUE,
+                          from = (mu - 18.3 * sigma),
+                          to = (mu + 18.3 * sigma))$x < mu - k[i] * sigma])
+            M[i] <- max(max.left, max.right)
+          }
+          
+          p <- 2 * pi * k ^ 2 * (exp(1) - 2 * pi / 3)
+          q <-
+            2 * (2 * pi * k) ^ 3 / 27 - (2 * pi) ^ 2 * k ^ 3 * exp(1) / 3 - 2 * pi * exp(1) /
+            (sigma * M)
+          
+          root <-
+            CubeRoot(-q / 2 + sqrt(q ^ 2 / 4 + p ^ 3 / 27)) + CubeRoot(-q / 2 - sqrt(q ^
+                                                                                       2 / 4 + p ^ 3 / 27)) + 2 * pi * k / 3
+          w <- which(root * sigma * M < 0.3 / 100)
+          if (length(w) > 0) {
+            k.opt <- min(k_Cheb, k[w[1]])
+          } else{
+            k.opt <- k_Cheb
+          }
+          
+          cap <- w.inf
+          outliers$m18[cap] <- signif(y[cap], 3)
+          
+          y[cap] <- mu + sign(y[cap]) * k.opt * sigma
+          output$m18 <- y
+          
+          
+          row.rm <- which(rowSums(!is.na(outliers[, -c(1), drop = FALSE])) == 0)
+          outliers <- outliers[-row.rm, , drop = FALSE]
+          col.kp <- which(colSums(!is.na(outliers)) != 0)
+          outliers <- outliers[, col.kp, drop = FALSE]
+          
+          warning(paste("For subject(s) ", paste(w.inf, collapse = ", "), ", the value of measure 18 was ±Inf so it has been capped.", sep=""))
+        }
+      }
+    }
     
     if (cap.outliers == TRUE){
       outliers <-
@@ -708,23 +788,22 @@ Step1Measures <-
       col.kp <- which(colSums(!is.na(outliers)) != 0)
       outliers <- outliers[, col.kp, drop = FALSE]
     }
-
+    
     ID <- IDvector
     
-    trajMeasures <-
-      structure(
-        list(
-          measures = output,
-          outliers = outliers,
-          mid = mid.position,
-          data = cbind(ID, data),
-          time = cbind(ID, time)
-        ),
-        class = "trajMeasures"
-      )
+    trajMeasures <-structure(list(
+      measures = output,
+      outliers = outliers,
+      mid = mid.position,
+      data = cbind(ID, data),
+      time = cbind(ID, time),
+      cap.outliers = cap.outliers
+    ),
+    class = "trajMeasures"
+    )
     return(trajMeasures)
-    
   }
+
 
 #'@rdname Step1Measures
 #'
@@ -765,7 +844,7 @@ summary.trajMeasures <- function(object, ...) {
   cat("m15: Maximum of the second derivative\n")
   cat("m16: Mean of the second derivative\n")
   cat("m17: Standard deviation of the second derivative\n")
-  cat("m18: Early change/Later change\n")
+  cat("m18: Later change/Early change\n")
   
   cat("\n")
   

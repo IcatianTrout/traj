@@ -4,6 +4,7 @@
 #'  to the measures computed by \code{\link[traj]{Step1Measures}}:
 #' \enumerate{
 #'   \item Drop the measures whose values are constant across the trajectories;
+#'   \item Whenever two measures are highly correlated (absolute value of Pearson correlation > 0.98), keep the highest-ranking measure on the list (see \code{\link[traj]{Step1Measures}}) and drop the other;
 #'   \item Use principal component analysis (PCA) on the measures to form factors summarizing the variability in the measures;
 #'   \item Drop the factors whose variance is smaller than any one of the standardized measures;
 #'   \item Perform a varimax rotation on the remaining factors;
@@ -33,6 +34,9 @@
 #'  of the selected measures, the output of the principal component analysis as
 #'  well as a curated form of the arguments.
 #'
+#'@details Whenever two measures are highly correlated (Pearson correlation >
+#'0.98), the highest-ranking measure on the list (see \code{\link[traj]{Step1Measures}}) is kept and the other is discarded and discards the others. PCA is applied on the remaining measures using the \code{\link[psych]{principal}} function from the \code{psych} package.
+#'
 #'@importFrom psych principal
 #'@importFrom stats cor
 #'
@@ -52,7 +56,7 @@
 #'
 #'print(s)
 #'
-#'s2 = Step2Selection(m, select = c(3, 13, 11, 15))
+#'s2 = Step2Selection(m, select = c(13, 3, 12, 9))
 #'}
 #'
 #'
@@ -66,7 +70,7 @@ Step2Selection <-
             num.select = NULL,
             discard = NULL,
             select = NULL
-            ) {
+  ) {
     input <- list(num.select, discard, select)
     names(input) <- c("num.select", "discard", "select")
     
@@ -187,27 +191,27 @@ Step2Selection <-
         num.select <- max(1, length(which(eigen.values > 1)))
       }
       
-        PC <- psych::principal(Z, rotate = "none", nfactors = ncol(data))
-        RC <-
-          psych::principal(Z, rotate = "varimax", nfactors = num.select)
-        principal.factors <- RC
-        
-        principal.variables <- c()
-        
-        if (is.null(select)) {
-          for (j in 1:num.select) {
-            if (j == 1) {
-              aux <- principal.factors$loadings
-            }
-            if (j > 1) {
-              w <-
-                which(row.names(principal.factors$loadings) %in% principal.variables)
-              aux <- principal.factors$loadings[-w, ]
-            }
-            principal.variables[j] <- rownames(aux)[which.max(abs(aux[, j, drop = FALSE]))]
+      PC <- psych::principal(Z, rotate = "none", nfactors = ncol(data))
+      RC <-
+        psych::principal(Z, rotate = "varimax", nfactors = num.select)
+      principal.factors <- RC
+      
+      principal.variables <- c()
+      
+      if (is.null(select)) {
+        for (j in 1:num.select) {
+          if (j == 1) {
+            aux <- principal.factors$loadings
           }
-          output <- cbind(ID, data[, principal.variables, drop = FALSE])
+          if (j > 1) {
+            w <-
+              which(row.names(principal.factors$loadings) %in% principal.variables)
+            aux <- principal.factors$loadings[-w, ]
+          }
+          principal.variables[j] <- rownames(aux)[which.max(abs(aux[, j, drop = FALSE]))]
         }
+        output <- cbind(ID, data[, principal.variables, drop = FALSE])
+      }
       
       trajSelection <-
         structure(
@@ -220,7 +224,8 @@ Step2Selection <-
             measures = trajMeasures$measures,
             data = trajMeasures$data,
             time = trajMeasures$time,
-            input = input
+            input = input,
+            cap.outliers = trajMeasures$cap.outliers
           ),
           class = "trajSelection"
         )

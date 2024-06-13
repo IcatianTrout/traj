@@ -1,3 +1,8 @@
+# traj 2.2.0
+
+-   Added k-medoids as the default clustering algorithm.
+-   Added the Calinski-Harabasz index as the default criterion for determining the optimal number of clusters.
+
 # traj 2.1.0
 
 -   Makes substantial changes to the list of measures.
