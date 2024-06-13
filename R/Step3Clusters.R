@@ -74,7 +74,7 @@ Step3Clusters <-
             criterion = "Calinski-Harabasz",
             K.max = 15,
             boot = TRUE,
-            R = 3,
+            R = 100,
             B = 500
   ) {
     

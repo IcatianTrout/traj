@@ -11,7 +11,7 @@
 \code{Step3Cluster}.}
 
 \item{sample.size}{the number of random trajectories to be randomly sampled
-from each cluster. Defaults to 5.}
+from each cluster. Defaults to \code{5}.}
 
 \item{ask}{logical. If \code{TRUE}, the user is asked before each plot. Defaults to
 \code{TRUE}.}
@@ -30,7 +30,7 @@ the smoothed trajectories. Defaults to \code{FALSE}}
 Up to 5 kinds of plots are currently available: a plot of the
 cluster-specific median and mean trajectories, a random sample of
 trajectories from each cluster and scatter plots of the measures on which
-the clustering was based. If the GAP criterion was used in
+the clustering was based. When the GAP criterion was used in
 \code{Step3Clusters} to determine the optimal number of clusters, a plot of
 the GAP statistic as a function of the number of clusters is provided.
 }
@@ -43,11 +43,14 @@ m = Step1Measures(trajdata.noGrp, ID = TRUE)
 s = Step2Selection(m)
 c3 = Step3Clusters(s, nclusters = 3)
 
-plot(c3) # The pointwise mean trajectories correspond to the third and fourth displayed plots.
+plot(c3)
+
+#The pointwise mean trajectories correspond to the third and fourth displayed plots.
 
 c4 = Step3Clusters(s, nclusters = 4)
 
 plot(c4, which.plots = 3:4)
+
 }
 
 

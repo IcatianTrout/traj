@@ -13,7 +13,7 @@ Step1Measures(
   ID = FALSE,
   measures = c(1:17),
   midpoint = NULL,
-  cap.outliers = TRUE
+  cap.outliers = FALSE
 )
 
 \method{print}{trajMeasures}(x, ...)
@@ -35,7 +35,7 @@ equidistant.}
 trajectories. Defaults to \code{FALSE}.}
 
 \item{measures}{a vector containing the numerical identifiers of the measures
-to compute (see "Details" section below). The default, 1:17, corresponds to
+to compute. The default, 1:17, corresponds to
 measures 1-17 and thus excludes the measures which require specifying a
 midpoint.}
 
@@ -45,13 +45,13 @@ the number of rows in \code{Time}. The default is \code{NULL}, in which case the
 midpoint is the time closest to the median of the Time vector specific to
 each trajectory.}
 
-\item{cap.outliers}{logical. If \code{TRUE}, extreme values of the measures will be caped (see details below). Defaults to \code{TRUE}.}
+\item{cap.outliers}{logical. If \code{TRUE}, extreme values of the measures will be capped. If \code{FALSE}, only the infinite values will be capped. Defaults to \code{FALSE}.}
 
-\item{x}{object of class trajMeasures.}
+\item{x}{object of class \code{trajMeasures}.}
 
 \item{...}{further arguments passed to or from other methods.}
 
-\item{object}{object of class trajMeasures.}
+\item{object}{object of class \code{trajMeasures}.}
 }
 \value{
 An object of class \code{trajMeasures}; a list containing the values
@@ -77,7 +77,7 @@ refer to the vignette for the specific formulas used to compute them.
 \item  \eqn{R^2}: Proportion of variance explained by the linear model\cr
 \item  Curve length (total variation)\cr
 \item  Rate of intersection with the mean\cr
-\item  Proportion of time spent under the mean\cr
+\item  Proportion of time spent above the mean\cr
 \item  Minimum  of the first derivative\cr
 \item  Maximum of the first derivative\cr
 \item  Mean of the first derivative\cr
@@ -86,25 +86,19 @@ refer to the vignette for the specific formulas used to compute them.
 \item  Maximum of the second derivative\cr
 \item  Mean of the second derivative\cr
 \item  Standard deviation of the second derivative\cr
-\item  Early change/Later change\cr
+\item  Later change/Early change\cr
 }
 
-In the presence of highly correlated measures (Pearson correlation >
-0.98), the function selects the highest-ranking measure on the list (see
-\code{\link[traj]{Step1Measures}}) and discards the others. Because the
-K-means algorithm is sensitive to outliers, the measures are prevented from taking extreme or
-infinite values (caused by a possible division by 0 in m18). Nishiyama's improved Chebychev
-bound is used to determine extreme values for each measure, corresponding to
+If 'cap.outliers' is set to \code{TRUE}, or if some measures are infinite as a result of division by 0, Nishiyama's improved Chebychev bound for continuous distributions
+is used to determine extreme values for each measure, corresponding to
 a 0.3\% probability threshold. Extreme values beyond the threshold are then capped
-to the 0.3\% probability threshold. If applicable, the values of m18 which
-would be of the form 0/0 are set to 1. PCA is applied on the remaining
-measures using the \code{\link[psych]{principal}} function from the
-\code{psych} package.
+to the 0.3\% probability threshold (see vignette for more details). If applicable, the values which
+would be of the form 0/0 are set to 1.
 }
 \examples{
 \dontrun{
 data("trajdata")
-trajdata.noGrp <- trajdata[, which(colnames(trajdata) == "Group")] #remove the Group column
+trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] #remove the Group column
 
 m1 = Step1Measures(trajdata.noGrp, ID = TRUE, measures = 18, midpoint = NULL)
 m2 = Step1Measures(trajdata.noGrp, ID = TRUE, measures = 18, midpoint = 3)

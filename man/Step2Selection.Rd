@@ -47,12 +47,17 @@ This function applies the following dimension reduction algorithm
 to the measures computed by \code{\link[traj]{Step1Measures}}:
 \enumerate{
 \item Drop the measures whose values are constant across the trajectories;
+\item Whenever two measures are highly correlated (absolute value of Pearson correlation > 0.98), keep the highest-ranking measure on the list (see \code{\link[traj]{Step1Measures}}) and drop the other;
 \item Use principal component analysis (PCA) on the measures to form factors summarizing the variability in the measures;
 \item Drop the factors whose variance is smaller than any one of the standardized measures;
 \item Perform a varimax rotation on the remaining factors;
 \item For each rotated factor, select the measure that has the highest correlation (aka factor loading) with it and that hasn't yet been selected;
 \item Drop the remaining measures.
 }
+}
+\details{
+Whenever two measures are highly correlated (Pearson correlation >
+0.98), the highest-ranking measure on the list (see \code{\link[traj]{Step1Measures}}) is kept and the other is discarded and discards the others. PCA is applied on the remaining measures using the \code{\link[psych]{principal}} function from the \code{psych} package.
 }
 \examples{
 \dontrun{
@@ -64,7 +69,7 @@ s = Step2Selection(m)
 
 print(s)
 
-s2 = Step2Selection(m, select = c(3, 13, 11, 15))
+s2 = Step2Selection(m, select = c(13, 3, 12, 9))
 }
 
 
