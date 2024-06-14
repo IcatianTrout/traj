@@ -215,11 +215,12 @@ Step1Measures <-
       }
       
       data2 <- data
+      rmv <- c()
       for (i in seq_len(nrow(data))) {
         NA.str_i <- is.na(data)[i,]
         w <- unname(which(NA.str_i == FALSE))
         if (length(w) < 3) {
-          data2 <- data2[-i,]
+          rmv <- c(rmv, i)
           warning(
             paste(
               "Row ",
@@ -228,9 +229,12 @@ Step1Measures <-
               sep = ""
             )
           )
-          if (ID == TRUE) {
-            IDvector <- IDvector[-i]
-          }
+        }
+      }
+      if (length(rmv) > 0) {
+        data2 <- data2[-rmv, ]
+        if (ID == TRUE) {
+          IDvector <- IDvector[-rmv]
         }
       }
       data <- data2
