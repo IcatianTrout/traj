@@ -9,12 +9,12 @@ CalinskiHarabasz <- function (x, clustering, cn = max(clustering))
   for (i in 1:cn) cln[i] <- sum(clustering == i)
   for (i in 1:cn) {
     clx <- x[clustering == i, ]
-    cclx <- cov(as.matrix(clx))
+    cclx <- var(as.matrix(clx))
     if (cln[i] < 2) 
       cclx <- 0
     W <- W + ((cln[i] - 1) * cclx)
   }
-  S <- (n - 1) * cov(x)
+  S <- (n - 1) * var(x)
   B <- S - W
   out <- (n - cn) * sum(diag(B))/((cn - 1) * sum(diag(W)))
   out

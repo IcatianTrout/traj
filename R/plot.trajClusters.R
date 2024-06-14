@@ -22,9 +22,10 @@
 #'@param ... other parameters to be passed through to plotting functions.
 #'
 #'@importFrom grDevices palette.colors
-#'@importFrom graphics legend lines par polygon
+#'@importFrom graphics legend lines par polygon barplot
 #'@importFrom grDevices devAskNewPage graphics.off
 #'@importFrom stats smooth.spline predict
+#'
 #'
 #'@seealso \code{\link[traj]{Step3Clusters}}
 #'
