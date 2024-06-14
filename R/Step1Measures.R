@@ -708,7 +708,7 @@ Step1Measures <-
           col.kp <- which(colSums(!is.na(outliers)) != 0)
           outliers <- outliers[, col.kp, drop = FALSE]
           
-          warning(paste("For subject(s) ", paste(w.inf, collapse = ", "), ", the value of measure 18 was ±Inf so it has been capped.", sep=""))
+          warning(paste("For subject(s) ", paste(w.inf, collapse = ", "), ", the value of measure 18 was Inf so it has been capped.", sep=""))
         }
       }
     }

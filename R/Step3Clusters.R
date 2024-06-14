@@ -32,7 +32,8 @@
 #'Instead, if \code{"Calinski-Harabasz"} is the chosen \code{criterion}, the Calinski-Harabasz index is computed for each possible number of clusters between 2 and \code{K.max} and the optimal number of clusters is the maximizer of the Calinski-Harabasz index. Moreover, if \code{boot} is set to \code{TRUE}, then, following the guidelines suggested by Mesidor et al., a sampling distribution of the optimal number of clusters is obtained by bootstrap and the optimal number of clusters is chosen to be the (first) mode of this sampling distribution. 
 #'
 #'@import cluster
-#'@importFrom stats kmeans na.omit qt quantile
+#'@importFrom stats kmeans na.omit qt quantile var
+#'@importFrom graphics barplot
 #'
 #'@references Miceline Mésidor, Caroline Sirois, Marc Simard, Denis Talbot, A Bootstrap Approach for Evaluating Uncertainty in the Number of Groups Identified by Latent Class Growth Models, American Journal of Epidemiology, Volume 192, Issue 11, November 2023, Pages 1896–1903, https://doi.org/10.1093/aje/kwad148
 #'
