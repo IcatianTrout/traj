@@ -161,16 +161,16 @@ Step3Clusters <-
             s1$measures$ID <- id
             s2.boot <- Step2Selection(trajMeasures = s1, num.select = s1$input$num.select, discard = s1$input$discard, select = s1$input$select)
             d = data.frame(apply(data.frame(s2.boot$selection[,-c(1), drop = FALSE]), 2, scale))
-            CH <- c()
+            CH.aux <- c()
             for(k in 2:K.max){
               if(algorithm == "k-medoids"){
-                CH[k] <- CalinskiHarabasz(x = d, clustering = cluster::pam(x = d, k = k, cluster.only = TRUE))
+                CH.aux[k] <- CalinskiHarabasz(x = d, clustering = cluster::pam(x = d, k = k, cluster.only = TRUE))
               }
               if(algorithm == "k-means"){
-                CH[k] <- CalinskiHarabasz(x = d, clustering = stats::kmeans(x = d, centers = k, iter.max = iter.max, nstart = nstart)$cluster)
+                CH.aux[k] <- CalinskiHarabasz(x = d, clustering = stats::kmeans(x = d, centers = k, iter.max = iter.max, nstart = nstart)$cluster)
               }
             }
-            CH.boot[i] <- which(CH == max(CH, na.rm = T))
+            CH.boot[i] <- which(CH.aux == max(CH.aux, na.rm = T))
           }
           
           nclusters <- FirstMode(CH.boot)
