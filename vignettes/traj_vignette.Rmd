@@ -19,10 +19,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-The `traj` package implements a clustering algorithm for functional data (henceforth referred to as trajectories) that extends previous work from Leffondré et al [1]. This algorithm is comprised of three steps. The first step sumarizes the main features of the trajectories by computing the 18 measures listed below and detailed in Appendix A.
+The `traj` package implements a clustering algorithm for functional data (henceforth referred to as trajectories) that extends previous work from Leffondré et al [1]. This algorithm is comprised of three steps. The first step summarizes the main features of the trajectories by computing the 18 measures listed below and detailed in Appendix A.
 
 1.  Maximum
-2.  Range (max - min)
+2.  Range
 3.  Mean value
 4.  Standard deviation
 5.  Slope of the linear model
@@ -40,14 +40,14 @@ The `traj` package implements a clustering algorithm for functional data (hencef
 17. Standard deviation of the second derivative
 18. Later change/Early change
 
-The second step performs dimensionality reduction on the 18 measures to extract the main features of the trajectories. Specifically,
+The second step performs a dimensionality reduction on the 18 measures to extract the main features of the trajectories. Specifically,
 
 1.  Measures that are constant across trajectories are discarded because they do not provide any discriminating information.
-2.  A principal component analysis is conducted on the measures. The main principal components (defined as those principal components contributing more to the total variance than any of the individual standardized measures) are selected.
+2.  A principal component analysis (PCA) is conducted on the measures. The main principal components (defined as those principal components contributing more to the total variance than any of the individual standardized measures) are selected.
 3.  A varimax rotation is applied to the main principal components.
 4.  The measure which is most strongly correlated with each rotated component is selected, starting from the component that explains the most variance.
 
-In the third step, the k-means algorithm is used to cluster the trajectories based on the measures selected in step 2.
+In the third step, a clustering algorithm is used to form clusters of trajectories based on the measures selected in step 2.
 
 ## An example
 
@@ -96,7 +96,8 @@ Each trajectory is made up of six observations and there are no missing values. 
 step1 <- Step1Measures(Data = dat, 
                        ID = FALSE, 
                        measures = 1:18, 
-                       midpoint = NULL) 
+                       midpoint = NULL,
+                       cap.outliers = TRUE) 
 
 summary(step1)
 ```
@@ -114,15 +115,15 @@ Two measures are defined as "perfectly or almost perfectly correlated" if the ab
 print(step2)
 ```
 
-Measure 4 (Standard deviation) was dropped because it is perfectly or almost perfectly correlated with measure 2 (Range) and measure 12 (Mean of the first derivative) was dropped because it is perfectly or almost perfectly correlated with measure 5 (Slope of the linear model). The `Step3Clusters` function uses the k-means algorithm (function `stats:::kmeans`) on the measures selected in step 2 to cluster the trajectories.
+Measure 4 (Standard deviation) was dropped because it is perfectly or almost perfectly correlated with measure 2 (Range) and measure 12 (Mean of the first derivative) was dropped because it is perfectly or almost perfectly correlated with measure 5 (Slope of the linear model). The `Step3Clusters` function uses either the k-means algorithm (function `stats:::kmeans`) or the k-medoids algorithm (function `cluster:::pam`) on the measures selected in step 2 to cluster the trajectories. The GAP criterion and the Calinski-Harabasz criterion are available for determining the optimal number of clusters.
 
 ```{r ex1.step3a}
 library(cluster)
-set.seed(141114)
-step3 <- Step3Clusters(trajSelection = step2, B = 20, nclusters = NULL) # B = 20 is used in the interest of time; the default is B = 500.
+set.seed(1337)
+step3 <- Step3Clusters(trajSelection = step2, algorithm = "k-means", nclusters = NULL, criterion = "GAP", B = 100) 
 ```
 
-By setting `nclusters` to `NULL`, `Step3Clusters` uses the criterion proposed by Tibshirani et al. [2] to select the optimal number of clusters. In our case, this gives $k=4$ as can be inspected visually with
+By setting `nclusters` to `NULL` and `criterion` to `"GAP"`, `Step3Clusters` uses the criterion proposed by Tibshirani et al. [2] to select the optimal number $k$ of clusters. In our case, this gives $k=4$ cluster as can be inspected visually with
 
 ```{r ex1.step3b}
 par(mfrow = c(1, 1))

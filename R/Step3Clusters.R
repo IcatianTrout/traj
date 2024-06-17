@@ -77,7 +77,6 @@ Step3Clusters <-
             R = 100,
             B = 500
   ) {
-    
     if (is.null(nclusters) & !(criterion %in% c("Calinski-Harabasz", "GAP"))) { 
       stop("'criterion' should be one of 'Calinski-Harabasz' or 'GAP'.")
     }
