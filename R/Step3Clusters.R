@@ -85,6 +85,7 @@ Step3Clusters <-
       stop("'algorithm' should be either 'k-medoids' or 'k-means'.")
     }
     
+    K.max <- min(K.max, nrow(trajSelection$selection))
     GAP <- NULL
     CH <- NULL
     CH.boot <- NULL
