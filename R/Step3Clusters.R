@@ -85,7 +85,9 @@ Step3Clusters <-
       stop("'algorithm' should be either 'k-medoids' or 'k-means'.")
     }
     
-    K.max <- min(K.max, nrow(trajSelection$selection))
+    if (K.max > nrow(trajSelection$selection)) {
+      stop("The maximum number of clusters to investigate (K.max) cannot be greater than the total number of trajectories.")
+    }
     GAP <- NULL
     CH <- NULL
     CH.boot <- NULL
