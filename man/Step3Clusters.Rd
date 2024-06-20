@@ -15,7 +15,7 @@ Step3Clusters(
   nclusters = NULL,
   criterion = "Calinski-Harabasz",
   K.max = 15,
-  boot = TRUE,
+  boot = FALSE,
   R = 100,
   B = 500
 )
@@ -46,7 +46,7 @@ number of clusters is determined using the criterion chosen in \code{criterion}.
 
 \item{K.max}{maximum number of clusters to be considered if \code{nclusters} is set to \code{NULL}. Defaults to \code{15}.}
 
-\item{boot}{logical. If \code{TRUE}, and if \code{"Calinski-Harabasz"} is the chosen \code{criterion}, the optimal number of clusters will be the first mode of sampling distribution of the optimal number of clusters obtained by bootstrap. Defaults to \code{TRUE}.}
+\item{boot}{logical. If \code{TRUE}, and if \code{"Calinski-Harabasz"} is the chosen \code{criterion}, the optimal number of clusters will be the first mode of sampling distribution of the optimal number of clusters obtained by bootstrap. Defaults to \code{FALSE}.}
 
 \item{R}{the number of bootstrap replicate if \code{boot} is set to \code{TRUE}. Defaults to \code{100}.}
 
