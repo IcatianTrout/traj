@@ -72,7 +72,7 @@ Step3Clusters <-
             iter.max = 100,
             nclusters = NULL,
             criterion = "Calinski-Harabasz",
-            K.max = 15,
+            K.max = min(15, nrow(trajSelection$selection) - 1),
             boot = FALSE,
             R = 100,
             B = 500
@@ -86,7 +86,7 @@ Step3Clusters <-
     }
     
     if (K.max > nrow(trajSelection$selection)) {
-      stop("The maximum number of clusters to investigate (K.max) cannot be greater than the total number of trajectories.")
+      stop("The maximum number of clusters to investigate (K.max) must be smaller than the number of trajectories.")
     }
     GAP <- NULL
     CH <- NULL
