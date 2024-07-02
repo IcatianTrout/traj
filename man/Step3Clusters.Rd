@@ -14,7 +14,7 @@ Step3Clusters(
   iter.max = 100,
   nclusters = NULL,
   criterion = "Calinski-Harabasz",
-  K.max = 15,
+  K.max = min(15, nrow(trajSelection$selection) - 1),
   boot = FALSE,
   R = 100,
   B = 500
