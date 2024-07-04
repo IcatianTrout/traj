@@ -1,0 +1,312 @@
+
+---
+title: "Using the traj package"
+author: "Laurence Boulanger"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+  word_document: default
+vignette: >
+  %\VignetteIndexEntry{Using the traj package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Introduction
+
+The `traj` package implements a clustering algorithm for functional data (henceforth referred to as trajectories) that extends previous work from Leffondré et al [1]. This algorithm is comprised of three steps. The first step summarizes the main features of the trajectories by computing the 18 measures listed below and detailed in Appendix A.
+
+1.  Maximum
+2.  Range
+3.  Mean value
+4.  Standard deviation
+5.  Slope of the linear model
+6.  $R^2$: Proportion of variance explained by the linear model
+7.  Curve length (total variation)
+8.  Rate of intersection with the mean
+9.  Proportion of time spent above the mean
+10. Minimum of the first derivative
+11. Maximum of the first derivative
+12. Mean of the first derivative
+13. Standard deviation of the first derivative
+14. Minimum of the second derivative
+15. Maximum of the second derivative
+16. Mean of the second derivative
+17. Standard deviation of the second derivative
+18. Later change/Early change
+
+The second step performs a dimensionality reduction on the 18 measures to extract the main features of the trajectories. Specifically,
+
+1.  Measures that are constant across trajectories are discarded because they do not provide any discriminating information.
+2.  A principal component analysis (PCA) is conducted on the measures. The main principal components (defined as those principal components contributing more to the total variance than any of the individual standardized measures) are selected.
+3.  A varimax rotation is applied to the main principal components.
+4.  The measure which is most strongly correlated with each rotated component is selected, starting from the component that explains the most variance.
+
+In the third step, a clustering algorithm is used to form clusters of trajectories based on the measures selected in step 2.
+
+## An example
+
+Let us illustrate how to use the `traj` package on an artificially created dataset (`trajdata`) comprised of 130 trajectories following four distinct patterns (A, B, C, D).
+
+```{r plottrajdata, echo = FALSE}
+library(traj)
+data(trajdata) 
+dat <- trajdata[, -c(1:2)]
+wA <- which(trajdata$Group == "A")
+wB <- which(trajdata$Group == "B")
+wC <- which(trajdata$Group == "C")
+wD <- which(trajdata$Group == "D")
+
+plot(x = 0, y = 0, xlim = c(1, 6), ylim = c(min(dat), max(dat) + 30), type = "n", ylab = "", xlab = "")
+
+for(k in wA){
+  lines(x = 1:6, y = dat[k, ], type = "l", col = "black ")
+}
+
+for(k in wB){
+  lines(x = 1:6, y = dat[k, ], type = "l", col = "blue")
+}
+
+for(k in wC){
+  lines(x = 1:6, y = dat[k, ], type = "l", col = "red")
+}
+
+for(k in wD){
+  lines(x = 1:6, y = dat[k, ], type = "l", col = "green")
+}
+
+legend("topright",legend = c(paste("A (n = ", 50, ")", sep = ""), paste("B (n = ", 40, ")", sep = ""), paste("C (n = ", 30, ")", sep = ""), paste("D (n = ", 10, ")", sep = "")), col = c("black", "blue", "red", "green"), lty = 1)
+```
+
+```{r loadtraj}
+library(traj)
+data(trajdata) 
+head(trajdata)
+dat <- trajdata[, -c(1,2)]
+```
+
+Each trajectory is made up of six observations and there are no missing values. The function `Step1Measures` computes the measures. By default, measure 18 (Early change/Later change) is not included in the analysis. This is because, depending on the situation (uneven observation times, attrition, missing values, etc.), there might not be, for each trajectory, a natural midpoint. In the present data set, we include measure 18. By leaving the 'midpoint' argument at its default of `NULL`, the third observation will be taken as the midpoint.
+
+```{r ex1.step1}
+step1 <- Step1Measures(Data = dat, measures = 1:18) 
+
+summary(step1)
+```
+
+Once the measures are computed, we use the `Step2Selection` function to extract the measures that best characterize the trajectories.
+
+```{r ex1.step2a}
+step2 <- Step2Selection(trajMeasures = step1) 
+summary(step2)
+```
+
+Two measures are defined as "perfectly or almost perfectly correlated" if the absolute value of their Pearson correlation coefficient is greater than 0.98. The print function provides more detailed information:
+
+```{r ex1.step2b}
+print(step2)
+```
+
+Measure 4 (Standard deviation) was dropped because it is perfectly or almost perfectly correlated with measure 2 (Range) and measure 12 (Mean of the first derivative) was dropped because it is perfectly or almost perfectly correlated with measure 5 (Slope of the linear model). The `Step3Clusters` function uses the k-medoids algorithm (function `cluster:::pam`) on the measures selected in step 2 to cluster the trajectories.
+
+```{r ex1.step3a}
+library(cluster)
+set.seed(1337)
+step3 <- Step3Clusters(trajSelection = step2) 
+```
+
+If the `nclusters` argument is set to `NULL` (the default), the optimal number $k$ of clusters will be determined using the Calinski-Harabasz criterion. In our case, this gives $k=4$ cluster as can be inspected visually with
+
+```{r ex1.step3b}
+par(mfrow = c(1, 1))
+plot(step3, which.plots = 1, ask = FALSE)
+```
+
+To visually inspect the classification, we write `plot(step3, ask = TRUE)`. We can also ask for specific plots with `which.plots`.
+
+```{r ex1.step3e, echo = FALSE}
+par(mfrow = c(1, 1))
+plot(step3, which.plots = 2, ask = FALSE)
+```
+
+```{r ex1.step3f, echo = FALSE}
+par(mfrow = c(1, 1))
+plot(step3, which.plots = 3, ask = FALSE)
+```
+
+```{r ex1.step3g, echo = FALSE}
+par(mfrow = c(1, 1))
+plot(step3, which.plots = 4, ask = FALSE)
+```
+
+```{r ex1.step3h, echo = FALSE}
+par(mfrow = c(1, 1))
+plot(step3, which.plots = 5, ask = FALSE)
+```
+
+```{r ex1.step3i, echo = FALSE}
+par(mfrow = c(1, 1))
+plot(step3, which.plots = 6, ask = FALSE)
+```
+
+The "Sample trajectories" plot tends to get cluttered when there are too many clusters. In any case, it is always a good idea to plot the *whole* clusters:
+
+```{r ex1.step3n}
+color.pal <- palette.colors(palette = "Okabe-Ito", alpha = 1)
+par(mfrow = c(1, 1))
+for(k in 1:4){
+  w <- which(step3$partition$Cluster == k)
+  dat.w <- dat[w, ]
+  plot(y = 0, x = 0, ylim = c(floor(min(dat)), ceiling(max(dat))), xlim = c(1,6), xlab="", ylab="", type="n", main = paste("Cluster ", k, " (n = ", step3$partition.summary[k], ")", sep = ""))
+  for(i in 1:length(w)){
+    lines(y = dat.w[i, ], x = 1:6, col = color.pal[k])
+  }
+}
+```
+
+------------------------------------------------------------------------
+
+## Appendix A: The measures
+
+In this section, we expand on how the eighteen measures are computed. Let $y=y(t)$ denote a continuous function $[a,b]\rightarrow \mathbb{R}$ and let $y(t_i)$ denote the trajectory obtained by measuring $y(t)$ at times $a\leq t_1<\ldots< t_N\leq b$, where $N\geq 3$. We do not assume that the times $t_i$ are equidistant from one another.
+
+-   **m1: Maximum.** This is $$\max_iy(t_i)$$
+
+-   **m2: Range.** This is $$\max_iy(t_i) - \min_iy(t_i)$$
+
+-   **m3: Mean value.** This measure is defined by the formula
+
+    $$
+    \mathrm{m3}=\frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{y(t_i)+y(t_{i+1})}{2}(t_{i+1}-t_i).
+    $$
+
+-   **m4: Standard deviation.** This measure is given by the formula
+
+    $$
+    \mathrm{m4} = \sqrt{\frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\left(y(t_i)-\mathrm{m3}\right)^2 + \left(y(t_{i+1})-\mathrm{m3}\right)^2}{2}(t_{i+1}-t_i)}.
+    $$
+
+-   **m5: Slope of the linear model.** Here the $y(t_i)$ are regressed against the $t_i$ in the linear model $y(t_i) = \beta_0 + \beta_1t_i+\epsilon_i$ using the method of least squares and m5 is defined as $\hat{\beta}_1$.
+
+-   **m6: Proportion of variance explained by the linear model (R squared)**. This is the coefficient of determination of the linear model used to define m5.
+
+-   **m7: Curve length (total variation).** This measure is given by the formula
+
+    $$
+    \mathrm{m7} = \sum_{i=1}^{N-1}\sqrt{(t_{i+1} - t_i)^2 + (y(t_{i+1}) - y(t_i))^2}.
+    $$
+
+-   **m8: Rate of intersection with the mean.** For each $i=1,\ldots,N-1$, let $y_0(t_i) = y(t_i) -\mathrm{m3}$ and set
+
+    $$
+    \chi_i=\left\{
+    \begin{array}{cc}
+    1 & \text{if $y_0(t_{i})\neq 0$ and $\mathrm{sgn}(y_0(t_{i})\times y_0(t_{j}))=-1$ for $j$ the smallest index with $j>i$ and $y_0(t_j)\neq 0$} \\
+    0 & \text{otherwise}
+    \end{array}
+    \right. ,
+    $$
+
+    $$
+    \mathrm{m8} = \frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\chi_i.
+    $$
+
+-   **m9: Proportion of time spent above the mean.** Again, let $y_0(t_i) =y(t_i)-\mathrm{m3}$ and set
+
+    $$
+    T^+=\frac{t_2 - t_1}{2}\mathbb{I}(y_0(t_1)>0) + \sum_{i=2}^{N-1}\frac{t_{i+1} - t_{i-1}}{2}\mathbb{I}(y_0(t_i)>0) + \frac{t_N - t_{N-1}}{2}\mathbb{I}(y_0(t_N)>0),
+    $$
+
+    $$
+    T^-=\frac{t_2 - t_1}{2}\mathbb{I}(y_0(t_1)<0) + \sum_{i=2}^{N-1}\frac{t_{i+1} -t_{i-1}}{2}\mathbb{I}(y_0(t_i)<0) + \frac{t_N - t_{N-1}}{2}\mathbb{I}(y_0(t_N)<0),
+    $$
+
+    $$
+    \mathrm{m9} = \frac{T^+}{T^- + T^+}.
+    $$
+
+    In the event that both the numerator and denominator of m9 are 0, m9 is set to 1.
+
+-   **m10: Minimum of the first derivative.** Measures 10-13 concern $y'(t)$, the first derivative of $y(t)$. The trajectory, $y'(t_i)$ is approximated from the data as follows:$$\widehat{y'}(t_i)=
+    \left\{
+    \begin{array}{cc}
+    \Delta_i^+ & \text{if $i=1$} \\
+    w_i^-\Delta^-_i + w_i^+\Delta^+_i & \text{if $1<i<N$} \\
+    \Delta_i^- & \text{if $i=N$}
+    \end{array}
+    \right.$$
+
+    where $$\Delta^-_i = \frac{y(t_i)-y(t_{i-1})}{t_i-t_{i-1}},\quad \Delta_i^+=\frac{y(t_{i+1})-y(t_i)}{t_{i+1}-t_i}$$
+
+    and where $$
+    w^-_i = \frac{t_{i+1}-t_i}{t_{i+1} - t_{i-1}},\quad w^+_i = \frac{t_i-t_{i-1}}{t_{i+1}-t_{i-1}}.
+    $$
+
+    By definition then,$$\mathrm{m10}=\min_{1\leq i\leq N}\widehat{y'}(t_i).$$
+
+-   **m11: Maximum of the first derivative.** This is $$\mathrm{m11} = \max_{1\leq i\leq N}\widehat{y'}(t_i),$$where $\widehat{y'}(t_i)$ is the trajectory define in the discussion of m10.
+
+-   **m12: Mean of the first derivative.** This is $$\mathrm{m12} = \frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\widehat{y'}(t_i)+\widehat{y'}(t_{i+1})}{2}(t_{i+1}-t_i),$$where $\widehat{y'}(t_i)$ is the trajectory define in the discussion of m10.
+
+-   **m13: Standard deviation of the first derivative.** This is defined by the formula
+
+    $$\mathrm{m13} = \sqrt{\frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\left(\widehat{y'}(t_i)-\mathrm{m12}\right)^2 + \left(\widehat{y'}(t_{i+1})-\mathrm{m12}\right)^2}{2}(t_{i+1}-t_i)}.
+    $$
+
+-   **m14: Minimum of the second derivative.** Measures 14-17 concern $y''(t)$, the second derivative of $y(t)$. For this, a trajectory $\widehat{y''}(t_i)$ is constructed from the trajectory $\widehat{y'}(t_i)$ in the same way as $\widehat{y'}(t_i)$ is constructed from $y(t_i)$ (cf. m10):$$
+    \widehat{y''}(t_i) = 
+    \left\{
+    \begin{array}{cc}
+    \Delta'^-_{\,i} & \text{if $i=1$} \\
+    w_i^-\Delta'^-_{\,i} + w_i^+\Delta'^+_{\,i} & \text{if $1<i<N$} \\
+    \Delta'^+_{\,i} & \text{if $i=N$}
+    \end{array}
+    \right.
+    $$
+
+    where $w_i^{\pm}$ are defined as in the description of m10 and where $$
+    \Delta'^-_{\,i} =\frac{\widehat{y'}(t_i) - \widehat{y'}(t_{i-1})}{t_i-t_{i-1}},\quad \Delta'^+_{\,i} =\frac{\widehat{y'}(t_{i+1}) - \widehat{y'}(t_{i})}{t_{i+1}-t_{i}}.
+    $$
+
+    By definition then,$$\mathrm{m14}=\min_{1\leq i\leq N}\widehat{y''}(t_i).$$
+
+-   **m15: Maximum of the second derivative.** This is $$\mathrm{m15} = \max_{1\leq i\leq N}\widehat{y''}(t_i),$$where $\widehat{y''}(t_i)$ is the trajectory defined in the discussion of m14.
+
+-   **m16: Mean of the second derivative.** This is $$\mathrm{m16} = \frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\widehat{y''}(t_i)+\widehat{y''}(t_{i+1})}{2}(t_{i+1}-t_i),$$where $\widehat{y''}(t_i)$ is the trajectory define in the discussion of m14.
+
+-   **m17: Standard deviation of the second derivative.** This is defined by
+
+    $$\mathrm{m17} = \sqrt{\frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\left(\widehat{y''}(t_i)-\mathrm{m16}\right)^2 + \left(\widehat{y''}(t_{i+1})-\mathrm{m16}\right)^2}{2}(t_{i+1}-t_i)}.
+    $$
+
+-   **m18: Later change/Early change.** Given an observation time $t_m$ with $1<m<N$ which is to act as the "midpoint" of the trajectory, this is$$\mathrm{m18} = \frac{y(t_N)-y(t_m)}{y(t_m)-y(t_1)}.$$
+
+    In the event that both the numerator and denominator of m18 are 0, m18 is set to 1.
+
+## Appendix B: The capping procedure
+
+If the `cap.outliers` argument of the `Step1Measures` function is set to `TRUE` or if measure contains values that are infinite (cause by a division by 0), the outliers will be capped as follows. In a recent paper published on the arXiv [3], the author proves that for any *continuous* random variable $X$ with finite first two moments there holds $$
+P[|X-\mu|>k\sigma]<\sigma M(k)\alpha(k),
+$$where $M(k)$ is the least upper bound of the probability density function on $\{x \ | \ |x-\mu|>k\sigma\}$ and where $\alpha(k)$ is the unique real root of the cubic polynomial$$t^3 + 2\pi kt^2 + 2\pi e k^2t - \frac{2\pi e}{\sigma M(k)}.$$Suppose that our data set contains $n$ trajectories. This gives us a sample $X_1,\ldots,X_n$ from the distribution of $X$. Our capping procedure consists of the following steps.
+
+1.  After relabeling the observed values of $X$ so that $|X_1|\leq |X_2|\leq\ldots \leq |X_n|$, remove the last $r=\min(1,n/100)$ observations.
+
+2.  From the remaining values $X_1,\ldots, X_{n-r}$, we compute estimates $\hat{\mu}$ and $\hat{\sigma}$ of the mean and standard deviation as usual.
+
+3.  Still using only $X_1,\ldots, X_{n-r}$, approximate the probability density function of $X$ using a kernel density estimator (function `stats:::density`), find the value of $M(k)$ for this PDF and compute $\alpha(k)$.
+
+4.  Using these, identify the smallest value of $k$ for which $\hat{\sigma}M(k)\alpha(k)<0.003$. If $k^*$ denotes this smallest value of $k$, replace the value of any $X_i$ with $X_i<\hat{\mu}-k^*\hat{\sigma}$ by $\hat{\mu}-k^*\hat{\sigma}$ and we replace the value of any $X_i$ with $X_i>\hat{\mu}+k^*\hat{\sigma}$ by $\hat{\mu}+k^*\hat{\sigma}$ .
+
+## Bibliography
+
+[1] Leffondré K, Abrahamowicz M, Regeasse A, Hawker GA, Badley EM, McCusker J, Belzile E. Statistical measures were proposed for identifying longitudinal patterns of change in quantitative health indicators. J Clin Epidemiol. 2004 Oct; 57(10):1049-62. doi: 10.1016/j.jclinepi.2004.02.012. PMID: 15528056.
+
+[2] Tibshirani R, Walther G, Hastie T. Estimating the Number of Clusters in a Data Set Via the Gap Statistic, Journal of the Royal Statistical Society Series B: Statistical Methodology, Volume 63, Issue 2, July 2001, Pages 411–423
+
+[3] Nishiyama T. Improved Chebyshev inequality: new probability bounds with known supremum of PDF [arXiv:1808.10770v2](https://arxiv.org/abs/1808.10770v2)
