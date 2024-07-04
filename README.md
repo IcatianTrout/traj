@@ -7,7 +7,7 @@
 <!-- badges: end -->
 
 The goal of traj is to implement a three-step procedure in the spirit of
-Leffondree et al. (2004) to identify clusters of individual longitudinal
+Leffondre et al. (2004) to identify clusters of individual longitudinal
 trajectories. The procedure involves (1) computing a number of “measures
 of change”” capturing various features of the trajectories; (2) using a
 Principal Component Analysis based dimension reduction algorithm to
