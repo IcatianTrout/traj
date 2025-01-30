@@ -1,4 +1,3 @@
-
 ---
 title: "Using the traj package"
 author: "Laurence Boulanger"
@@ -17,7 +16,6 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
 
 ## Introduction
 
@@ -158,7 +156,7 @@ plot(step3, which.plots = 6, ask = FALSE)
 The "Sample trajectories" plot tends to get cluttered when there are too many clusters. In any case, it is always a good idea to plot the *whole* clusters:
 
 ```{r ex1.step3n}
-color.pal <- palette.colors(palette = "Okabe-Ito", alpha = 1)
+color.pal <- palette.colors(palette = "Polychrome 36", alpha = 1) 
 par(mfrow = c(1, 1))
 for(k in 1:4){
   w <- which(step3$partition$Cluster == k)
@@ -301,7 +299,7 @@ $$where $M(k)$ is the least upper bound of the probability density function on $
 
 3.  Still using only $X_1,\ldots, X_{n-r}$, approximate the probability density function of $X$ using a kernel density estimator (function `stats:::density`), find the value of $M(k)$ for this PDF and compute $\alpha(k)$.
 
-4.  Using these, identify the smallest value of $k$ for which $\hat{\sigma}M(k)\alpha(k)<0.003$. If $k^*$ denotes this smallest value of $k$, replace the value of any $X_i$ with $X_i<\hat{\mu}-k^*\hat{\sigma}$ by $\hat{\mu}-k^*\hat{\sigma}$ and we replace the value of any $X_i$ with $X_i>\hat{\mu}+k^*\hat{\sigma}$ by $\hat{\mu}+k^*\hat{\sigma}$ .
+4.  Using these, identify the smallest value of $k$ for which $\hat{\sigma}M(k)\alpha(k)<0.003$. If $k^*$ denotes this smallest value of $k$, replace the value of any $X_i$ with $X_i<\hat{\mu}-k^*\hat{\sigma}$ by $\hat{\mu}-k^*\hat{\sigma}$ and we replace the value of any $X_i$ with $X_i>\hat{\mu}+k^*\hat{\sigma}$ by $\hat{\mu}+k^*\hat{\sigma}$.
 
 ## Bibliography
 

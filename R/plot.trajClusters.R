@@ -73,7 +73,7 @@ plot.trajClusters <-
     on.exit(devAskNewPage(ask = current.ask.status))  # Restore ask status on exit
     devAskNewPage(ask = ask)
     
-    color.pal <- palette.colors(palette = "Polychrome 36", alpha = 1) 
+    color.pal <- palette.colors(palette = "Polychrome 36", alpha = 1)[-2]
     
     plot.counter <-
       0 # This labels the plots that appear when 'which.plots' is set to NULL
@@ -524,11 +524,13 @@ plot.trajClusters <-
       
       selection <- x$selection[, -c(1)]
       
-      selection.by.clusters <- list()
-      for (k in seq_len(x$nclusters)) {
-        selection.by.clusters[[k]] <-
-          selection[which(x$partition[, 2] == k),]
-      }
+      
+      # no need for this:
+      ##selection.by.clusters <- list()
+      ##for (k in seq_len(x$nclusters)) {
+      ##  selection.by.clusters[[k]] <-
+      ##    selection[which(x$partition[, 2] == k),]
+      ##}
       
       # Set up the most compact grid depending on the number of selected measures
       X <- sqrt(nb.measures - 1)
@@ -552,42 +554,46 @@ plot.trajClusters <-
       for (m in which.scatter) {
         par(mfrow = good.grid)
         
-        for (n in seq_len(nb.measures - 1)) {
+        for (n in seq_len(nb.measures)[-m]) {
           plot(
             x = 0,
             y = 0,
             xlim = c(min(selection[, m]), max(selection[, m])),
-            ylim = c(min(selection[,-c(m)][, n]), max(selection[,-c(m)][, n])),
+            ylim = c(min(selection[, n]), max(selection[, n])),
             type = "n",
             xlab = paste(colnames(selection[m])),
-            ylab = paste(colnames(selection[,-c(m)])[n]),
+            ylab = paste(colnames(selection[n])),
             main = paste(
               "Scatter plot of ",
               paste(colnames(selection[m])),
               " vs ",
-              paste(colnames(selection[,-c(m)])[n]),
+              paste(colnames(selection)[n]),
               sep = ""
             )
           )
           
-          for (k in seq_len(x$nclusters)) {
+          set.seed(38550)
+          S <- sample(1:nrow(selection), nrow(selection), replace = FALSE)
+          
+          for(s in S){
             lines(
-              x = selection.by.clusters[[k]][, m],
-              y = selection.by.clusters[[k]][,-c(m)][, n],
+              x = selection[s, m],
+              y = selection[s, n],
               type = "p",
-              pch = 20,
-              col = color.pal[k],
-              bg = color.pal[k]
-            )
-            
-            legend(
-              "topright",
-              lty = rep(0, k),
-              pch = rep(16, k),
-              col = color.pal[1:k],
-              legend = paste(seq_len(x$nclusters))[1:k]
+              pch = (x$partition$Cluster[s] - 1),
+              col = color.pal[x$partition$Cluster[s]],
+              bg = color.pal[x$partition$Cluster[s]]
             )
           }
+          
+          
+            legend(
+              "topright",
+              lty = rep(0, x$nclusters),
+              pch = c(0:(x$nclusters-1)),
+              col = color.pal[1:x$nclusters],
+              legend = paste(seq_len(x$nclusters))[1:x$nclusters]
+            )
         }
       }
     }
