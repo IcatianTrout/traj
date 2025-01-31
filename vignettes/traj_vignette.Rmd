@@ -19,28 +19,29 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-The `traj` package implements a clustering algorithm for functional data (henceforth referred to as trajectories) that extends previous work from Leffondré et al [1]. This algorithm is comprised of three steps. The first step summarizes the main features of the trajectories by computing the 18 measures listed below and detailed in Appendix A.
+The `traj` package implements a clustering algorithm for functional data (henceforth referred to as trajectories) that extends previous work from Leffondré et al [1]. This algorithm is comprised of three steps. The first step summarizes the main features of the trajectories by computing the 19 measures listed below and detailed in Appendix A.
 
 1.  Maximum
 2.  Range
 3.  Mean value
 4.  Standard deviation
-5.  Slope of the linear model
-6.  $R^2$: Proportion of variance explained by the linear model
-7.  Curve length (total variation)
-8.  Rate of intersection with the mean
-9.  Proportion of time spent above the mean
-10. Minimum of the first derivative
-11. Maximum of the first derivative
-12. Mean of the first derivative
-13. Standard deviation of the first derivative
-14. Minimum of the second derivative
-15. Maximum of the second derivative
-16. Mean of the second derivative
-17. Standard deviation of the second derivative
-18. Later change/Early change
+5.  Intercept of the linear model
+6.  Slope of the linear model
+7.  $R^2$: Proportion of variance explained by the linear model
+8.  Curve length (total variation)
+9.  Rate of intersection with the mean
+10. Proportion of time spent above the mean
+11. Minimum of the first derivative
+12. Maximum of the first derivative
+13. Mean of the first derivative
+14. Standard deviation of the first derivative
+15. Minimum of the second derivative
+16. Maximum of the second derivative
+17. Mean of the second derivative
+18. Standard deviation of the second derivative
+19. Later change/Early change
 
-The second step performs a dimensionality reduction on the 18 measures to extract the main features of the trajectories. Specifically,
+The second step performs a dimensionality reduction on the 19 measures to extract the main features of the trajectories. Specifically,
 
 1.  Measures that are constant across trajectories are discarded because they do not provide any discriminating information.
 2.  A principal component analysis (PCA) is conducted on the measures. The main principal components (defined as those principal components contributing more to the total variance than any of the individual standardized measures) are selected.
@@ -90,10 +91,10 @@ head(trajdata)
 dat <- trajdata[, -c(1,2)]
 ```
 
-Each trajectory is made up of six observations and there are no missing values. The function `Step1Measures` computes the measures. By default, measure 18 (Early change/Later change) is not included in the analysis. This is because, depending on the situation (uneven observation times, attrition, missing values, etc.), there might not be, for each trajectory, a natural midpoint. In the present data set, we include measure 18. By leaving the 'midpoint' argument at its default of `NULL`, the third observation will be taken as the midpoint.
+Each trajectory is made up of six observations and there are no missing values. The function `Step1Measures` computes the measures. By default, measure 19 (Early change/Later change) is not included in the analysis. This is because, depending on the situation (uneven observation times, attrition, missing values, etc.), there might not be, for each trajectory, a natural midpoint. In the present data set, we include measure 19. By leaving the 'midpoint' argument at its default of `NULL`, the third observation will be taken as the midpoint.
 
 ```{r ex1.step1}
-step1 <- Step1Measures(Data = dat, measures = 1:18) 
+step1 <- Step1Measures(Data = dat, measures = 1:19) 
 
 summary(step1)
 ```
@@ -111,52 +112,45 @@ Two measures are defined as "perfectly or almost perfectly correlated" if the ab
 print(step2)
 ```
 
-Measure 4 (Standard deviation) was dropped because it is perfectly or almost perfectly correlated with measure 2 (Range) and measure 12 (Mean of the first derivative) was dropped because it is perfectly or almost perfectly correlated with measure 5 (Slope of the linear model). The `Step3Clusters` function uses the k-medoids algorithm (function `cluster:::pam`) on the measures selected in step 2 to cluster the trajectories.
+Measure 4 (Standard deviation) was dropped because it is perfectly or almost perfectly correlated with measure 2 (Range). The `Step3Clusters` function uses the k-medoids algorithm (function `cluster:::pam`) on the measures selected in step 2 to cluster the trajectories.
 
 ```{r ex1.step3a}
 library(cluster)
 set.seed(1337)
-step3 <- Step3Clusters(trajSelection = step2) 
+step3 <- Step3Clusters(trajSelection = step2, nclusters = 4) 
 ```
 
-If the `nclusters` argument is set to `NULL` (the default), the optimal number $k$ of clusters will be determined using the Calinski-Harabasz criterion. In our case, this gives $k=4$ cluster as can be inspected visually with
+If the `nclusters` argument is set to `NULL` (the default), the number $k$ of clusters will be determined using the Calinski-Harabasz criterion. To visually inspect the classification, we write `plot(step3, ask = TRUE)`. We can also ask for specific plots with `which.plots`.
 
-```{r ex1.step3b}
+```{r ex1.step3e, echo = FALSE}
 par(mfrow = c(1, 1))
 plot(step3, which.plots = 1, ask = FALSE)
 ```
 
-To visually inspect the classification, we write `plot(step3, ask = TRUE)`. We can also ask for specific plots with `which.plots`.
-
-```{r ex1.step3e, echo = FALSE}
+```{r ex1.step3f, echo = FALSE}
 par(mfrow = c(1, 1))
 plot(step3, which.plots = 2, ask = FALSE)
 ```
 
-```{r ex1.step3f, echo = FALSE}
+```{r ex1.step3g, echo = FALSE}
 par(mfrow = c(1, 1))
 plot(step3, which.plots = 3, ask = FALSE)
 ```
 
-```{r ex1.step3g, echo = FALSE}
+```{r ex1.step3h, echo = FALSE}
 par(mfrow = c(1, 1))
 plot(step3, which.plots = 4, ask = FALSE)
 ```
 
-```{r ex1.step3h, echo = FALSE}
-par(mfrow = c(1, 1))
-plot(step3, which.plots = 5, ask = FALSE)
-```
-
 ```{r ex1.step3i, echo = FALSE}
 par(mfrow = c(1, 1))
-plot(step3, which.plots = 6, ask = FALSE)
+plot(step3, which.plots = 5, ask = FALSE)
 ```
 
 The "Sample trajectories" plot tends to get cluttered when there are too many clusters. In any case, it is always a good idea to plot the *whole* clusters:
 
 ```{r ex1.step3n}
-color.pal <- palette.colors(palette = "Polychrome 36", alpha = 1) 
+color.pal <- palette.colors(palette = "Polychrome 36", alpha = 1)[-2] 
 par(mfrow = c(1, 1))
 for(k in 1:4){
   w <- which(step3$partition$Cluster == k)
@@ -190,17 +184,19 @@ In this section, we expand on how the eighteen measures are computed. Let $y=y(t
     \mathrm{m4} = \sqrt{\frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\left(y(t_i)-\mathrm{m3}\right)^2 + \left(y(t_{i+1})-\mathrm{m3}\right)^2}{2}(t_{i+1}-t_i)}.
     $$
 
--   **m5: Slope of the linear model.** Here the $y(t_i)$ are regressed against the $t_i$ in the linear model $y(t_i) = \beta_0 + \beta_1t_i+\epsilon_i$ using the method of least squares and m5 is defined as $\hat{\beta}_1$.
+-   **m5: Intercept of the linear model.** Here the $y(t_i)$ are regressed against the $t_i$ in the linear model $y(t_i) = \beta_0 + \beta_1t_i+\epsilon_i$ using the method of least squares and m5 is defined as $\hat{\beta}_0$.
 
--   **m6: Proportion of variance explained by the linear model (R squared)**. This is the coefficient of determination of the linear model used to define m5.
+-   **m6: Slope of the linear model.** Here the $y(t_i)$ are regressed against the $t_i$ in the linear model $y(t_i) = \beta_0 + \beta_1t_i+\epsilon_i$ using the method of least squares and m6 is defined as $\hat{\beta}_1$.
 
--   **m7: Curve length (total variation).** This measure is given by the formula
+-   **m7: Proportion of variance explained by the linear model (R squared)**. This is the coefficient of determination of the linear model used to define m5 and m6.
+
+-   **m8: Curve length (total variation).** This measure is given by the formula
 
     $$
-    \mathrm{m7} = \sum_{i=1}^{N-1}\sqrt{(t_{i+1} - t_i)^2 + (y(t_{i+1}) - y(t_i))^2}.
+    \mathrm{m8} = \sum_{i=1}^{N-1}\sqrt{(t_{i+1} - t_i)^2 + (y(t_{i+1}) - y(t_i))^2}.
     $$
 
--   **m8: Rate of intersection with the mean.** For each $i=1,\ldots,N-1$, let $y_0(t_i) = y(t_i) -\mathrm{m3}$ and set
+-   **m9: Rate of intersection with the mean.** For each $i=1,\ldots,N-1$, let $y_0(t_i) = y(t_i) -\mathrm{m3}$ and set
 
     $$
     \chi_i=\left\{
@@ -212,10 +208,10 @@ In this section, we expand on how the eighteen measures are computed. Let $y=y(t
     $$
 
     $$
-    \mathrm{m8} = \frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\chi_i.
+    \mathrm{m9} = \frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\chi_i.
     $$
 
--   **m9: Proportion of time spent above the mean.** Again, let $y_0(t_i) =y(t_i)-\mathrm{m3}$ and set
+-   **m10: Proportion of time spent above the mean.** Again, let $y_0(t_i) =y(t_i)-\mathrm{m3}$ and set
 
     $$
     T^+=\frac{t_2 - t_1}{2}\mathbb{I}(y_0(t_1)>0) + \sum_{i=2}^{N-1}\frac{t_{i+1} - t_{i-1}}{2}\mathbb{I}(y_0(t_i)>0) + \frac{t_N - t_{N-1}}{2}\mathbb{I}(y_0(t_N)>0),
@@ -226,12 +222,12 @@ In this section, we expand on how the eighteen measures are computed. Let $y=y(t
     $$
 
     $$
-    \mathrm{m9} = \frac{T^+}{T^- + T^+}.
+    \mathrm{m10} = \frac{T^+}{T^- + T^+}.
     $$
 
-    In the event that both the numerator and denominator of m9 are 0, m9 is set to 1.
+    In the event that both the numerator and denominator of m10 are 0, m10 is set to 1.
 
--   **m10: Minimum of the first derivative.** Measures 10-13 concern $y'(t)$, the first derivative of $y(t)$. The trajectory, $y'(t_i)$ is approximated from the data as follows:$$\widehat{y'}(t_i)=
+-   **m11: Minimum of the first derivative.** Measures 11-14 concern $y'(t)$, the first derivative of $y(t)$. The trajectory, $y'(t_i)$ is approximated from the data as follows:$$\widehat{y'}(t_i)=
     \left\{
     \begin{array}{cc}
     \Delta_i^+ & \text{if $i=1$} \\
@@ -246,18 +242,18 @@ In this section, we expand on how the eighteen measures are computed. Let $y=y(t
     w^-_i = \frac{t_{i+1}-t_i}{t_{i+1} - t_{i-1}},\quad w^+_i = \frac{t_i-t_{i-1}}{t_{i+1}-t_{i-1}}.
     $$
 
-    By definition then,$$\mathrm{m10}=\min_{1\leq i\leq N}\widehat{y'}(t_i).$$
+    By definition then,$$\mathrm{m11}=\min_{1\leq i\leq N}\widehat{y'}(t_i).$$
 
--   **m11: Maximum of the first derivative.** This is $$\mathrm{m11} = \max_{1\leq i\leq N}\widehat{y'}(t_i),$$where $\widehat{y'}(t_i)$ is the trajectory define in the discussion of m10.
+-   **m12: Maximum of the first derivative.** This is $$\mathrm{m12} = \max_{1\leq i\leq N}\widehat{y'}(t_i),$$where $\widehat{y'}(t_i)$ is the trajectory define in the discussion of m11.
 
--   **m12: Mean of the first derivative.** This is $$\mathrm{m12} = \frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\widehat{y'}(t_i)+\widehat{y'}(t_{i+1})}{2}(t_{i+1}-t_i),$$where $\widehat{y'}(t_i)$ is the trajectory define in the discussion of m10.
+-   **m13: Mean of the first derivative.** This is $$\mathrm{m13} = \frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\widehat{y'}(t_i)+\widehat{y'}(t_{i+1})}{2}(t_{i+1}-t_i),$$where $\widehat{y'}(t_i)$ is the trajectory define in the discussion of m11.
 
--   **m13: Standard deviation of the first derivative.** This is defined by the formula
+-   **m14: Standard deviation of the first derivative.** This is defined by the formula
 
-    $$\mathrm{m13} = \sqrt{\frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\left(\widehat{y'}(t_i)-\mathrm{m12}\right)^2 + \left(\widehat{y'}(t_{i+1})-\mathrm{m12}\right)^2}{2}(t_{i+1}-t_i)}.
+    $$\mathrm{m14} = \sqrt{\frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\left(\widehat{y'}(t_i)-\mathrm{m13}\right)^2 + \left(\widehat{y'}(t_{i+1})-\mathrm{m13}\right)^2}{2}(t_{i+1}-t_i)}.
     $$
 
--   **m14: Minimum of the second derivative.** Measures 14-17 concern $y''(t)$, the second derivative of $y(t)$. For this, a trajectory $\widehat{y''}(t_i)$ is constructed from the trajectory $\widehat{y'}(t_i)$ in the same way as $\widehat{y'}(t_i)$ is constructed from $y(t_i)$ (cf. m10):$$
+-   **m15: Minimum of the second derivative.** Measures 15-18 concern $y''(t)$, the second derivative of $y(t)$. For this, a trajectory $\widehat{y''}(t_i)$ is constructed from the trajectory $\widehat{y'}(t_i)$ in the same way as $\widehat{y'}(t_i)$ is constructed from $y(t_i)$ (cf. m11):$$
     \widehat{y''}(t_i) = 
     \left\{
     \begin{array}{cc}
@@ -268,24 +264,24 @@ In this section, we expand on how the eighteen measures are computed. Let $y=y(t
     \right.
     $$
 
-    where $w_i^{\pm}$ are defined as in the description of m10 and where $$
+    where $w_i^{\pm}$ are defined as in the description of m11 and where $$
     \Delta'^-_{\,i} =\frac{\widehat{y'}(t_i) - \widehat{y'}(t_{i-1})}{t_i-t_{i-1}},\quad \Delta'^+_{\,i} =\frac{\widehat{y'}(t_{i+1}) - \widehat{y'}(t_{i})}{t_{i+1}-t_{i}}.
     $$
 
-    By definition then,$$\mathrm{m14}=\min_{1\leq i\leq N}\widehat{y''}(t_i).$$
+    By definition then,$$\mathrm{m15}=\min_{1\leq i\leq N}\widehat{y''}(t_i).$$
 
--   **m15: Maximum of the second derivative.** This is $$\mathrm{m15} = \max_{1\leq i\leq N}\widehat{y''}(t_i),$$where $\widehat{y''}(t_i)$ is the trajectory defined in the discussion of m14.
+-   **m16: Maximum of the second derivative.** This is $$\mathrm{m16} = \max_{1\leq i\leq N}\widehat{y''}(t_i),$$where $\widehat{y''}(t_i)$ is the trajectory defined in the discussion of m15.
 
--   **m16: Mean of the second derivative.** This is $$\mathrm{m16} = \frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\widehat{y''}(t_i)+\widehat{y''}(t_{i+1})}{2}(t_{i+1}-t_i),$$where $\widehat{y''}(t_i)$ is the trajectory define in the discussion of m14.
+-   **m17: Mean of the second derivative.** This is $$\mathrm{m17} = \frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\widehat{y''}(t_i)+\widehat{y''}(t_{i+1})}{2}(t_{i+1}-t_i),$$where $\widehat{y''}(t_i)$ is the trajectory define in the discussion of m15.
 
--   **m17: Standard deviation of the second derivative.** This is defined by
+-   **m18: Standard deviation of the second derivative.** This is defined by
 
-    $$\mathrm{m17} = \sqrt{\frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\left(\widehat{y''}(t_i)-\mathrm{m16}\right)^2 + \left(\widehat{y''}(t_{i+1})-\mathrm{m16}\right)^2}{2}(t_{i+1}-t_i)}.
+    $$\mathrm{m18} = \sqrt{\frac{1}{t_N-t_1}\sum_{i=1}^{N-1}\frac{\left(\widehat{y''}(t_i)-\mathrm{m17}\right)^2 + \left(\widehat{y''}(t_{i+1})-\mathrm{m17}\right)^2}{2}(t_{i+1}-t_i)}.
     $$
 
--   **m18: Later change/Early change.** Given an observation time $t_m$ with $1<m<N$ which is to act as the "midpoint" of the trajectory, this is$$\mathrm{m18} = \frac{y(t_N)-y(t_m)}{y(t_m)-y(t_1)}.$$
+-   **m19: Later change/Early change.** Given an observation time $t_m$ with $1<m<N$ which is to act as the "midpoint" of the trajectory, this is$$\mathrm{m19} = \frac{y(t_N)-y(t_m)}{y(t_m)-y(t_1)}.$$
 
-    In the event that both the numerator and denominator of m18 are 0, m18 is set to 1.
+    In the event that both the numerator and denominator of m19 are 0, m19 is set to 1.
 
 ## Appendix B: The capping procedure
 

@@ -1,11 +1,8 @@
 #'@title Plots \code{trajClusters} objects
 #'
-#'@description Up to 5 kinds of plots are currently available: a plot of the
-#'  cluster-specific median and mean trajectories, a random sample of
-#'  trajectories from each cluster and scatter plots of the measures on which
-#'  the clustering was based. When the GAP criterion was used in
-#'  \code{Step3Clusters} to determine the optimal number of clusters, a plot of
-#'  the GAP statistic as a function of the number of clusters is provided.
+#'@description Plots the
+#'  cluster-specific median and mean trajectories and a random sample of
+#'  trajectories from each cluster.
 #'
 #'@param x object of class \code{trajClusters} as returned by
 #'  \code{Step3Cluster}.
@@ -61,7 +58,7 @@ plot.trajClusters <-
     if (!is.null(which.plots) &
         (!is.numeric(which.plots) | !is.vector(which.plots))) {
       stop(
-        "The argument 'which.plots' should be a subset of the plots required, specified as a vector such as c(1, 2, 5:7), or NULL if all the plots are required."
+        "The argument 'which.plots' should be a subset of the plots required, specified as a vector such as c(1, 3:5), or NULL if all the plots are required."
       )
     }
     
@@ -75,31 +72,6 @@ plot.trajClusters <-
     
     color.pal <- palette.colors(palette = "Polychrome 36", alpha = 1)[-2]
     
-    plot.counter <-
-      0 # This labels the plots that appear when 'which.plots' is set to NULL
-    
-    ### GAP statistic ###
-    
-    gapch.condition <- (is.null(which.plots) | (1 %in% which.plots))
-    
-    if (gapch.condition & !is.null(x$GAP)) {
-      par(mfrow = c(1, 1))
-      plot(x$GAP, main = "Gap statistic up to one SE")
-    }
-    
-    if (gapch.condition & !is.null(x$CH)) {
-      par(mfrow = c(1, 1))
-      plot(x$CH, type = "b", xlab = "k", ylab = "Index", main = "Calinski-Harabasz index")
-    }
-    
-    if (gapch.condition & !is.null(x$CH.boot)) {
-      par(mfrow = c(1, 1))
-      barplot(table(x$CH.boot), xlab = "k", ylab = "absolute frequency", main = "Sampling distribution of optimal k")
-    }
-    
-    if (!is.null(x$GAP) | !is.null(x$CH) | !is.null(x$CH.boot) ) {
-      plot.counter <- plot.counter + 1
-    }
     
     ### Mean and median traj ###
     universal.time <- x$time[1,-1]
@@ -114,14 +86,13 @@ plot.trajClusters <-
       ((spline |
           homogeneous.times) &
          (is.null(which.plots) |
-            sum(c((plot.counter + 1):(plot.counter + 4)
-            ) %in% which.plots) > 0))
+            sum(c(1:4) %in% which.plots) > 0))
     if (med.mean.condition) {
       if (is.null(which.plots)) {
         which.med.mean <- c(1:4)
       } else{
         which.med.mean <-
-          which(c((plot.counter + 1):(plot.counter + 4)) %in% which.plots)
+          which(c(1:4) %in% which.plots)
       }
       
       if (spline == TRUE) {
@@ -426,14 +397,11 @@ plot.trajClusters <-
       )
     }
     
-    if (spline | homogeneous.times) {
-      plot.counter <- plot.counter + 4
-    }
+    
     
     
     ### Randomly sampled trajectories from each clusters ###
-    random.condition <-
-      (is.null(which.plots) | (plot.counter + 1) %in% which.plots)
+    random.condition <- (is.null(which.plots) | 5 %in% which.plots)
     
     if (random.condition) {
       traj.by.clusters <- list()
@@ -502,99 +470,110 @@ plot.trajClusters <-
         )
       }
     }
+    print("See also 'plot.crit' for a plot of the statistic used to determined the number of clusters and see 'plot.scatter' for scatter plots of the measures involved in the clustering.")
+  }
+
+#'@rdname Step1Measures
+#'
+#'@export
+plot.scatter <- function(x, ask = TRUE, ...) {
+  
+  current.ask.status <- devAskNewPage(ask = NULL)
+  on.exit(devAskNewPage(ask = current.ask.status))  # Restore ask status on exit
+  devAskNewPage(ask = ask)
+  
+  color.pal <- palette.colors(palette = "Polychrome 36", alpha = 1)[-2]
+  
+  nb.measures <- ncol(x$selection) - 1
+  scatter.condition <- (nb.measures > 1)
+  
+  if (scatter.condition) {
     
-    plot.counter <- plot.counter + 1 # Update plot counter
+    which.scatter <- c(1:nb.measures)
+    
+    selection <- x$selection[, -c(1)]
+    
+    # Set up the most compact grid depending on the number of selected measures
+    X <- sqrt(nb.measures - 1)
+    
+    int.X <- floor(X)
+    frac.X <- X - int.X
     
     
-    ### Scatter plots of the selected measures ###
-    nb.measures <- ncol(x$selection) - 1
-    scatter.condition <-
-      (nb.measures > 1) &
-      (is.null(which.plots) |
-         sum(c((plot.counter + 1):(plot.counter + nb.measures)
-         ) %in% which.plots) > 0)
+    if (frac.X == 0) {
+      good.grid <- c(int.X, int.X)
+    }
     
-    if (scatter.condition) {
-      if (is.null(which.plots)) {
-        which.scatter <- c(1:nb.measures)
-      } else{
-        which.scatter <-
-          which(c((plot.counter + 1):(plot.counter + nb.measures)) %in% which.plots)
-      }
+    if ((frac.X > 0) & (frac.X < 0.5)) {
+      good.grid <- c(int.X, int.X + 1)
+    }
+    
+    if (frac.X >= 0.5) {
+      good.grid <- c(int.X + 1, int.X + 1)
+    }
+    
+    for (m in which.scatter) {
+      par(mfrow = good.grid)
       
-      selection <- x$selection[, -c(1)]
-      
-      
-      # no need for this:
-      ##selection.by.clusters <- list()
-      ##for (k in seq_len(x$nclusters)) {
-      ##  selection.by.clusters[[k]] <-
-      ##    selection[which(x$partition[, 2] == k),]
-      ##}
-      
-      # Set up the most compact grid depending on the number of selected measures
-      X <- sqrt(nb.measures - 1)
-      
-      int.X <- floor(X)
-      frac.X <- X - int.X
-      
-      
-      if (frac.X == 0) {
-        good.grid <- c(int.X, int.X)
-      }
-      
-      if ((frac.X > 0) & (frac.X < 0.5)) {
-        good.grid <- c(int.X, int.X + 1)
-      }
-      
-      if (frac.X >= 0.5) {
-        good.grid <- c(int.X + 1, int.X + 1)
-      }
-      
-      for (m in which.scatter) {
-        par(mfrow = good.grid)
-        
-        for (n in seq_len(nb.measures)[-m]) {
-          plot(
-            x = 0,
-            y = 0,
-            xlim = c(min(selection[, m]), max(selection[, m])),
-            ylim = c(min(selection[, n]), max(selection[, n])),
-            type = "n",
-            xlab = paste(colnames(selection[m])),
-            ylab = paste(colnames(selection[n])),
-            main = paste(
-              "Scatter plot of ",
-              paste(colnames(selection[m])),
-              " vs ",
-              paste(colnames(selection)[n]),
-              sep = ""
-            )
+      for (n in seq_len(nb.measures)[-m]) {
+        plot(
+          x = 0,
+          y = 0,
+          xlim = c(min(selection[, m]), max(selection[, m])),
+          ylim = c(min(selection[, n]), max(selection[, n])),
+          type = "n",
+          xlab = paste(colnames(selection[m])),
+          ylab = paste(colnames(selection[n])),
+          main = paste(
+            "Scatter plot of ",
+            paste(colnames(selection[m])),
+            " vs ",
+            paste(colnames(selection)[n]),
+            sep = ""
           )
-          
-          set.seed(38550)
-          S <- sample(1:nrow(selection), nrow(selection), replace = FALSE)
-          
-          for(s in S){
-            lines(
-              x = selection[s, m],
-              y = selection[s, n],
-              type = "p",
-              pch = (x$partition$Cluster[s] - 1),
-              col = color.pal[x$partition$Cluster[s]],
-              bg = color.pal[x$partition$Cluster[s]]
-            )
-          }
-          
-          
-            legend(
-              "topright",
-              lty = rep(0, x$nclusters),
-              pch = c(0:(x$nclusters-1)),
-              col = color.pal[1:x$nclusters],
-              legend = paste(seq_len(x$nclusters))[1:x$nclusters]
-            )
+        )
+        
+        set.seed(38550)
+        S <- sample(1:nrow(selection), nrow(selection), replace = FALSE)
+        
+        for(s in S){
+          lines(
+            x = selection[s, m],
+            y = selection[s, n],
+            type = "p",
+            pch = (x$partition$Cluster[s] - 1),
+            col = color.pal[x$partition$Cluster[s]],
+            bg = color.pal[x$partition$Cluster[s]]
+          )
         }
+        
+        
+        legend(
+          "topright",
+          lty = rep(0, x$nclusters),
+          pch = c(0:(x$nclusters-1)),
+          col = color.pal[1:x$nclusters],
+          legend = paste(seq_len(x$nclusters))[1:x$nclusters]
+        )
       }
     }
+  } else{
+    print("Since only one measure participated in the clustering there are no scatter plots to display.")
   }
+}
+
+#'@rdname Step1Measures
+#'
+#'@export
+plot.crit <- function(x, ...) {
+  
+  if (!is.null(x$GAP)) {
+    par(mfrow = c(1, 1))
+    plot(x$GAP, main = "Gap statistic up to one SE")
+  } else if (!is.null(x$CH)) {
+    par(mfrow = c(1, 1))
+    plot(x$CH, type = "b", xlab = "k", ylab = "Index", main = "Calinski-Harabasz index")
+  } else {
+    print("There are no GAP or Calinski-Harabasz statistics to plot.")
+  }
+}

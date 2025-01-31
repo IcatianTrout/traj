@@ -127,7 +127,7 @@ Step1Measures <-
       if (Time.is.vector == FALSE) {
         ID.time <- time[, 1]
         time <- time[,-1]
-        if (identical(IDvector, ID.time) == FALSE) {
+        if (identical(as.numeric(IDvector), as.numeric(ID.time)) == FALSE) {
           stop("ID vector in Data differs from ID vector in Time.")
         }
       }
@@ -136,20 +136,30 @@ Step1Measures <-
     }
     
     if (identical(dim(time), dim(data))) {
-      if (identical(is.na(data), is.na(time)) == FALSE) {
-        stop(
-          "Data has cells with no corresponding time or Time has cells with no corresponding data."
-        )
-      }
+      
       
       data2 <- data
       time2 <- time
-      for (i in seq_len(nrow(data))) {
-        NA.str_i <- is.na(data)[i,]
+      
+      #if either data of time has an NA at [i,j], do the same for the other
+      for(i in seq_len(nrow(data2))) {
+        for(j in seq_len(ncol(data2))) {
+          if(is.na(data2[i,j])){
+            time2[i,j] <- NA
+          }  
+          if(is.na(time2[i,j])){
+            data2[i,j] <- NA
+          } 
+        }
+      }
+      
+      rows.rmv <- c()
+      
+      for (i in seq_len(nrow(data2))) {
+        NA.str_i <- is.na(data2)[i,]
         w <- unname(which(NA.str_i == FALSE))
         if (length(w) < 3) {
-          data2 <- data2[-i,]
-          time2 <- time2[-i,]
+          rows.rmv <- c(rows.rmv, i)
           warning (
             paste(
               "Row ",
@@ -158,18 +168,25 @@ Step1Measures <-
               sep = ""
             )
           )
-          IDvector <- IDvector[-i]
-        } else if (!identical(w, seq_len(length(w)))) {
-          stop(
-            paste(
-              "Row ",
-              i,
-              " of Data is not formatted correctly. Rows should be of the form X Y ... Z NA ... NA.",
-              sep = ""
-            )
-          )
         }
       }
+      
+      if(length(rows.rmv > 0)){
+        IDvector <- IDvector[-rows.rmv]
+        data2 <- data2[-rows.rmv, ]
+        time2 <- time2[-rows.rmv, ]
+      }
+      
+      for(i in seq_len(nrow(data2))) {
+        NA.str_i <- is.na(data2)[i,]
+        w <- unname(which(NA.str_i == FALSE))
+        v <- rep(NA, ncol(data2))
+        v[seq_len(length(w))] <- data2[i, w]
+        data2[i, ] <- v
+        v[seq_len(length(w))] <- time2[i, w]
+        time2[i, ] <- v
+      }
+      
       data <- data2
       time <- time2
       
