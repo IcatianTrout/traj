@@ -1,3 +1,13 @@
+# traj 2.2.1
+
+-   Added a new measure, "m5: slope of linear model".
+
+-   Spit the "plot" function into three: plot, plot.scatter and plot.crit.
+
+-   Improved the presentation of the scatter plots.
+
+-   Made Step1Measures more lenient with how the input data is formatted.
+
 # traj 2.2.0
 
 -   Added k-medoids as the default clustering algorithm.

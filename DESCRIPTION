@@ -1,6 +1,6 @@
 Package: traj
 Title: Clustering of Functional Data Based on Measures of Change
-Version: 2.2.0
+Version: 2.2.1
 Authors@R: c(person("Marie-Pierre", "Sylvestre", role = "aut", email="marie-pierre.sylvestre@umontreal.ca"),
               person("Laurence", "Boulanger", role = c("aut","cre"), email="laurence.boulanger@umontreal.ca"),
               person("Gillis Delmas", "Tchouangue Dinkou", role = "ctb"),
