@@ -470,13 +470,13 @@ plot.trajClusters <-
         )
       }
     }
-    print("See also 'plot.crit' for a plot of the statistic used to determined the number of clusters and see 'plot.scatter' for scatter plots of the measures involved in the clustering.")
+    print("See also 'critplot' for a plot of the statistic used to determined the number of clusters and see 'scatterplots' for scatter plots of the measures involved in the clustering.")
   }
 
 #'@rdname Step1Measures
 #'
 #'@export
-plot.scatter <- function(x, ask = TRUE, ...) {
+scatterplots <- function(x, ask = TRUE, ...) {
   
   current.ask.status <- devAskNewPage(ask = NULL)
   on.exit(devAskNewPage(ask = current.ask.status))  # Restore ask status on exit
@@ -565,7 +565,7 @@ plot.scatter <- function(x, ask = TRUE, ...) {
 #'@rdname Step1Measures
 #'
 #'@export
-plot.crit <- function(x, ...) {
+critplot <- function(x, ...) {
   
   if (!is.null(x$GAP)) {
     par(mfrow = c(1, 1))
