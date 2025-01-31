@@ -473,7 +473,7 @@ plot.trajClusters <-
     print("See also 'critplot' for a plot of the statistic used to determined the number of clusters and see 'scatterplots' for scatter plots of the measures involved in the clustering.")
   }
 
-#'@rdname Step1Measures
+#'@rdname plot.trajClusters
 #'
 #'@export
 scatterplots <- function(x, ask = TRUE, ...) {
@@ -562,7 +562,7 @@ scatterplots <- function(x, ask = TRUE, ...) {
   }
 }
 
-#'@rdname Step1Measures
+#'@rdname plot.trajClusters
 #'
 #'@export
 critplot <- function(x, ...) {

@@ -4,8 +4,8 @@
 \alias{Step1Measures}
 \alias{print.trajMeasures}
 \alias{summary.trajMeasures}
-\alias{plot.scatter}
-\alias{plot.crit}
+\alias{scatterplots}
+\alias{critplot}
 \title{Compute Measures for Identifying Patterns of Change in Longitudinal
 Data}
 \usage{
@@ -22,9 +22,9 @@ Step1Measures(
 
 \method{summary}{trajMeasures}(object, ...)
 
-\method{plot}{scatter}(x, ask = TRUE, ...)
+scatterplots(x, ask = TRUE, ...)
 
-\method{plot}{crit}(x, ...)
+critplot(x, ...)
 }
 \arguments{
 \item{Data}{a matrix or data frame in which each row contains the longitudinal
