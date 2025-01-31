@@ -2,9 +2,15 @@
 % Please edit documentation in R/plot.trajClusters.R
 \name{plot.trajClusters}
 \alias{plot.trajClusters}
+\alias{scatterplots}
+\alias{critplot}
 \title{Plots \code{trajClusters} objects}
 \usage{
 \method{plot}{trajClusters}(x, sample.size = 5, ask = TRUE, which.plots = NULL, spline = FALSE, ...)
+
+scatterplots(x, ask = TRUE, ...)
+
+critplot(x, ...)
 }
 \arguments{
 \item{x}{object of class \code{trajClusters} as returned by
