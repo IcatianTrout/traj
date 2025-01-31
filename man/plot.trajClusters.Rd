@@ -27,12 +27,9 @@ the smoothed trajectories. Defaults to \code{FALSE}}
 \item{...}{other parameters to be passed through to plotting functions.}
 }
 \description{
-Up to 5 kinds of plots are currently available: a plot of the
-cluster-specific median and mean trajectories, a random sample of
-trajectories from each cluster and scatter plots of the measures on which
-the clustering was based. When the GAP criterion was used in
-\code{Step3Clusters} to determine the optimal number of clusters, a plot of
-the GAP statistic as a function of the number of clusters is provided.
+Plots the
+cluster-specific median and mean trajectories and a random sample of
+trajectories from each cluster.
 }
 \examples{
 \dontrun{

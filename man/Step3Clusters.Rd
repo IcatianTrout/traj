@@ -14,9 +14,7 @@ Step3Clusters(
   iter.max = 100,
   nclusters = NULL,
   criterion = "Calinski-Harabasz",
-  K.max = min(15, nrow(trajSelection$selection) - 1),
-  boot = FALSE,
-  R = 100,
+  K.max = min(ceiling(sqrt(nrow(trajSelection$selection))), 10),
   B = 500
 )
 
@@ -44,11 +42,7 @@ number of clusters is determined using the criterion chosen in \code{criterion}.
 
 \item{criterion}{criterion to determine the optimal number of clusters if \code{nclusters} is \code{NULL}. Either \code{"GAP"} or \code{"Calinski-Harabasz"}. Defaults to \code{"Calinski-Harabasz"}.}
 
-\item{K.max}{maximum number of clusters to be considered if \code{nclusters} is set to \code{NULL}. Defaults to \code{15}.}
-
-\item{boot}{logical. If \code{TRUE}, and if \code{"Calinski-Harabasz"} is the chosen \code{criterion}, the optimal number of clusters will be the first mode of sampling distribution of the optimal number of clusters obtained by bootstrap. Defaults to \code{FALSE}.}
-
-\item{R}{the number of bootstrap replicate if \code{boot} is set to \code{TRUE}. Defaults to \code{100}.}
+\item{K.max}{maximum number of clusters to be considered if \code{nclusters} is set to \code{NULL}.}
 
 \item{B}{to be passed to the \code{B} argument of
 \code{\link[cluster]{clusGap}} if \code{"GAP"} is the chosen \code{criterion}.}
@@ -64,13 +58,13 @@ An object of class \code{trajClusters}; a list containing the result
 of the clustering, as well as a curated form of the arguments.
 }
 \description{
-Classifies the trajectories by applying the k-means clustering
+Classifies the trajectories by applying the k-medoids or k-means
 algorithm to the measures selected by \code{Step2Selection}.
 }
 \details{
 If \code{"GAP"} is the chosen \code{criterion} for determining the optimal number of clusters, the method described by Tibshirani et al. is implemented by the \code{\link[cluster]{clusGap}} function.
 
-Instead, if \code{"Calinski-Harabasz"} is the chosen \code{criterion}, the Calinski-Harabasz index is computed for each possible number of clusters between 2 and \code{K.max} and the optimal number of clusters is the maximizer of the Calinski-Harabasz index. Moreover, if \code{boot} is set to \code{TRUE}, then, following the guidelines suggested by Mesidor et al., a sampling distribution of the optimal number of clusters is obtained by bootstrap and the optimal number of clusters is chosen to be the (first) mode of this sampling distribution.
+Instead, if \code{"Calinski-Harabasz"} is the chosen \code{criterion}, the Calinski-Harabasz index is computed for each possible number of clusters between 2 and \code{K.max} and the optimal number of clusters is the maximizer of the Calinski-Harabasz index.
 }
 \examples{
 \dontrun{
@@ -92,8 +86,6 @@ c5.part <- Step3Clusters(s2, nclusters = 5)$partition
 
 }
 \references{
-Miceline Mésidor, Caroline Sirois, Marc Simard, Denis Talbot, A Bootstrap Approach for Evaluating Uncertainty in the Number of Groups Identified by Latent Class Growth Models, American Journal of Epidemiology, Volume 192, Issue 11, November 2023, Pages 1896–1903, https://doi.org/10.1093/aje/kwad148
-
 Tibshirani, R., Walther, G. and Hastie, T. (2001). Estimating the number of data clusters via the Gap statistic. Journal of the Royal Statistical Society B, 63, 411–423.
 
 Tibshirani, R., Walther, G. and Hastie, T. (2000). Estimating the number of clusters in a dataset via the Gap statistic. Technical Report. Stanford.
