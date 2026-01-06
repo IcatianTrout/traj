@@ -6,7 +6,7 @@
 \alias{traj-package}
 \title{traj: Clustering of Functional Data Based on Measures of Change}
 \description{
-Implements a three-step procedure in the spirit of Leffondre et al. (2004) to identify clusters of individual longitudinal trajectories. The procedure involves (1) computing a number of "measures of change" capturing various features of the trajectories; (2) using a Principal Component Analysis based dimension reduction algorithm to select a subset of measures and (3) using the k-medoids or k-means algorithm to identify clusters of trajectories.
+Identifies clusters of individual longitudinal trajectories. In the spirit of Leffondre et al. (2004), the procedure involves identifying each trajectory to a point in the space of measures. In this context, a measure is a quantity meant to capture a certain characteristic feature of the trajectory. The points in the space of measures are then clustered using an appropriate clustering algorithm.
 }
 \seealso{
 Useful links:

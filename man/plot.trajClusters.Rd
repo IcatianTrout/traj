@@ -3,18 +3,18 @@
 \name{plot.trajClusters}
 \alias{plot.trajClusters}
 \alias{scatterplots}
-\alias{critplot}
-\title{Plots \code{trajClusters} objects}
+\alias{CVIplot}
+\title{Plot \code{trajClusters} object}
 \usage{
-\method{plot}{trajClusters}(x, sample.size = 5, ask = TRUE, which.plots = NULL, spline = FALSE, ...)
+\method{plot}{trajClusters}(x, sample.size = 5, ask = TRUE, which.plots = NULL, ...)
 
 scatterplots(x, ask = TRUE, ...)
 
-critplot(x, ...)
+CVIplot(x, ...)
 }
 \arguments{
-\item{x}{object of class \code{trajClusters} as returned by
-\code{Step3Cluster}.}
+\item{x}{object of class \code{trajClusters} as returned by the function
+\code{trajClusters()}.}
 
 \item{sample.size}{the number of random trajectories to be randomly sampled
 from each cluster. Defaults to \code{5}.}
@@ -26,38 +26,28 @@ from each cluster. Defaults to \code{5}.}
 available plot is displayed. If a vector is supplied, only the corresponding
 plots will be displayed.}
 
-\item{spline}{logical. If \code{TRUE}, each trajectory will be smoothed using
-smoothing splines and the median and mean trajectories will be plotted from
-the smoothed trajectories. Defaults to \code{FALSE}}
-
 \item{...}{other parameters to be passed through to plotting functions.}
 }
 \description{
-Plots the
-cluster-specific median and mean trajectories and a random sample of
-trajectories from each cluster.
+Plots the curves corresponding to (or closest to) the centroids of the clusters and plots a random sample from each groups.
 }
 \examples{
 \dontrun{
 data("trajdata")
 trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] #remove the Group column
 
-m = Step1Measures(trajdata.noGrp, ID = TRUE)
-s = Step2Selection(m)
-c3 = Step3Clusters(s, nclusters = 3)
+m = trajMeasures(trajdata.noGrp, ID = TRUE)
+c3 = trajClusters(m, nclusters = 3)
 
 plot(c3)
 
 #The pointwise mean trajectories correspond to the third and fourth displayed plots.
 
-c4 = Step3Clusters(s, nclusters = 4)
+c4 = trajClusters(m, nclusters = 4)
 
 plot(c4, which.plots = 3:4)
 
 }
 
 
-}
-\seealso{
-\code{\link[traj]{Step3Clusters}}
 }
