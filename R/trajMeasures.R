@@ -687,7 +687,7 @@ trajMeasures <-
     ##         Cap the outliers         ##
     ######################################
  
-    outliers <- NA
+    outliers <- NULL
     
     if (cap.outliers == TRUE){
       outliers <-
