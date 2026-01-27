@@ -50,7 +50,7 @@
 #'\item  Maximum of the first derivative\cr
 #'\item  Minimum of the first derivative\cr
 #'\item  Standard deviation of the first derivative\cr
-#'\item  First derivative’s net variation per unit of time\cr
+#'\item  First derivative's net variation per unit of time\cr
 #'\item  Maximum  of the second derivative\cr
 #'\item  Minimum of the second derivative\cr
 #'\item  Standard deviation of the second derivative\cr
@@ -808,7 +808,7 @@ print.trajMeasures <- function(x, ...) {
   cat("m14: Maximum of the first derivative\n")
   cat("m15: Minimum of the first derivative\n")
   cat("m16: Standard deviation of the first derivative\n")
-  cat("m17: First derivative’s net variation per unit of time\n")
+  cat("m17: First derivative's net variation per unit of time\n")
   cat("m18: Maximum  of the second derivative\n")
   cat("m19: Minimum  of the second derivative\n")
   cat("m20: Standard deviation of the second derivative\n")
@@ -849,7 +849,7 @@ summary.trajMeasures <- function(object, ...) {
   cat("m14: Maximum of the first derivative\n")
   cat("m15: Minimum of the first derivative\n")
   cat("m16: Standard deviation of the first derivative\n")
-  cat("m17: First derivative’s net variation per unit of time\n")
+  cat("m17: First derivative's net variation per unit of time\n")
   cat("m18: Maximum  of the second derivative\n")
   cat("m19: Minimum  of the second derivative\n")
   cat("m20: Standard deviation of the second derivative\n")

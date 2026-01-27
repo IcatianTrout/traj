@@ -11,7 +11,7 @@ trajMeasures(
   Data,
   Time = NULL,
   ID = FALSE,
-  measures = c(1:18),
+  measures = c(1:10, 12:20),
   midpoint = NULL,
   cap.outliers = FALSE
 )
@@ -35,17 +35,16 @@ equidistant.}
 trajectories. Defaults to \code{FALSE}.}
 
 \item{measures}{a vector containing the numerical identifiers of the measures
-to compute. The default, 1:18, corresponds to
-measures 1-18 and thus excludes the measures which require specifying a
+to compute. The default, c(1:10,12:20), excludes the measure which require specifying a
 midpoint.}
 
 \item{midpoint}{specifies which column of \code{Time} to use as the midpoint
-in measure 19. Can be \code{NULL}, an integer or a vector of integers of length
+in measure 11 Can be \code{NULL}, an integer or a vector of integers of length
 the number of rows in \code{Time}. The default is \code{NULL}, in which case the
 midpoint is the time closest to the median of the Time vector specific to
 each trajectory.}
 
-\item{cap.outliers}{logical. If \code{TRUE}, extreme values of the measures will be capped. If \code{FALSE}, only the infinite values will be capped. Defaults to \code{FALSE}.}
+\item{cap.outliers}{logical. If \code{TRUE}, extreme values of the measures will be capped. Defaults to \code{FALSE}.}
 
 \item{x}{object of class \code{trajMeasures}.}
 
@@ -59,40 +58,40 @@ of the measures, a table of the outliers which have been capped, as well as
 a curated form of the function's arguments.
 }
 \description{
-\code{trajMeasures} computes up to 19 measures for each
+\code{trajMeasures} computes up to 20 measures for each
 longitudinal trajectory. See Details for the list of measures.
 }
 \details{
 Each trajectory must have a minimum of 3 observations, otherwise it
-is omitted from the analysis. The 19 measures and their numerical identifiers are listed below. Please
+is omitted from the analysis. The 20 measures and their numerical identifiers are listed below. Please
 refer to the vignette for the specific formulas used to compute them.
 \enumerate{
 \item  Maximum\cr
-\item  Range (max - min)\cr
+\item  Minimum\cr
+\item  Range\cr
 \item  Mean value\cr
 \item  Standard deviation\cr
-\item  Intercept of linear model\cr
-\item  Slope of the linear model\cr
-\item  \eqn{R^2}: Proportion of variance explained by the linear model\cr
-\item  Curve length (total variation)\cr
-\item  Rate of intersection with the mean\cr
-\item  Proportion of time spent above the mean\cr
-\item  Minimum  of the first derivative\cr
+\item  Slope of the affine approximation\cr
+\item  Intercept of the affine approximation\cr
+\item  Proportion of variance explained by the affine approximation\cr
+\item  Rate of intersection with the best affine approximation\cr
+\item  Net variation per unit of time\cr
+\item  Late variation to early variation contrast\cr
+\item  Total variation per unit time\cr
+\item  Spikiness\cr
 \item  Maximum of the first derivative\cr
-\item  Mean of the first derivative\cr
+\item  Minimum of the first derivative\cr
 \item  Standard deviation of the first derivative\cr
-\item  Minimum  of the second derivative\cr
-\item  Maximum of the second derivative\cr
-\item  Mean of the second derivative\cr
+\item  First derivative's net variation per unit of time\cr
+\item  Maximum  of the second derivative\cr
+\item  Minimum of the second derivative\cr
 \item  Standard deviation of the second derivative\cr
-\item  Later change/Early change\cr
 }
 
-If 'cap.outliers' is set to \code{TRUE}, or if some measures are infinite as a result of division by 0, Nishiyama's improved Chebychev bound for continuous distributions
+If 'cap.outliers' is set to \code{TRUE}, Nishiyama's improved Chebychev bound for continuous distributions
 is used to determine extreme values for each measure, corresponding to
 a 0.3\% probability threshold. Extreme values beyond the threshold are then capped
-to the 0.3\% probability threshold (see vignette for more details). If applicable, the values which
-would be of the form 0/0 are set to 1.
+to the 0.3\% probability threshold (see vignette for more details).
 }
 \examples{
 \dontrun{
