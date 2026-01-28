@@ -1,3 +1,14 @@
+# traj 3.0.0
+
+-   Substantial modifications to the measures.
+
+-   The clustering step now relies of a version of spectral clustering
+
+-   The main function are trajMeasures (computes the measures) and trajClusters (finds the clusters), with trajReduce (finds a representative subset of measures) being accessory.
+
+-   The plotting functions that trajClusters can be passed into are now plot, scatterplots and CVIplot.
+
+
 # traj 2.2.1
 
 -   Added a new measure, "m5: slope of linear model".
