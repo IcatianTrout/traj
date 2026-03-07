@@ -7,13 +7,11 @@
 
 <!-- badges: end -->
 
-The goal of traj is to implement a three-step procedure in the spirit of
-Leffondre et al. (2004) to identify clusters of individual longitudinal
-trajectories. The procedure involves (1) computing a number of “measures
-of change” capturing various features of the trajectories; (2) using a
-Principal Component Analysis based dimension reduction algorithm to
-select a subset of measures and (3) using the k-medoids or k-means
-algorithm to identify clusters of trajectories.
+The goal of traj is to form clusters of longitudinal trajectories
+sharing certain distinctive characteristics. The procedure involves
+computing a set of numerical “measures”, each capturing a certain
+feature of the trajectory, and using a Spectral Clustering algorithm on
+those to identify the clusters.
 
 ## Installation
 
