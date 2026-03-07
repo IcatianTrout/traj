@@ -1,12 +1,17 @@
+# traj 3.0.1
+
+
 # traj 3.0.0
 
 -   Substantial modifications to the measures.
 
--   The clustering step now relies of a version of spectral clustering
+-   The clustering step now relies on a version of the Spectral Clustering algorithm.
 
 -   The main function are trajMeasures (computes the measures) and trajClusters (finds the clusters), with trajReduce (finds a representative subset of measures) being accessory.
 
 -   The plotting functions that trajClusters can be passed into are now plot, scatterplots and CVIplot.
+
+-   The trajClusters function responsible of finding the clusters has a logical argument that allows to choose between soft and hard clustering.
 
 
 # traj 2.2.1
