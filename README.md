@@ -4,6 +4,7 @@
 # traj
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 The goal of traj is to implement a three-step procedure in the spirit of
