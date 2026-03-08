@@ -206,10 +206,10 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, ...) {
     }
     
     
-    selection.y <- x$selection[, -c(1)]
+    selection.y <- x$selection[, -c(1), drop = F]
     
     if(!is.null(which.scatter)){
-      selection.x <- selection.y[, which.scatter]
+      selection.x <- selection.y[, which.scatter, drop = F]
     } else{
       selection.x <- selection.y
     }
