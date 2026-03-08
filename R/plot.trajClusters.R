@@ -258,7 +258,8 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
     }
     
     for (m in v) {
-      par(mfrow = good.grid)
+      # mar=c(bottom, left, top, right)
+      par(mfrow = good.grid, mar = c(5, 4, 4, 3), xpd = TRUE)
       
       if(!is.null(which.scatter)){
         w <- which(x$select == which.scatter[m])
@@ -298,7 +299,7 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
         }
         
         legend(
-          "topright",
+          "topright", inset = c(-0.225, 0),
           lty = rep(0, x$nclusters),
           pch = c(0:(x$nclusters-1)),
           col = color.pal[1:x$nclusters],
