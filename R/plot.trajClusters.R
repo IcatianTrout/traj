@@ -4,8 +4,8 @@
 #'
 #'@param x object of class \code{trajClusters} as returned by the function
 #'  \code{trajClusters()}.
-#'@param sample.size the number of random trajectories to be randomly sampled
-#'  from each cluster. Defaults to \code{5}.
+#'@param sample.size the number of trajectories to be randomly sampled
+#'  from each clusters. If \code{NULL}, all the trajectories are included in a random order. Defaults to \code{5}.
 #'@param ask logical. If \code{TRUE}, the user is asked before each plot. Defaults to
 #'  \code{TRUE}.
 #'@param which.plots either \code{NULL} or a vector of integers. If \code{NULL}, every
@@ -112,29 +112,40 @@ plot.trajClusters <-
           x$time[which(x$partition[, 2] == k),-c(1), drop = FALSE]
       }
       
-      # Plot (max) sample.size random trajectories from each group
+      ## Plot (max) sample.size random trajectories from each group
       smpl.traj.by.clusters <- list()
       smpl.time.by.clusters <- list()
       
       smpl.traj <-
-        matrix(nrow = 0, ncol = ncol(x$data) - 1)
+        matrix(nrow = 0, ncol = ncol(x$data))
       smpl.time <-
         matrix(nrow = 0, ncol = ncol(x$time) - 1)
+
+      size <- c()
       
       for (k in seq_len(x$nclusters)) {
-        size <- min(sample.size, nrow(traj.by.clusters[[k]]))
+        if(!is.null(sample.size)){
+        size[k] <- min(sample.size, nrow(traj.by.clusters[[k]]))
+        } else{
+          size[k] <- nrow(traj.by.clusters[[k]])
+        }
         smpl <-
           sample(x = seq_len(nrow(traj.by.clusters[[k]])),
-                 size = size,
+                 size = size[k],
                  replace = FALSE)
         smpl <- smpl[order(smpl)]
         
-        smpl.traj.by.clusters[[k]] <- traj.by.clusters[[k]][smpl, , drop = FALSE]
+        smpl.traj.by.clusters[[k]] <- cbind(traj.by.clusters[[k]][smpl, , drop = FALSE],k)
         smpl.time.by.clusters[[k]] <- time.by.clusters[[k]][smpl, , drop = FALSE]
         
         smpl.traj <- rbind(smpl.traj, smpl.traj.by.clusters[[k]])
         smpl.time <- rbind(smpl.time, smpl.time.by.clusters[[k]])
       }
+      
+      ## Shuffle the rows
+      s <- sample(seq_len(nrow(smpl.traj)), nrow(smpl.traj), replace=F)
+      smpl.traj <- smpl.traj[s, ]
+      smpl.time <- smpl.time[s, ]
       
       par(mfrow = c(1, 1))
       
@@ -142,29 +153,30 @@ plot.trajClusters <-
         x = 0,
         y = 0,
         xlim = c(min(smpl.time, na.rm = TRUE), max(smpl.time, na.rm = TRUE)),
-        ylim = c(min(smpl.traj, na.rm = TRUE), max(smpl.traj, na.rm = TRUE)),
+        ylim = c(min(smpl.traj[, -ncol(smpl.traj)], na.rm = TRUE), max(smpl.traj[, -ncol(smpl.traj)], na.rm = TRUE)),
         type = "n",
         xlab = "",
         ylab = "",
         main = "Sample trajectories"
       )
       
-      for (k in seq_len(x$nclusters)) {
-        for (i in seq_len(min(size, x$partition.summary[k]))) {
-          lines(
-            x = smpl.time.by.clusters[[k]][i,],
-            y = smpl.traj.by.clusters[[k]][i,],
-            type = "l",
-            col = color.pal[k]
-          )
-        }
-        legend(
-          "topright",
-          col = color.pal[1:k],
-          legend = paste(seq_len(x$nclusters))[1:k],
-          lty = rep(1, k)
+      ## Plot the trajectories in a random order
+      for(i in seq_len(nrow(smpl.traj))){
+        k <- smpl.traj[i, ncol(smpl.traj)]
+        
+        lines(
+          x = smpl.time[i,],
+          y = smpl.traj[i, -ncol(smpl.traj)],
+          type = "l",
+          col = color.pal[k]
         )
       }
+      legend(
+        "topright",
+        col = color.pal[seq_len(x$nclusters)],
+        legend = paste(seq_len(x$nclusters)),
+        lty = rep(1, x$nclusters)
+      )
     }
     
     print("See also 'CVIplot' for a plot of the statistic used to determined the number of clusters (if applicable) and see 'scatterplots' for scatter plots of the measures involved in the clustering.")
