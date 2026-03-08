@@ -11,6 +11,7 @@
 #'@param which.plots either \code{NULL} or a vector of integers. If \code{NULL}, every
 #'  available plot is displayed. If a vector is supplied, only the corresponding
 #'  plots will be displayed.
+#'@param which.scatter either \code{NULL} or a vector of integers that is a subset of the \code{measure} argument used in function \code{trajClusters} to produce object \code{x}. If \code{NULL}, every available scatter plots are displayed. If a vector is supplied, only the corresponding plots will be displayed.
 #'@param ... other parameters to be passed through to plotting functions.
 #'
 #'@importFrom grDevices palette.colors devAskNewPage graphics.off
@@ -171,7 +172,9 @@ plot.trajClusters <-
 #'@rdname plot.trajClusters
 #'
 #'@export
-scatterplots <- function(x, ask = TRUE, ...) {
+scatterplots <- function(x, ask = TRUE, which.scatter = NULL, ...) {
+  
+  if( (!is.null(which.scatter)) & (sum(!(which.scatter %in% x$select)) > 0) ){stop("The argument which.scatter should be a subset of the measure argument used in function trajClusters.")}
   
   current.ask.status <- devAskNewPage(ask = NULL)
   on.exit(devAskNewPage(ask = current.ask.status))  # Restore ask status on exit
@@ -184,9 +187,20 @@ scatterplots <- function(x, ask = TRUE, ...) {
   
   if (scatter.condition) {
     
-    which.scatter <- c(1:nb.measures)
+    if(is.null(which.scatter)){
+      v <- c(1:nb.measures)
+    } else{
+      v <- c(1:length(which.scatter))
+    }
     
-    selection <- x$selection[, -c(1)]
+    
+    selection.y <- x$selection[, -c(1)]
+    
+    if(!is.null(which.scatter)){
+      selection.x <- selection.y[, which.scatter]
+    } else{
+      selection.x <- selection.y
+    }
     
     # Set up the most compact grid depending on the number of selected measures
     X <- sqrt(nb.measures - 1)
@@ -207,34 +221,39 @@ scatterplots <- function(x, ask = TRUE, ...) {
       good.grid <- c(int.X + 1, int.X + 1)
     }
     
-    for (m in which.scatter) {
+    for (m in v) {
       par(mfrow = good.grid)
       
-      for (n in seq_len(nb.measures)[-m]) {
+      if(!is.null(which.scatter)){
+        w <- which(x$select == which.scatter[m])
+      } else {
+        w <- m
+      }
+      for (n in seq_len(nb.measures)[-w]) {
         plot(
           x = 0,
           y = 0,
-          xlim = c(min(selection[, m]), max(selection[, m])),
-          ylim = c(min(selection[, n]), max(selection[, n])),
+          xlim = c(min(selection.x[, m]), max(selection.x[, m])),
+          ylim = c(min(selection.y[, n]), max(selection.y[, n])),
           type = "n",
-          xlab = paste(colnames(selection[m])),
-          ylab = paste(colnames(selection[n])),
+          xlab = paste(colnames(selection.x[m])),
+          ylab = paste(colnames(selection.y[n])),
           main = paste(
             "Scatter plot of ",
-            paste(colnames(selection[m])),
+            paste(colnames(selection.x[m])),
             " vs ",
-            paste(colnames(selection)[n]),
+            paste(colnames(selection.y)[n]),
             sep = ""
           )
         )
         
         set.seed(38550)
-        S <- sample(1:nrow(selection), nrow(selection), replace = FALSE)
+        S <- sample(1:nrow(selection.x), nrow(selection.x), replace = FALSE)
         
         for(s in S){
           lines(
-            x = selection[s, m],
-            y = selection[s, n],
+            x = selection.x[s, m],
+            y = selection.y[s, n],
             type = "p",
             pch = (x$partition[s,2] - 1),
             col = color.pal[x$partition[s,2]],
