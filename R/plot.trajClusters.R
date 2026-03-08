@@ -12,6 +12,7 @@
 #'  available plot is displayed. If a vector is supplied, only the corresponding
 #'  plots will be displayed.
 #'@param which.scatter either \code{NULL} or a vector of integers that is a subset of the \code{measure} argument used in function \code{trajClusters} to produce object \code{x}. If \code{NULL}, every available scatter plots are displayed. If a vector is supplied, only the corresponding plots will be displayed.
+#'@param N the maximum number of points present in each scatter plots. If a non \code{NULL} value is specified, N points are sampled randomly in a way that preserves the relative groups sizes. If \code{NULL} (the default), all the points are plotted.
 #'@param ... other parameters to be passed through to plotting functions.
 #'
 #'@importFrom grDevices palette.colors devAskNewPage graphics.off
@@ -184,7 +185,7 @@ plot.trajClusters <-
 #'@rdname plot.trajClusters
 #'
 #'@export
-scatterplots <- function(x, ask = TRUE, which.scatter = NULL, ...) {
+scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
   
   if( (!is.null(which.scatter)) & (sum(!(which.scatter %in% x$select)) > 0) ){stop("The argument which.scatter should be a subset of the measure argument used in function trajClusters.")}
   
@@ -209,7 +210,7 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, ...) {
     selection.y <- x$selection[, -c(1), drop = F]
     
     if(!is.null(which.scatter)){
-      selection.x <- selection.y[, which.scatter, drop = F]
+      selection.x <- selection.y[, which(x$select == which.scatter), drop = F]
     } else{
       selection.x <- selection.y
     }
@@ -233,6 +234,29 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, ...) {
       good.grid <- c(int.X + 1, int.X + 1)
     }
     
+    
+    selection.x0 <- selection.x
+    selection.y0 <- selection.y
+    
+    grps <- x$partition[, 2]
+    
+    if(!is.null(N)){
+      selection.x.new <- selection.x[0, , drop = F]
+      selection.y.new <- selection.y[0, , drop = F]
+      new.grp.size <- round(N*x$partition.summary/sum(x$partition.summary))
+      grps <- c()
+      for(k in seq_len(x$nclusters)){
+        s <- sample(seq_len(x$partition.summary[k]), size = new.grp.size[k], replace = F)
+        aux.x <- selection.x[which(x$partition[, 2] == k), , drop = F][s, , drop = F]
+        aux.y <- selection.y[which(x$partition[, 2] == k), , drop = F][s, , drop = F]
+        selection.x.new <- rbind(selection.x.new, aux.x)
+        selection.y.new <- rbind(selection.y.new, aux.y)
+        grps <- c(grps, rep(k, new.grp.size[k]))
+      }
+      selection.x <- selection.x.new
+      selection.y <- selection.y.new
+    }
+    
     for (m in v) {
       par(mfrow = good.grid)
       
@@ -245,34 +269,33 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, ...) {
         plot(
           x = 0,
           y = 0,
-          xlim = c(min(selection.x[, m]), max(selection.x[, m])),
-          ylim = c(min(selection.y[, n]), max(selection.y[, n])),
+          xlim = c(min(selection.x0[, m]), max(selection.x0[, m])),
+          ylim = c(min(selection.y0[, n]), max(selection.y0[, n])),
           type = "n",
-          xlab = paste(colnames(selection.x[m])),
-          ylab = paste(colnames(selection.y[n])),
+          xlab = paste(colnames(selection.x0[m])),
+          ylab = paste(colnames(selection.y0[n])),
           main = paste(
             "Scatter plot of ",
-            paste(colnames(selection.x[m])),
+            paste(colnames(selection.x0[m])),
             " vs ",
-            paste(colnames(selection.y)[n]),
+            paste(colnames(selection.y0)[n]),
             sep = ""
           )
         )
-        
+      
         set.seed(38550)
-        S <- sample(1:nrow(selection.x), nrow(selection.x), replace = FALSE)
+        S <- sample(seq_len(nrow(selection.x)), nrow(selection.x), replace = FALSE)
         
         for(s in S){
           lines(
             x = selection.x[s, m],
             y = selection.y[s, n],
             type = "p",
-            pch = (x$partition[s,2] - 1),
-            col = color.pal[x$partition[s,2]],
-            bg = color.pal[x$partition[s,2]]
+            pch = (grps[s] - 1),
+            col = color.pal[grps[s]],
+            bg = color.pal[grps[s]]
           )
         }
-        
         
         legend(
           "topright",
