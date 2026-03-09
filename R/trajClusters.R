@@ -8,6 +8,7 @@
 #'  measures to use in the clustering. Defaults to \code{NULL}, which uses all the measures contained in \code{Measures}.
 #'@param fuzzy logical. If FALSE, each trajectory is assigned to a unique group. If TRUE, each trajectory is assigned a "degree of membership" to each group. Defaults to FALSE.
 #'@param nclusters The desired number of clusters. If \code{NULL}, clustering is carried out for every number of clusters between 2 and (up to) 8 and the "best" number of clusters is used, as judged by the combination of three internal cluster validity indices. See section 'Value' for more details. Defaults to \code{NULL}.
+#'@param subset.n A positive numerical integer smaller than the number of trajectories. If \code{nclusters} is \code{NULL}, \code{subset} is the number of trajectories, randomly sampled from the complete data set, that will be used to determine the optimal number of clusters in the interest of speeding up the process.
 #'@param nstart The number of random starts. Defaults to \code{50}.
 #'@param x object of class \code{trajClusters}.
 #'@param object object of class \code{trajClusters}.
@@ -54,6 +55,7 @@ trajClusters <-
             select = NULL,
             fuzzy = FALSE,
             nclusters = NULL,
+            subset.n = NULL,
             nstart = 50
   ) {
     
@@ -63,6 +65,10 @@ trajClusters <-
     
     if (!(fuzzy %in% c("TRUE", "FALSE"))) {
       stop("'fuzzy' should be either 'TRUE' or 'FALSE'.")
+    }
+    
+    if ( is.null(nclusters) && !( (length(subset.n) == 1) && (subset.n %in% seq_len(nrow(Measures$data))) ) ){
+      stop("'subset.n' should be a numerical integer smaller than the number of trajectories.")
     }
     
     k.max <- min(ceiling(sqrt(nrow(Measures$measures))), 8)
@@ -112,6 +118,12 @@ trajClusters <-
     
     if (is.null(nclusters)) {
       
+      if(is.null(subset.n)){
+        dat0 <- dat
+      } else{
+        dat0 <- dat[sample(seq_len(nrow(dat)), subset.n, replace = FALSE), ]
+      }
+      
       crit.list <- c("C_index", "Calinski_Harabasz", "Wemmert_Gancarski")
       
       ICV <- matrix(NA, nrow = length(crit.list), ncol = (k.max - 1))
@@ -119,7 +131,7 @@ trajClusters <-
       colnames(ICV) <- paste("k=",2:k.max,sep="")
       
       for(p in 2:k.max){
-        ICV[, p-1] <-  unlist(clusterCrit::intCriteria(as.matrix(dat), part = spect(x = dat, k = p, fuzzy = FALSE, nstart = nstart)$cluster, crit = crit.list))
+        ICV[, p-1] <-  unlist(clusterCrit::intCriteria(as.matrix(dat0), part = spect(x = dat0, k = p, fuzzy = FALSE, nstart = nstart)$cluster, crit = crit.list))
       }
       
       ICV.raw <- ICV
