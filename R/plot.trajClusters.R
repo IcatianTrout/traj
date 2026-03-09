@@ -284,7 +284,6 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
           )
         )
       
-        set.seed(38550)
         S <- sample(seq_len(nrow(selection.x)), nrow(selection.x), replace = FALSE)
         
         for(s in S){
