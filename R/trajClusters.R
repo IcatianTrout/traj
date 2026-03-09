@@ -67,9 +67,12 @@ trajClusters <-
       stop("'fuzzy' should be either 'TRUE' or 'FALSE'.")
     }
     
-    if ( is.null(nclusters) && !( (length(subset.n) == 1) && (subset.n %in% seq_len(nrow(Measures$data))) ) ){
-      stop("'subset.n' should be a numerical integer smaller than the number of trajectories.")
+    if(is.null(nclusters)){
+      if ( !is.null(subset.n) && !( (length(subset.n) == 1) && (subset.n %in% seq_len(nrow(Measures$data))) ) ){
+        stop("'subset.n' should be a numerical integer smaller than the number of trajectories.")
+      }
     }
+    
     
     k.max <- min(ceiling(sqrt(nrow(Measures$measures))), 8)
     ID <- Measures$measures[, 1]
