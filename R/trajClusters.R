@@ -68,8 +68,8 @@ trajClusters <-
     }
     
     if(is.null(nclusters)){
-      if ( !is.null(subset.n) && !( (length(subset.n) == 1) && (subset.n %in% seq_len(nrow(Measures$data))) ) ){
-        stop("'subset.n' should be a numerical integer smaller than the number of trajectories.")
+      if ( !is.null(subset.n) && !( (length(subset.n) == 1) && (subset.n %in% seq_len(nrow(Measures$measures))) ) ){
+        stop("'subset.n' should be a numerical integer smaller than the total number of admissible trajectories.")
       }
     }
     

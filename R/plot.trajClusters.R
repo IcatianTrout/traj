@@ -189,6 +189,12 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
   
   if( (!is.null(which.scatter)) & (sum(!(which.scatter %in% x$select)) > 0) ){stop("The argument which.scatter should be a subset of the measure argument used in function trajClusters.")}
   
+
+    if ( !is.null(N) && !( ( is.numeric(N) && (length(N) == 1)) && (N %in% seq_len(nrow(x$selection))) ) ){
+      stop("'N' should be either NULL or a numerical integer smaller than the total number of admissible trajectories.")
+    }
+  
+  
   current.ask.status <- devAskNewPage(ask = NULL)
   on.exit(devAskNewPage(ask = current.ask.status))  # Restore ask status on exit
   devAskNewPage(ask = ask)
