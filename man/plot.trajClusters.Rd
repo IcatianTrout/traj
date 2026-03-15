@@ -8,7 +8,7 @@
 \usage{
 \method{plot}{trajClusters}(x, sample.size = 5, ask = TRUE, which.plots = NULL, ...)
 
-scatterplots(x, ask = TRUE, ...)
+scatterplots(x, ask = TRUE, which.scatter = NULL, N = NULL, ...)
 
 CVIplot(x, ...)
 }
@@ -16,8 +16,8 @@ CVIplot(x, ...)
 \item{x}{object of class \code{trajClusters} as returned by the function
 \code{trajClusters()}.}
 
-\item{sample.size}{the number of random trajectories to be randomly sampled
-from each cluster. Defaults to \code{5}.}
+\item{sample.size}{the number of trajectories to be randomly sampled
+from each clusters. If \code{NULL}, all the trajectories are included in a random order. Defaults to \code{5}.}
 
 \item{ask}{logical. If \code{TRUE}, the user is asked before each plot. Defaults to
 \code{TRUE}.}
@@ -27,6 +27,10 @@ available plot is displayed. If a vector is supplied, only the corresponding
 plots will be displayed.}
 
 \item{...}{other parameters to be passed through to plotting functions.}
+
+\item{which.scatter}{either \code{NULL} or a vector of integers that is a subset of the \code{measure} argument used in function \code{trajClusters} to produce object \code{x}. If \code{NULL}, every available scatter plots are displayed. If a vector is supplied, only the corresponding plots will be displayed.}
+
+\item{N}{the maximum number of points present in each scatter plots. If a non \code{NULL} value is specified, N points are sampled randomly in a way that preserves the relative groups sizes. If \code{NULL} (the default), all the points are plotted.}
 }
 \description{
 Plots the curves corresponding to (or closest to) the centroids of the clusters and plots a random sample from each groups.

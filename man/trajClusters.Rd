@@ -11,6 +11,7 @@ trajClusters(
   select = NULL,
   fuzzy = FALSE,
   nclusters = NULL,
+  subset.n = NULL,
   nstart = 50
 )
 
@@ -28,6 +29,8 @@ measures to use in the clustering. Defaults to \code{NULL}, which uses all the m
 \item{fuzzy}{logical. If FALSE, each trajectory is assigned to a unique group. If TRUE, each trajectory is assigned a "degree of membership" to each group. Defaults to FALSE.}
 
 \item{nclusters}{The desired number of clusters. If \code{NULL}, clustering is carried out for every number of clusters between 2 and (up to) 8 and the "best" number of clusters is used, as judged by the combination of three internal cluster validity indices. See section 'Value' for more details. Defaults to \code{NULL}.}
+
+\item{subset.n}{A positive numerical integer smaller than the number of trajectories. If \code{nclusters} is \code{NULL}, \code{subset} is the number of trajectories, randomly sampled from the complete data set, that will be used to determine the optimal number of clusters in the interest of speeding up the process.}
 
 \item{nstart}{The number of random starts. Defaults to \code{50}.}
 

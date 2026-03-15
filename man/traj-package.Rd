@@ -6,7 +6,7 @@
 \alias{traj-package}
 \title{traj: Feature-Based Clustering of Longitudinal Trajectories}
 \description{
-Identifies clusters of individual longitudinal trajectories. In the spirit of Leffondre et al. (2004), the procedure involves identifying each trajectory to a point in the space of measures. In this context, a measure is a quantity meant to capture a certain characteristic feature of the trajectory. The points in the space of measures are then clustered using a version of spectral clustering.
+Identifies clusters of individual longitudinal trajectories. In the spirit of Leffondre et al. (2004), the procedure involves identifying each trajectory to a point in the space of measures. In this context, a measure is a quantity meant to capture a certain characteristic feature of the trajectory. The points in the space of measures are then clustered using a version of the Spectral Clustering algorithm.
 }
 \seealso{
 Useful links:
