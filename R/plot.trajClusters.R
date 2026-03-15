@@ -144,7 +144,7 @@ plot.trajClusters <-
       }
       
       ## Shuffle the rows
-      s <- sample(seq_len(nrow(smpl.traj)), nrow(smpl.traj), replace=F)
+      s <- sample(seq_len(nrow(smpl.traj)), nrow(smpl.traj), replace = FALSE)
       smpl.traj <- smpl.traj[s, ]
       smpl.time <- smpl.time[s, ]
       
@@ -213,10 +213,10 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
     }
     
     
-    selection.y <- x$selection[, -c(1), drop = F]
+    selection.y <- x$selection[, -c(1), drop = FALSE]
     
     if(!is.null(which.scatter)){
-      selection.x <- selection.y[, which(x$select == which.scatter), drop = F]
+      selection.x <- selection.y[, which(x$select == which.scatter), drop = FALSE]
     } else{
       selection.x <- selection.y
     }
@@ -247,14 +247,14 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
     grps <- x$partition[, 2]
     
     if(!is.null(N)){
-      selection.x.new <- selection.x[0, , drop = F]
-      selection.y.new <- selection.y[0, , drop = F]
+      selection.x.new <- selection.x[0, , drop = FALSE]
+      selection.y.new <- selection.y[0, , drop = FALSE]
       new.grp.size <- round(N*x$partition.summary/sum(x$partition.summary))
       grps <- c()
       for(k in seq_len(x$nclusters)){
-        s <- sample(seq_len(x$partition.summary[k]), size = new.grp.size[k], replace = F)
-        aux.x <- selection.x[which(x$partition[, 2] == k), , drop = F][s, , drop = F]
-        aux.y <- selection.y[which(x$partition[, 2] == k), , drop = F][s, , drop = F]
+        s <- sample(seq_len(x$partition.summary[k]), size = new.grp.size[k], replace = FALSE)
+        aux.x <- selection.x[which(x$partition[, 2] == k), , drop = FALSE][s, , drop = FALSE]
+        aux.y <- selection.y[which(x$partition[, 2] == k), , drop = FALSE][s, , drop = FALSE]
         selection.x.new <- rbind(selection.x.new, aux.x)
         selection.y.new <- rbind(selection.y.new, aux.y)
         grps <- c(grps, rep(k, new.grp.size[k]))
