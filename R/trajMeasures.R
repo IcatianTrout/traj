@@ -250,9 +250,9 @@ trajMeasures <-
       }
       if (length(rmv) > 0) {
         data2 <- data2[-rmv, ]
-        if (ID == TRUE) {
+        
           IDvector <- IDvector[-rmv]
-        }
+        
       }
       data <- data2
       
