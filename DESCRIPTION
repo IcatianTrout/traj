@@ -1,6 +1,6 @@
 Package: traj
 Title: Feature-Based Clustering of Longitudinal Trajectories
-Version: 3.0.1
+Version: 3.0.2
 Authors@R: c(person("Marie-Pierre", "Sylvestre", role = "aut", email="marie-pierre.sylvestre@umontreal.ca"),
               person("Laurence", "Boulanger", role = c("aut","cre"), email="laurence.boulanger@umontreal.ca"),
               person("Gillis Delmas", "Tchouangue Dinkou", role = "ctb"),

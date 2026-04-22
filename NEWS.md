@@ -1,3 +1,9 @@
+# traj 3.0.2
+
+-   Fixed a small bug that occurred in `trajMeasures` when ID=FALSE and some trajectories have less than 3 observations.
+-   Changed the `trajdata` data set by making trajectories 1 and 130 into outliers.
+
+
 # traj 3.0.1
 
 -  In the `plot` function, setting the argument `sample.size` to `NULL` plots all the trajectories on the same graph (in a random order).
@@ -5,7 +11,6 @@
 -   In `scatterplots`, the legend now appear outside the scatter plots, for improved visibility.
 -   In the `scatterplots` function, we added an argument `which.scatter` allowing to plot only a subset of all the available scatter plots.
 -   In the `scatterplots` function, we added an argument `N` allowing to plot a random sample of size `N`, while preserving the groups' relative sizes. Assuming `N` is large enough that the sample is representative of the data, this would speed up the plotting process.
-
 
 
 # traj 3.0.0
