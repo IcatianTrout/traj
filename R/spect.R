@@ -2,8 +2,8 @@ spect <- function(x, k, nstart, fuzzy){
   
   knn_adjacency <- function(X, K){
     W <- matrix(0, nrow = nrow(X), ncol = nrow(X)) 
-    for(j in 1:ncol(X)){
-      knn <- order(X[j, ])[-which(order(X[j, ]) == j)][1:K] # find the K nearest points to the j-th data point, excluding the j-th data point.
+    for(j in seq_len(ncol(X))){
+      knn <- order(X[j, ])[-which(order(X[j, ]) == j)][seq_len(K)] # find the K nearest points to the j-th data point, excluding the j-th data point.
       W[knn, j] <- 1
     }
     return((W + t(W))/2)
@@ -25,7 +25,7 @@ spect <- function(x, k, nstart, fuzzy){
     Y <- as.matrix(eigenvectors[, c(1:k)])
   }
   X <- solve(sqrt(D)) %*% Y
-  for(l in 1:n){
+  for(l in seq_len(n)){
     if(!(sum(X[l, ])^2 == 0)){
       X[l, ] <- X[l, ]/sqrt(sum(X[l, ]^2))
     }
@@ -38,9 +38,9 @@ spect <- function(x, k, nstart, fuzzy){
   sq.sum <- function(y, g, cl){return((y - cl$centers[g, ])^2)}
   find.row <- function(y, w, aux){return(identical(y, aux[w, ]))}
   
-  for(s in 1:nstart){
+  for(s in seq_len(nstart)){
     
-    center.matrix <- as.matrix(X[sample(1:n, size = 1), , drop = F]) #pick the first center randomly
+    center.matrix <- as.matrix(X[sample(seq_len(n), size = 1), , drop = F]) #pick the first center randomly
     
     #pick the rest of the centers to be as mutually orthogonal as possible
     for(p in 2:k){
@@ -66,7 +66,7 @@ spect <- function(x, k, nstart, fuzzy){
       partition.matrix[s, ] <- cl$cluster
       fuzzy.partition.list <- NULL
       
-      for(g in 1:k){
+      for(g in seq_len(k)){
         aux <- X[which(cl$cluster == g), , drop = FALSE]
         if(ncol(X) > 1){
           distance <- sqrt(colSums(apply(aux, 1, FUN = sq.sum, g = g, cl = cl)))
@@ -82,7 +82,7 @@ spect <- function(x, k, nstart, fuzzy){
       CH.v[s] <- unlist(clusterCrit::intCriteria(as.matrix(X), part = cl$cluster, crit = "calinski_harabasz")$calinski_harabasz)
       partition.matrix[s, ] <- cl$cluster
       fuzzy.partition.list[[s]] <- cl$membership
-      for(g in 1:k){
+      for(g in seq_len(k)){
         aux <- X[which(cl$cluster == g), , drop = FALSE]
         if(ncol(X) > 1){
           distance <- sqrt(colSums(apply(aux, 1, FUN = sq.sum, g = g, cl = cl)))

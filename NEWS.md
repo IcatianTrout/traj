@@ -2,6 +2,7 @@
 
 -   Fixed a small bug that occurred in `trajMeasures` when ID=FALSE and some trajectories have less than 3 observations.
 -   Changed the `trajdata` data set by making trajectories 1 and 130 into outliers.
+-   Changed the I
 
 
 # traj 3.0.1
