@@ -182,7 +182,11 @@ trajClusters <-
     
     decr.order <- rev(order(summary(factor(partition))))
     row.centers <- row.centers[decr.order]
-    fuzzy.partition <- fuzzy.partition[, decr.order]
+    if(fuzzy == TRUE){
+      fuzzy.partition <- fuzzy.partition[, decr.order]
+      colnames(fuzzy.partition) <- as.character(seq_len(nclusters))
+    }
+    
     
     w <- list()
     for (g in seq_len(nclusters)) {
