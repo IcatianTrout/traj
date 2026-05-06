@@ -65,7 +65,7 @@ trajReduce <-
       criterion.v <- c()
       
       for(i in 1:(ncol(combin))){
-        s3.i = quiet(trajClusters(Measures, select = combin[, i], fuzzy = FALSE, nclusters =  Clusters$nclusters))
+        s3.i = quiet(trajClusters(Measures, select = combin[, i], fuzzy = Clusters$fuzzy, nclusters =  Clusters$nclusters))
         
         traj.i <- as.factor(s3.i$partition[,"Cluster"])
         
@@ -82,7 +82,7 @@ trajReduce <-
       
       w <- which(criterion.v == max(criterion.v))[1]
       
-      Clusters.red <- quiet(trajClusters(Measures, select = combin[, w], fuzzy = Clusters$fuzzy, nclusters = keep))
+      Clusters.red <- quiet(trajClusters(Measures, select = combin[, w], fuzzy = Clusters$fuzzy, nclusters = Clusters$nclusters))
       
       traj.red <- as.factor(Clusters.red$partition[, "Cluster"])
       

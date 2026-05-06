@@ -1,8 +1,8 @@
 # traj 3.0.2
 
 -   Fixed a small bug that occurred in `trajMeasures` when ID=FALSE and some trajectories have less than 3 observations.
--   Changed the `trajdata` data set by making trajectories 1 and 130 into outliers.
--   Changed the I
+-   Made substantial changes to the `trajdata` data set.
+-   Fixed a mistake in the  `trajReduced` function that caused it to output the wrong number of clusters in certain situations.
 
 
 # traj 3.0.1
