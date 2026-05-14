@@ -19,8 +19,7 @@
 #'@param midpoint specifies which column of \code{Time} to use as the midpoint
 #'  in measure 11 Can be \code{NULL}, an integer or a vector of integers of length
 #'  the number of rows in \code{Time}. The default is \code{NULL}, in which case the
-#'  midpoint is the time closest to the median of the Time vector specific to
-#'  each trajectory.
+#'  midpoint is the time closest to the middle of the interval from the first to the last observation time specific to each trajectory.
 #'@param cap.outliers logical. If \code{TRUE}, extreme values of the measures will be capped. Defaults to \code{FALSE}.
 #'@param x object of class \code{trajMeasures}.
 #'@param object object of class \code{trajMeasures}.
@@ -309,9 +308,9 @@ trajMeasures <-
           if (length(Lines) == 1) {
             warning(
               paste(
-                "When left blank, the 'midpoint' argument defaults to the observation time closests to the median time 0.5*(max(Time)-min(Time)), but this can't be either the first or last observation time. As a result, row ",
+                "When left blank, the 'midpoint' argument defaults to the observation time closests to the average 0.5*(max(Time) + min(Time)), but this can't be either the first or last observation time. As a result, row ",
                 Lines,
-                " has been removed. To avoid this, consider excluding measure 19 from the analysis or providing custom 'midpoint' values.",
+                " has been removed. To avoid this, consider excluding measure 11 from the analysis or providing custom 'midpoint' values.",
                 sep = ""
               )
             )
@@ -319,9 +318,9 @@ trajMeasures <-
           if (length(Lines) > 1) {
             warning(
               paste(
-                "When left blank, the 'midpoint' argument defaults to the observation time closests to the median time 0.5*(max(Time)-min(Time)), but this can't be either the first or last observation time. As a result, rows ",
+                "When left blank, the 'midpoint' argument defaults to the observation time closests to the average time 0.5*(max(Time) + min(Time)), but this can't be either the first or last observation time. As a result, rows ",
                 noquote(paste(Lines, collapse = ", ")),
-                " have been removed. To avoid this, consider excluding measure 18 from the analysis or providing custom 'midpoint' values.",
+                " have been removed. To avoid this, consider excluding measure 11 from the analysis or providing custom 'midpoint' values.",
                 sep = ""
               )
             )
