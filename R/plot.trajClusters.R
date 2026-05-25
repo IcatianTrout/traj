@@ -12,7 +12,7 @@
 #'  available plot is displayed. If a vector is supplied, only the corresponding
 #'  plots will be displayed.
 #'@param which.scatter either \code{NULL} or a vector of integers that is a subset of the \code{measure} argument used in function \code{trajClusters} to produce object \code{x}. If \code{NULL}, every available scatter plots are displayed. If a vector is supplied, only the corresponding plots will be displayed.
-#'@param N the maximum number of points present in each scatter plots. If a non \code{NULL} value is specified, N points are sampled randomly in a way that preserves the relative groups sizes. If \code{NULL} (the default), all the points are plotted.
+#'@param N the maximum number of points present in each scatter plots. If a non \code{NULL} value is specified, \code{N} points are sampled randomly in a way that preserves the relative groups sizes. If \code{NULL} (the default), all the points are plotted.
 #'@param ... other parameters to be passed through to plotting functions.
 #'
 #'@importFrom grDevices palette.colors devAskNewPage graphics.off
