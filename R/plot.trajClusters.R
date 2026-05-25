@@ -25,17 +25,12 @@
 #'trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] #remove the Group column
 #'
 #'m = trajMeasures(trajdata.noGrp, ID = TRUE)
-
+#'
 #'c3 = trajClusters(m, nclusters = 3)
 #'
-#'plot(c3)
+#'plot(c3, which.plots = 1, ask= FALSE) ## centroids
 #'
-#'#The pointwise mean trajectories correspond to the third and fourth displayed plots.
-#'
-#'c4 = trajClusters(m, nclusters = 4)
-#'
-#'plot(c4, which.plots = 3:4)
-#'
+#'plot(c3, which.plots = 2, ask= FALSE) ## sample trajectories
 #'}
 #'
 #'
