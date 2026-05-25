@@ -9,6 +9,8 @@
 #'
 #'@details The Rand index ranges from 0 to 1 with 0 indicating identical clusters and 1 indicating maximally different clusters. The normalized variation of information distance (nVId) and normalized split-join distance (nSJd) and have the opposite interpretation with 0 indicating maximally different clusters and 1 indicating identical clusters. Therefor, to facilitate comparison, we plot 1 - nVId (resp. 1 - nSJd) instead of nVId (resp. nSJd).
 #'
+#'The function runs the \code{\link[traj]{trajClusters}} function on every combination of \code{keep} measures and identifies the reduced representation yielding the clustering most similar to the (hard) clustering in \code{Clusters}. If the (hard) clustering in \code{Clusters} derives from a soft clustering, the iterations of \code{\link[traj]{trajClusters}}  will also be ran using \code{fuzzy = TRUE} and the corresponding hard clusterings will be used for comparison.
+#'
 #'@importFrom igraph compare
 #'
 #'@references 
