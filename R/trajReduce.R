@@ -24,8 +24,9 @@
 #'data("trajdata")
 #'trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] #remove the Group column
 #'
-#'m = trajMeasures(trajdata.noGrp, ID = TRUE)
-#'trajReduce(m)
+#'m = trajMeasures(trajdata.noGrp, ID = TRUE, measures = 1:20)
+#'s2.4 <- trajClusters(m, nclusters = 4)
+#'trajReduce(m, s2.4)
 #'}
 #'
 #'@rdname trajReduce

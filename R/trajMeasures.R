@@ -79,8 +79,8 @@
 #'data("trajdata")
 #'trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] #remove the Group column
 #'
-#'m1 = trajMeasures(trajdata.noGrp, ID = TRUE, measures = 19, midpoint = NULL)
-#'m2 = trajMeasures(trajdata.noGrp, ID = TRUE, measures = 19, midpoint = 3)
+#'m1 = trajMeasures(trajdata.noGrp, ID = TRUE, measures = 11, midpoint = NULL)
+#'m2 = trajMeasures(trajdata.noGrp, ID = TRUE, measures = 11, midpoint = 3)
 #'
 #'identical(m1$measures, m2$measures)
 #'}
