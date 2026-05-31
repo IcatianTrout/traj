@@ -12,19 +12,19 @@ spect <- function(x, k, nstart, fuzzy){
   n <- nrow(x)
   K <- max(4, min(8, floor(n/(2*k)))) #number between 4 and 8
   S <- knn_adjacency(X = as.matrix(stats::dist(x)), K = K)
-  D <- diag(rowSums(S))
-  L <- solve(sqrt(D)) %*% S %*% solve(sqrt(D))
-  eigen_result <- eigen(L)
+  Dsq.inv <- diag(1/sqrt(rowSums(S)))
+  L <- as(Dsq.inv %*% S %*% Dsq.inv, "dgCMatrix") 
+  
+  eigen_result <- eigs_sym(L,k)
   eigenvalues <- eigen_result$values
   eigenvectors <- eigen_result$vectors
   
-  
-  if( abs(eigenvalues[2] - 1) > 1e-6 ){
-    Y <- as.matrix(eigenvectors[, c(2:k)])
-  } else {
-    Y <- as.matrix(eigenvectors[, c(1:k)])
+  if(length(unique(eigenvectors[,1])) == 1){
+    Y <- eigenvectors[, -1, drop = FALSE]
+  } else{
+    Y <- eigenvectors
   }
-  X <- solve(sqrt(D)) %*% Y
+  X <- Dsq.inv %*% Y
   for(l in seq_len(n)){
     if(!(sum(X[l, ])^2 == 0)){
       X[l, ] <- X[l, ]/sqrt(sum(X[l, ]^2))
