@@ -5,7 +5,7 @@
 -   Made substantial changes to the `trajdata` data set.
 -   Fixed a mistake in the `trajReduced` function that caused it to output the wrong number of clusters in certain situations.
 -   Fixed labeling of the columns in the `fuzzy.partition` component of `trajClusters`.
-
+-   In the `scatterplots` function, the title of the plots is more informative.
 
 # traj 3.0.1
 

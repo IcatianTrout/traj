@@ -260,7 +260,9 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
     
     for (m in v) {
       # mar=c(bottom, left, top, right)
-      par(mfrow = good.grid, mar = c(5, 4, 4, 3), xpd = TRUE)
+      #par(mfrow = good.grid, mar = c(5, 4, 4, 3), xpd = TRUE)
+      par(mfrow = good.grid, mar = c(5, 4, 4, 5), xpd = TRUE)
+      
       
       if(!is.null(which.scatter)){
         w <- which(x$select == which.scatter[m])
@@ -268,6 +270,47 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
         w <- m
       }
       for (n in seq_len(nb.measures)[-w]) {
+        if(colnames(selection.x0[m]) == "m1"){ main1 <- paste(colnames(selection.x0[m])," : max", sep = "")}
+        if(colnames(selection.x0[m]) == "m2"){ main1 <- paste(colnames(selection.x0[m])," : min", sep = "")}
+        if(colnames(selection.x0[m]) == "m3"){ main1 <- paste(colnames(selection.x0[m])," : range", sep = "")}
+        if(colnames(selection.x0[m]) == "m4"){ main1 <- paste(colnames(selection.x0[m])," : mean", sep = "")}
+        if(colnames(selection.x0[m]) == "m5"){ main1 <- paste(colnames(selection.x0[m])," : SD", sep = "")}
+        if(colnames(selection.x0[m]) == "m6"){ main1 <- paste(colnames(selection.x0[m])," : slope", sep = "")}
+        if(colnames(selection.x0[m]) == "m7"){ main1 <- paste(colnames(selection.x0[m])," : intercept", sep = "")}
+        if(colnames(selection.x0[m]) == "m8"){ main1 <- paste(colnames(selection.x0[m])," : R²", sep = "")}
+        if(colnames(selection.x0[m]) == "m9"){ main1 <- paste(colnames(selection.x0[m])," : int. rate", sep = "")}
+        if(colnames(selection.x0[m]) == "m10"){ main1 <- paste(colnames(selection.x0[m])," : var. rate", sep = "")}
+        if(colnames(selection.x0[m]) == "m11"){ main1 <- paste(colnames(selection.x0[m])," : contrast", sep = "")}
+        if(colnames(selection.x0[m]) == "m12"){ main1 <- paste(colnames(selection.x0[m])," : tot var", sep = "")}
+        if(colnames(selection.x0[m]) == "m13"){ main1 <- paste(colnames(selection.x0[m])," : spikiness", sep = "")}
+        if(colnames(selection.x0[m]) == "m14"){ main1 <- paste(colnames(selection.x0[m])," : max f'", sep = "")}
+        if(colnames(selection.x0[m]) == "m15"){ main1 <- paste(colnames(selection.x0[m])," : min f'", sep = "")}
+        if(colnames(selection.x0[m]) == "m16"){ main1 <- paste(colnames(selection.x0[m])," : SD f'", sep = "")}
+        if(colnames(selection.x0[m]) == "m17"){ main1 <- paste(colnames(selection.x0[m])," : f' var. rate", sep = "")}
+        if(colnames(selection.x0[m]) == "m18"){ main1 <- paste(colnames(selection.x0[m])," : max f''", sep = "")}
+        if(colnames(selection.x0[m]) == "m19"){ main1 <- paste(colnames(selection.x0[m])," : min f''", sep = "")}
+        if(colnames(selection.x0[m]) == "m20"){ main1 <- paste(colnames(selection.x0[m])," : SD f''", sep = "")}
+        if(colnames(selection.y0[n]) == "m1"){ main2 <- paste(colnames(selection.y0[n])," : max", sep = "")}
+        if(colnames(selection.y0[n]) == "m2"){ main2 <- paste(colnames(selection.y0[n])," : min", sep = "")}
+        if(colnames(selection.y0[n]) == "m3"){ main2 <- paste(colnames(selection.y0[n])," : range", sep = "")}
+        if(colnames(selection.y0[n]) == "m4"){ main2 <- paste(colnames(selection.y0[n])," : mean", sep = "")}
+        if(colnames(selection.y0[n]) == "m5"){ main2 <- paste(colnames(selection.y0[n])," : SD", sep = "")}
+        if(colnames(selection.y0[n]) == "m6"){ main2 <- paste(colnames(selection.y0[n])," : slope", sep = "")}
+        if(colnames(selection.y0[n]) == "m7"){ main2 <- paste(colnames(selection.y0[n])," : intercept", sep = "")}
+        if(colnames(selection.y0[n]) == "m8"){ main2 <- paste(colnames(selection.y0[n])," : R²", sep = "")}
+        if(colnames(selection.y0[n]) == "m9"){ main2 <- paste(colnames(selection.y0[n])," : int. rate", sep = "")}
+        if(colnames(selection.y0[n]) == "m10"){ main2 <- paste(colnames(selection.y0[n])," : var. rate", sep = "")}
+        if(colnames(selection.y0[n]) == "m11"){ main2 <- paste(colnames(selection.y0[n])," : contrast", sep = "")}
+        if(colnames(selection.y0[n]) == "m12"){ main2 <- paste(colnames(selection.y0[n])," : tot var", sep = "")}
+        if(colnames(selection.y0[n]) == "m13"){ main2 <- paste(colnames(selection.y0[n])," : spikiness", sep = "")}
+        if(colnames(selection.y0[n]) == "m14"){ main2 <- paste(colnames(selection.y0[n])," : max f'", sep = "")}
+        if(colnames(selection.y0[n]) == "m15"){ main2 <- paste(colnames(selection.y0[n])," : min f'", sep = "")}
+        if(colnames(selection.y0[n]) == "m16"){ main2 <- paste(colnames(selection.y0[n])," : SD f'", sep = "")}
+        if(colnames(selection.y0[n]) == "m17"){ main2 <- paste(colnames(selection.y0[n])," : f' var. rate", sep = "")}
+        if(colnames(selection.y0[n]) == "m18"){ main2 <- paste(colnames(selection.y0[n])," : max f''", sep = "")}
+        if(colnames(selection.y0[n]) == "m19"){ main2 <- paste(colnames(selection.y0[n])," : min f''", sep = "")}
+        if(colnames(selection.y0[n]) == "m20"){ main2 <- paste(colnames(selection.y0[n])," : SD f''", sep = "")}
+        
         plot(
           x = 0,
           y = 0,
@@ -276,13 +319,7 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
           type = "n",
           xlab = paste(colnames(selection.x0[m])),
           ylab = paste(colnames(selection.y0[n])),
-          main = paste(
-            "Scatter plot of ",
-            paste(colnames(selection.x0[m])),
-            " vs ",
-            paste(colnames(selection.y0)[n]),
-            sep = ""
-          )
+          main = paste(main1,main2, sep = "\n")
         )
       
         S <- sample(seq_len(nrow(selection.x)), nrow(selection.x), replace = FALSE)
@@ -298,13 +335,22 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
           )
         }
         
-        legend(
-          "topright", inset = c(-0.225, 0),
-          lty = rep(0, x$nclusters),
-          pch = c(0:(x$nclusters-1)),
-          col = color.pal[1:x$nclusters],
-          legend = paste(seq_len(x$nclusters))[1:x$nclusters]
-        )
+        # legend(
+        #   "topright", inset = c(-0.225, 0),
+        #   lty = rep(0, x$nclusters),
+        #   pch = c(0:(x$nclusters-1)),
+        #   col = color.pal[1:x$nclusters],
+        #   legend = paste(seq_len(x$nclusters))[1:x$nclusters]
+        # )
+        
+        usr <- par("usr")
+        
+        legend(x = usr[2],
+               y = usr[4],
+               legend = paste(seq_len(x$nclusters))[1:x$nclusters],
+               col = color.pal[1:x$nclusters],
+               lty = rep(0, x$nclusters),
+               pch = c(0:(x$nclusters-1)))
       }
     }
   } else{
