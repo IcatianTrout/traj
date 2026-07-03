@@ -260,8 +260,7 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
     
     for (m in v) {
       # mar=c(bottom, left, top, right)
-      #par(mfrow = good.grid, mar = c(5, 4, 4, 3), xpd = TRUE)
-      par(mfrow = good.grid, mar = c(5, 4, 4, 5), xpd = TRUE)
+      par(mfrow = good.grid, mar = c(5, 5, 4, 5), xpd = TRUE)
       
       
       if(!is.null(which.scatter)){
