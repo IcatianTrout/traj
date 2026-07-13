@@ -1,12 +1,13 @@
 # traj 3.1.0
 
--   Switched the eigensolver from `eigen` to `eigs_sym` (package RSpectra) to speed up `trajClusters()`.
+-   Changed the eigensolver from `eigen` to `eigs_sym` (package RSpectra) to speed up `trajClusters()`.
 -   Fixed a small bug that occurred in `trajMeasures` when ID=FALSE and some trajectories have less than 3 observations.
 -   Made substantial changes to the `trajdata` data set.
 -   Fixed a mistake in the `trajReduced()` function that caused it to output the wrong number of clusters in certain situations.
 -   Fixed labeling of the columns in the `fuzzy.partition` component of `trajClusters()`.
 -   In the `scatterplots()` function, the title of the plots is more informative.
--   The `summary()` function, as it applies to the output of the `trajClusters()` function, now includes a `top_p` argument which identifies the `top_p` measures which are most discriminating for each group. 
+-   To facilitate interpretation, the `summary()` function, as it applies to the output of the `trajClusters()` function, now includes a `top_p` argument which identifies, for each cluster, the `top_p` measures which are most extreme. 
+-   The `plot()` function now additionally displays the cluster medians of each standardized measure.
 
 # traj 3.0.1
 

@@ -1,6 +1,6 @@
 #'@title Plot \code{trajClusters} object
 #'
-#'@description \code{plot()} plots the clusters centroids as well as a random sample from each cluster. \code{(scatterplots()} displays the two dimensional projections of the standardized data in feature space for every pair of measures. \code{CVIplot()} graphs the internal cluster validity indices as a fucntion of the number of clusters as well as the result of the ranked voting system for determining the optimal number of clusters.
+#'@description \code{plot()} sequentially plots (i) the clusters centroids, (ii) a random sample of trajectories from each cluster, and (iii) the median of each standardized measure by cluster. \code{(scatterplots()} displays the two dimensional projections of the standardized data in feature space for every pair of measures. \code{CVIplot()} graphs the internal cluster validity indices as a function of the number of clusters as well as the result of the ranked voting system for determining the optimal number of clusters.
 #'
 #'@param x object of class \code{trajClusters} as returned by the function
 #'  \code{trajClusters()}.
@@ -11,7 +11,7 @@
 #'@param which.plots either \code{NULL} or a vector of integers. If \code{NULL}, every
 #'  available plot is displayed. If a vector is supplied, only the corresponding
 #'  plots will be displayed.
-#'@param which.scatter either \code{NULL} or a vector of integers that is a subset of the \code{measure} argument used in function \code{trajClusters} to produce object \code{x}. If \code{NULL}, every available scatter plots are displayed. If a vector is supplied, only the corresponding plots will be displayed.
+#'@param which.scatter either \code{NULL} or a vector of integers that is a subset of the \code{measure} argument used in the function \code{trajClusters} to produce object \code{x}. If \code{NULL}, every available scatter plots are displayed. If a vector is supplied, only the corresponding plots will be displayed.
 #'@param N the maximum number of points present in each scatter plots. If a non \code{NULL} value is specified, \code{N} points are sampled randomly in a way that preserves the relative groups sizes. If \code{NULL} (the default), all the points are plotted.
 #'@param ... other parameters to be passed through to plotting functions.
 #'
@@ -31,6 +31,8 @@
 #'plot(c3, which.plots = 1, ask= FALSE) ## centroids
 #'
 #'plot(c3, which.plots = 2, ask= FALSE) ## sample trajectories
+#'
+#'plot(c3, which.plots = 3, ask= FALSE) ## median of standardized measures by cluster
 #'}
 #'
 #'
@@ -47,7 +49,7 @@ plot.trajClusters <-
     if (!is.null(which.plots) &
         (!is.numeric(which.plots) | !is.vector(which.plots))) {
       stop(
-        "The argument 'which.plots' should be a subset of the plots required, specified as a vector, so either 1, 2 or 1:2."
+        "The argument 'which.plots' should be a subset of the plots required, specified as a vector, eg. 1, 2, 2:3."
       )
     }
     
@@ -175,6 +177,97 @@ plot.trajClusters <-
       )
     }
     
+    if(is.null(which.plots) | 3 %in% which.plots){
+      
+      cl.medians <- data.frame(matrix(NA, nrow = x$nclusters, ncol = length(x$select)))
+      colnames(cl.medians) <- colnames(x$selection)[-1]
+      
+      for (i in seq_len(x$nclusters)) {
+        which.i <- which(x$partition[, 2] == i)
+      cl.medians[i, ] <- apply(x$standardized.data[which.i, ], 2, Q2)
+      }
+      
+      # Set up the most compact grid depending on the number of selected measures
+      nb.measures <- ncol(x$selection) - 1
+      
+      X <- sqrt(nb.measures - 1)
+      
+      int.X <- floor(X)
+      frac.X <- X - int.X
+      
+      
+      if (frac.X == 0) {
+        good.grid <- c(int.X, int.X)
+      }
+      
+      if ((frac.X > 0) & (frac.X < 0.5)) {
+        good.grid <- c(int.X, int.X + 1)
+      }
+      
+      if (frac.X >= 0.5) {
+        good.grid <- c(int.X + 1, int.X + 1)
+      }
+      
+      # mar=c(bottom, left, top, right)
+      par(mfrow = good.grid, mar = c(5, 5, 4, 5), xpd = TRUE)
+      color.pal <- palette.colors(palette = "Polychrome 36", alpha = 1)[-2]
+      
+      for(m in seq_len(length(x$select))){
+        if(x$select[m] == 1){ main <- paste("m1 : max", sep = "")}
+        if(x$select[m] == 2){ main <- paste("m2 : min", sep = "")}
+        if(x$select[m] == 3){ main <- paste("m3 : range", sep = "")}
+        if(x$select[m] == 4){ main <- paste("m4 : mean", sep = "")}
+        if(x$select[m] == 5){ main <- paste("m5 : SD", sep = "")}
+        if(x$select[m] == 6){ main <- paste("m6 : slope", sep = "")}
+        if(x$select[m] == 7){ main <- paste("m7 : intercept", sep = "")}
+        if(x$select[m] == 8){ main <- paste("m8 : R²", sep = "")}
+        if(x$select[m] == 9){ main <- paste("m9 : int. rate", sep = "")}
+        if(x$select[m] == 10){ main <- paste("m10 : var. rate", sep = "")}
+        if(x$select[m] == 11){ main <- paste("m11 : contrast", sep = "")}
+        if(x$select[m] == 12){ main <- paste("m12 : tot var", sep = "")}
+        if(x$select[m] == 13){ main <- paste("m13 : spikiness", sep = "")}
+        if(x$select[m] == 14){ main <- paste("m14 : max f'", sep = "")}
+        if(x$select[m] == 15){ main <- paste("m15 : min f'", sep = "")}
+        if(x$select[m] == 16){ main <- paste("m16 : SD f'", sep = "")}
+        if(x$select[m] == 17){ main <- paste("m17 : f' var. rate", sep = "")}
+        if(x$select[m] == 18){ main <- paste("m18 : max f''", sep = "")}
+        if(x$select[m] == 19){ main <- paste("m19 : min f''", sep = "")}
+        if(x$select[m] == 20){ main <- paste("m20 : SD f''", sep = "")}
+        
+        plot(
+          x = 0,
+          y = 0,
+          xlim = c(min(cl.medians), max(cl.medians)),
+          ylim = c(0,2),
+          type = "n",
+          xlab = "",
+          ylab = "",
+          yaxt = "n",
+          main = main
+        )
+
+        for(s in seq_len(x$nclusters)){
+          lines(
+            x = cl.medians[s, m],
+            y = 1,
+            type = "p",
+            pch = s - 1,
+            col = color.pal[s],
+            bg = color.pal[s]
+          )
+        }
+        
+        usr <- par("usr")
+        
+        legend(x = usr[2],
+               y = usr[4],
+               legend = paste(seq_len(x$nclusters))[1:x$nclusters],
+               col = color.pal[1:x$nclusters],
+               lty = rep(0, x$nclusters),
+               pch = c(0:(x$nclusters - 1)))
+      }
+    }
+    
     print("See also 'CVIplot' for a plot of the statistic used to determined the number of clusters (if applicable) and see 'scatterplots' for scatter plots of the measures involved in the clustering.")
   }
 #'@rdname plot.trajClusters
@@ -184,10 +277,10 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
   
   if( (!is.null(which.scatter)) & (sum(!(which.scatter %in% x$select)) > 0) ){stop("The argument which.scatter should be a subset of the measure argument used in function trajClusters.")}
   
-
-    if ( !is.null(N) && !( ( is.numeric(N) && (length(N) == 1)) && (N %in% seq_len(nrow(x$selection))) ) ){
-      stop("'N' should be either NULL or a numerical integer smaller than the total number of admissible trajectories.")
-    }
+  
+  if ( !is.null(N) && !( ( is.numeric(N) && (length(N) == 1)) && (N %in% seq_len(nrow(x$selection))) ) ){
+    stop("'N' should be either NULL or a numerical integer smaller than the total number of admissible trajectories.")
+  }
   
   
   current.ask.status <- devAskNewPage(ask = NULL)
@@ -208,10 +301,10 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
     }
     
     
-    selection.y <- x$selection[, -c(1), drop = FALSE]
+    selection.y <- x$standardized.data[, -c(1), drop = FALSE]
     
     if(!is.null(which.scatter)){
-      selection.x <- selection.y[, which(x$select == which.scatter), drop = FALSE]
+      selection.x <- selection.y[, which(x$select %in% which.scatter), drop = FALSE]
     } else{
       selection.x <- selection.y
     }
@@ -258,11 +351,10 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
       selection.y <- selection.y.new
     }
     
+    # mar=c(bottom, left, top, right)
+    par(mfrow = good.grid, mar = c(5, 5, 4, 5), xpd = TRUE)
+    
     for (m in v) {
-      # mar=c(bottom, left, top, right)
-      par(mfrow = good.grid, mar = c(5, 5, 4, 5), xpd = TRUE)
-      
-      
       if(!is.null(which.scatter)){
         w <- which(x$select == which.scatter[m])
       } else {
@@ -320,8 +412,8 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
           ylab = paste(colnames(selection.y0[n])),
           main = paste(main1,main2, sep = "\n")
         )
-      
-        S <- sample(seq_len(nrow(selection.x)), nrow(selection.x), replace = FALSE)
+        
+        S <- sample(seq_len(nrow(selection.x)), nrow(selection.x), replace = FALSE) #randomize
         
         for(s in S){
           lines(
@@ -333,14 +425,6 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
             bg = color.pal[grps[s]]
           )
         }
-        
-        # legend(
-        #   "topright", inset = c(-0.225, 0),
-        #   lty = rep(0, x$nclusters),
-        #   pch = c(0:(x$nclusters-1)),
-        #   col = color.pal[1:x$nclusters],
-        #   legend = paste(seq_len(x$nclusters))[1:x$nclusters]
-        # )
         
         usr <- par("usr")
         
