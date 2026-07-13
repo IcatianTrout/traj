@@ -294,7 +294,6 @@ print.trajClusters <- function(x, ...) {
 #'
 #'@export
 summary.trajClusters <- function(object, top_p = 3, ...) {
-  if(!is.null(object$nclusters)){
     
     if(!is.numeric(top_p)) stop(paste("top_p must be an integer greater than 1", sep = ""))
     if(!(length(top_p) == 1)) stop(paste("top_p must be an integer greater than 1", sep = ""))
@@ -335,6 +334,8 @@ summary.trajClusters <- function(object, top_p = 3, ...) {
     cl.medians <- data.frame(matrix(NA, nrow = object$nclusters, ncol = length(object$select)))
     colnames(cl.medians) <- colnames(object$selection)[-1]
     
+    measures.summaries <- list()
+    
     for (i in seq_len(object$nclusters)) {
       measures.summary <-
         data.frame(matrix(
@@ -371,6 +372,8 @@ summary.trajClusters <- function(object, top_p = 3, ...) {
       cat("\n")
       print(measures.summary)
       cat("\n")
+      
+      measures.summaries[[i]] <- measures.summary
     }
     
     ranks <- dirs <- deltas <- cl.medians
@@ -442,7 +445,19 @@ summary.trajClusters <- function(object, top_p = 3, ...) {
     print(analysis)
     cat("\n")
     
-  }
+    summary.trajClusters <-
+      structure(
+        list(
+          summaries = measures.summaries,
+          analysis = analysis,
+          deltas = deltas,          
+          ranks = ranks,
+          directons = dirs
+        ),
+        class = "summary.trajClusters"
+      )
+    
+    return(summary.trajClusters)
 }
 
 
