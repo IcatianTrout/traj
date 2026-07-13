@@ -403,11 +403,35 @@ summary.trajClusters <- function(object, top_p = 3, ...) {
     analysis <- data.frame(matrix(NA, ncol = 5, nrow = top_p * object$nclusters))
     colnames(analysis) <- c("cluster", "measure", "rank", "direction", "delta")
     
+    measure.names <- colnames(ranks)
+    for( m in seq_len(length(measure.names))){
+      if(colnames(ranks[m]) == "m1"){ measure.names[m]  <- paste(colnames(ranks[m])," : max", sep = "")}
+      if(colnames(ranks[m]) == "m2"){ measure.names[m]  <- paste(colnames(ranks[m])," : min", sep = "")}
+      if(colnames(ranks[m]) == "m3"){ measure.names[m]  <- paste(colnames(ranks[m])," : range", sep = "")}
+      if(colnames(ranks[m]) == "m4"){ measure.names[m]  <- paste(colnames(ranks[m])," : mean", sep = "")}
+      if(colnames(ranks[m]) == "m5"){ measure.names[m]  <- paste(colnames(ranks[m])," : SD", sep = "")}
+      if(colnames(ranks[m]) == "m6"){ measure.names[m]  <- paste(colnames(ranks[m])," : slope", sep = "")}
+      if(colnames(ranks[m]) == "m7"){ measure.names[m]  <- paste(colnames(ranks[m])," : intercept", sep = "")}
+      if(colnames(ranks[m]) == "m8"){ measure.names[m]  <- paste(colnames(ranks[m])," : R²", sep = "")}
+      if(colnames(ranks[m]) == "m9"){ measure.names[m]  <- paste(colnames(ranks[m])," : int. rate", sep = "")}
+      if(colnames(ranks[m]) == "m10"){ measure.names[m]  <- paste(colnames(ranks[m])," : var. rate", sep = "")}
+      if(colnames(ranks[m]) == "m11"){ measure.names[m]  <- paste(colnames(ranks[m])," : contrast", sep = "")}
+      if(colnames(ranks[m]) == "m12"){ measure.names[m]  <- paste(colnames(ranks[m])," : tot var", sep = "")}
+      if(colnames(ranks[m]) == "m13"){ measure.names[m]  <- paste(colnames(ranks[m])," : spikiness", sep = "")}
+      if(colnames(ranks[m]) == "m14"){ measure.names[m]  <- paste(colnames(ranks[m])," : max f'", sep = "")}
+      if(colnames(ranks[m]) == "m15"){ measure.names[m]  <- paste(colnames(ranks[m])," : min f'", sep = "")}
+      if(colnames(ranks[m]) == "m16"){ measure.names[m]  <- paste(colnames(ranks[m])," : SD f'", sep = "")}
+      if(colnames(ranks[m]) == "m17"){ measure.names[m]  <- paste(colnames(ranks[m])," : f' var. rate", sep = "")}
+      if(colnames(ranks[m]) == "m18"){ measure.names[m]  <- paste(colnames(ranks[m])," : max f''", sep = "")}
+      if(colnames(ranks[m]) == "m19"){ measure.names[m]  <- paste(colnames(ranks[m])," : min f''", sep = "")}
+      if(colnames(ranks[m]) == "m20"){ measure.names[m]  <- paste(colnames(ranks[m])," : SD f''", sep = "")}
+    }
+    
     for(i in seq_len(object$nclusters)){
       w <- order(unlist(ranks[i, ]))[1:top_p]
       
       analysis[(i-1)*top_p + c(1:top_p), 1] <- i
-      analysis[(i-1)*top_p + c(1:top_p), 2] <- colnames(ranks)[w]
+      analysis[(i-1)*top_p + c(1:top_p), 2] <- measure.names[w]
       analysis[(i-1)*top_p + c(1:top_p), 3] <- unlist(ranks[i, w])
       analysis[(i-1)*top_p + c(1:top_p), 4] <- unlist(dirs[i, w])
       analysis[(i-1)*top_p + c(1:top_p), 5] <- unlist(deltas[i, w])
