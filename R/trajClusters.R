@@ -213,6 +213,7 @@ trajClusters <-
           select = select,
           selection = selection,
           fuzzy = fuzzy,
+          standardized.data = dat,
           nclusters.input = nclusters.input,
           raw.cluster.validity.indices = ICV.raw,
           cluster.validity.indices = ICV,
@@ -292,8 +293,12 @@ print.trajClusters <- function(x, ...) {
 #'@rdname trajClusters
 #'
 #'@export
-summary.trajClusters <- function(object, ...) {
+summary.trajClusters <- function(object, top_p = 3, ...) {
   if(!is.null(object$nclusters)){
+    
+    if(!is.numeric(top_p)) stop(paste("top_p must be an integer greater than 1", sep = ""))
+    if(!(length(top_p) == 1)) stop(paste("top_p must be an integer greater than 1", sep = ""))
+    if(is.numeric(top_p) & !((top_p > 1) & (top_p %% 1 == 0))) stop(paste("top_p must be an integer greater than 1", sep = ""))
     
     cat("Cluster frequencies:\n")
     clust.dist <-
@@ -327,7 +332,10 @@ summary.trajClusters <- function(object, ...) {
       return(quantile(x, probs = .75))
     }
     
-    for (i in 1:object$nclusters) {
+    cl.medians <- data.frame(matrix(NA, nrow = object$nclusters, ncol = length(object$select)))
+    colnames(cl.medians) <- colnames(object$selection)[-1]
+    
+    for (i in seq_len(object$nclusters)) {
       measures.summary <-
         data.frame(matrix(
           nrow = 6,
@@ -338,16 +346,19 @@ summary.trajClusters <- function(object, ...) {
       colnames(measures.summary) <-
         colnames(object$selection)[-1]
       
+      which.id.i <- object$partition[which(object$partition[, 2] == i), 1]
       which.i <- which(object$partition[, 2] == i)
       
-      selection.cluster.i <- object$selection[which.i,]
+      selection.cluster.i <- object$selection[which(object$selection$ID %in% which.id.i), ]
       
-      measures.summary[1,] <- apply(selection.cluster.i, 2, min)[-1]
-      measures.summary[2,] <- apply(selection.cluster.i, 2, Q1)[-1]
-      measures.summary[3,] <- apply(selection.cluster.i, 2, Q2)[-1]
-      measures.summary[4,] <- apply(selection.cluster.i, 2, mean)[-1]
-      measures.summary[5,] <- apply(selection.cluster.i, 2, Q3)[-1]
-      measures.summary[6,] <- apply(selection.cluster.i, 2, max)[-1]
+      measures.summary[1, ] <- apply(selection.cluster.i[, -1], 2, min)
+      measures.summary[2, ] <- apply(selection.cluster.i[, -1], 2, Q1)
+      measures.summary[3, ] <- apply(selection.cluster.i[, -1], 2, Q2)
+      measures.summary[4, ] <- apply(selection.cluster.i[, -1], 2, mean)
+      measures.summary[5, ] <- apply(selection.cluster.i[, -1], 2, Q3)
+      measures.summary[6, ] <- apply(selection.cluster.i[, -1], 2, max)
+      
+      cl.medians[i, ] <- apply(object$standardized.data[which.i, ], 2, Q2)
       
       cat(paste(
         "Cluster ",
@@ -361,6 +372,52 @@ summary.trajClusters <- function(object, ...) {
       print(measures.summary)
       cat("\n")
     }
+    
+    ranks <- dirs <- deltas <- cl.medians
+    ranks[1:nrow(ranks), 1:ncol(ranks)] <- NA
+    deltas <- dirs <- ranks
+    
+    for(j in seq_len(ncol(ranks))){
+      
+      median.j <- median(cl.medians[, j])
+      
+      deltas[, j] <- round(cl.medians[, j] - median.j, 4)
+      abs.deltas <- round(abs(cl.medians[, j] - median.j), 4)
+      n.unique <- length(unique(abs.deltas))
+      #we wish to give the rank of 1 to ALL the groups which have the most extreme value, and the rank of 2 to ALL the groups that have the second most extreme value, etc.
+      
+      for(k in seq_len(n.unique)){
+        w <- which(abs.deltas == unique(abs.deltas)[order(unique(abs.deltas), decreasing = TRUE)[k]])
+        ranks[w, j] <- k
+      }
+      
+      for(i in seq_len(nrow(ranks))){
+        if((ranks[i, j] == 1) & (deltas[i, j] > 0)){dirs[i, j] <- "largest"}
+        if((ranks[i, j] == 1) & (deltas[i, j] < 0)){dirs[i, j] <- "smallest"}
+        if((ranks[i, j] > 1) & (deltas[i, j] > 0)){dirs[i, j] <- "large"}
+        if((ranks[i, j] > 1) & (deltas[i, j] < 0)){dirs[i, j] <- "small"}
+        if(deltas[i, j] == 0){dirs[i, j] <- " "; ranks[i, j] <- 9999}
+      }
+    }
+    
+    analysis <- data.frame(matrix(NA, ncol = 5, nrow = top_p * object$nclusters))
+    colnames(analysis) <- c("cluster", "measure", "rank", "direction", "delta")
+    
+    for(i in seq_len(object$nclusters)){
+      w <- order(unlist(ranks[i, ]))[1:top_p]
+      
+      analysis[(i-1)*top_p + c(1:top_p), 1] <- i
+      analysis[(i-1)*top_p + c(1:top_p), 2] <- colnames(ranks)[w]
+      analysis[(i-1)*top_p + c(1:top_p), 3] <- unlist(ranks[i, w])
+      analysis[(i-1)*top_p + c(1:top_p), 4] <- unlist(dirs[i, w])
+      analysis[(i-1)*top_p + c(1:top_p), 5] <- unlist(deltas[i, w])
+    }
+    
+    cat("\n")
+    print(analysis)
+    cat("\n")
+    
   }
 }
+
 

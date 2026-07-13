@@ -1,6 +1,6 @@
 #'@title Plot \code{trajClusters} object
 #'
-#'@description Plots the curves corresponding to (or closest to) the centroids of the clusters and plots a random sample from each groups.
+#'@description \code{plot()} plots the clusters centroids as well as a random sample from each cluster. \code{(scatterplots()} displays the two dimensional projections of the standardized data in feature space for every pair of measures. \code{CVIplot()} graphs the internal cluster validity indices as a fucntion of the number of clusters as well as the result of the ranked voting system for determining the optimal number of clusters.
 #'
 #'@param x object of class \code{trajClusters} as returned by the function
 #'  \code{trajClusters()}.
