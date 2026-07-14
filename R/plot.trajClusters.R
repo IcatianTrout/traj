@@ -277,11 +277,9 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
   
   if( (!is.null(which.scatter)) & (sum(!(which.scatter %in% x$select)) > 0) ){stop("The argument which.scatter should be a subset of the measure argument used in function trajClusters.")}
   
-  
   if ( !is.null(N) && !( ( is.numeric(N) && (length(N) == 1)) && (N %in% seq_len(nrow(x$selection))) ) ){
     stop("'N' should be either NULL or a numerical integer smaller than the total number of admissible trajectories.")
   }
-  
   
   current.ask.status <- devAskNewPage(ask = NULL)
   on.exit(devAskNewPage(ask = current.ask.status))  # Restore ask status on exit
@@ -301,7 +299,7 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
     }
     
     
-    selection.y <- x$standardized.data[, -c(1), drop = FALSE]
+    selection.y <- x$standardized.data
     
     if(!is.null(which.scatter)){
       selection.x <- selection.y[, which(x$select %in% which.scatter), drop = FALSE]
@@ -351,15 +349,16 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
       selection.y <- selection.y.new
     }
     
-    # mar=c(bottom, left, top, right)
-    par(mfrow = good.grid, mar = c(5, 5, 4, 5), xpd = TRUE)
-    
     for (m in v) {
       if(!is.null(which.scatter)){
         w <- which(x$select == which.scatter[m])
       } else {
         w <- m
       }
+      
+      # mar=c(bottom, left, top, right)
+      par(mfrow = good.grid, mar = c(5, 5, 4, 5), xpd = TRUE)
+      
       for (n in seq_len(nb.measures)[-w]) {
         if(colnames(selection.x0[m]) == "m1"){ main1 <- paste(colnames(selection.x0[m])," : max", sep = "")}
         if(colnames(selection.x0[m]) == "m2"){ main1 <- paste(colnames(selection.x0[m])," : min", sep = "")}

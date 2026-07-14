@@ -334,8 +334,6 @@ summary.trajClusters <- function(object, top_p = 3, ...) {
     cl.medians <- data.frame(matrix(NA, nrow = object$nclusters, ncol = length(object$select)))
     colnames(cl.medians) <- colnames(object$selection)[-1]
     
-    measures.summaries <- list()
-    
     for (i in seq_len(object$nclusters)) {
       measures.summary <-
         data.frame(matrix(
@@ -372,8 +370,6 @@ summary.trajClusters <- function(object, top_p = 3, ...) {
       cat("\n")
       print(measures.summary)
       cat("\n")
-      
-      measures.summaries[[i]] <- measures.summary
     }
     
     ranks <- dirs <- deltas <- cl.medians
@@ -395,12 +391,11 @@ summary.trajClusters <- function(object, top_p = 3, ...) {
       }
       
       for(i in seq_len(nrow(ranks))){
-        if((ranks[i, j] == 1) & (deltas[i, j] > 0)){dirs[i, j] <- "largest"}
-        if((ranks[i, j] == 1) & (deltas[i, j] < 0)){dirs[i, j] <- "smallest"}
         if((ranks[i, j] > 1) & (deltas[i, j] > 0)){dirs[i, j] <- "large"}
         if((ranks[i, j] > 1) & (deltas[i, j] < 0)){dirs[i, j] <- "small"}
-        if(deltas[i, j] == 0){dirs[i, j] <- " "; ranks[i, j] <- 9999}
-      }
+        if(cl.medians[i, j] == max(cl.medians[, j])){dirs[i, j] <- "largest"}
+        if(cl.medians[i, j] == min(cl.medians[, j])){dirs[i, j] <- "smallest"}
+        if(deltas[i, j] == 0){dirs[i, j] <- " "; ranks[i, j] <- 9999}}
     }
     
     analysis <- data.frame(matrix(NA, ncol = 5, nrow = top_p * object$nclusters))
@@ -444,20 +439,6 @@ summary.trajClusters <- function(object, top_p = 3, ...) {
     cat("\n")
     print(analysis)
     cat("\n")
-    
-    summary.trajClusters <-
-      structure(
-        list(
-          summaries = measures.summaries,
-          analysis = analysis,
-          deltas = deltas,          
-          ranks = ranks,
-          directons = dirs
-        ),
-        class = "summary.trajClusters"
-      )
-    
-    return(summary.trajClusters)
 }
 
 
