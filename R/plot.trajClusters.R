@@ -45,7 +45,7 @@ plot.trajClusters <-
            ask = TRUE,
            which.plots = NULL,
            ...
-           ) {
+  ) {
     if (!is.null(which.plots) &
         (!is.numeric(which.plots) | !is.vector(which.plots))) {
       stop(
@@ -65,9 +65,9 @@ plot.trajClusters <-
     par(mfrow = c(1, 1))
     
     if(is.null(which.plots) | 1 %in% which.plots){
-
+      
       centroids.data <- x$data[x$data[, 1] %in% x$ID.centers, -1]
-
+      
       plot(
         x = 0,
         y = 0,
@@ -118,12 +118,12 @@ plot.trajClusters <-
         matrix(nrow = 0, ncol = ncol(x$data))
       smpl.time <-
         matrix(nrow = 0, ncol = ncol(x$time) - 1)
-
+      
       size <- c()
       
       for (k in seq_len(x$nclusters)) {
         if(!is.null(sample.size)){
-        size[k] <- min(sample.size, nrow(traj.by.clusters[[k]]))
+          size[k] <- min(sample.size, nrow(traj.by.clusters[[k]]))
         } else{
           size[k] <- nrow(traj.by.clusters[[k]])
         }
@@ -184,92 +184,82 @@ plot.trajClusters <-
       
       for (i in seq_len(x$nclusters)) {
         which.i <- which(x$partition[, 2] == i)
-      cl.medians[i, ] <- apply(x$standardized.data[which.i, ], 2, Q2)
-      }
-      
-      # Set up the most compact grid depending on the number of selected measures
-      nb.measures <- ncol(x$selection) - 1
-      
-      X <- sqrt(nb.measures - 1)
-      
-      int.X <- floor(X)
-      frac.X <- X - int.X
-      
-      
-      if (frac.X == 0) {
-        good.grid <- c(int.X, int.X)
-      }
-      
-      if ((frac.X > 0) & (frac.X < 0.5)) {
-        good.grid <- c(int.X, int.X + 1)
-      }
-      
-      if (frac.X >= 0.5) {
-        good.grid <- c(int.X + 1, int.X + 1)
+        cl.medians[i, ] <- apply(x$standardized.data[which.i, ], 2, median)
       }
       
       # mar=c(bottom, left, top, right)
-      par(mfrow = good.grid, mar = c(5, 5, 4, 5), xpd = TRUE)
+      par(mfrow = c(1,1), mar = c(5, 8, 4, 5), xpd = TRUE)
       color.pal <- palette.colors(palette = "Polychrome 36", alpha = 1)[-2]
       
+      hor.labels <- c()
       for(m in seq_len(length(x$select))){
-        if(x$select[m] == 1){ main <- paste("m1 : max", sep = "")}
-        if(x$select[m] == 2){ main <- paste("m2 : min", sep = "")}
-        if(x$select[m] == 3){ main <- paste("m3 : range", sep = "")}
-        if(x$select[m] == 4){ main <- paste("m4 : mean", sep = "")}
-        if(x$select[m] == 5){ main <- paste("m5 : SD", sep = "")}
-        if(x$select[m] == 6){ main <- paste("m6 : slope", sep = "")}
-        if(x$select[m] == 7){ main <- paste("m7 : intercept", sep = "")}
-        if(x$select[m] == 8){ main <- paste("m8 : R²", sep = "")}
-        if(x$select[m] == 9){ main <- paste("m9 : int. rate", sep = "")}
-        if(x$select[m] == 10){ main <- paste("m10 : var. rate", sep = "")}
-        if(x$select[m] == 11){ main <- paste("m11 : contrast", sep = "")}
-        if(x$select[m] == 12){ main <- paste("m12 : tot var", sep = "")}
-        if(x$select[m] == 13){ main <- paste("m13 : spikiness", sep = "")}
-        if(x$select[m] == 14){ main <- paste("m14 : max f'", sep = "")}
-        if(x$select[m] == 15){ main <- paste("m15 : min f'", sep = "")}
-        if(x$select[m] == 16){ main <- paste("m16 : SD f'", sep = "")}
-        if(x$select[m] == 17){ main <- paste("m17 : f' var. rate", sep = "")}
-        if(x$select[m] == 18){ main <- paste("m18 : max f''", sep = "")}
-        if(x$select[m] == 19){ main <- paste("m19 : min f''", sep = "")}
-        if(x$select[m] == 20){ main <- paste("m20 : SD f''", sep = "")}
+        if(x$select[m] == 1){ hor.labels <- c(hor.labels, paste("m1 : max", sep = ""))}
+        if(x$select[m] == 2){ hor.labels <- c(hor.labels, paste("m2 : min", sep = ""))}
+        if(x$select[m] == 3){ hor.labels <- c(hor.labels, paste("m3 : range", sep = ""))}
+        if(x$select[m] == 4){ hor.labels <- c(hor.labels, paste("m4 : mean", sep = ""))}
+        if(x$select[m] == 5){ hor.labels <- c(hor.labels, paste("m5 : SD", sep = ""))}
+        if(x$select[m] == 6){ hor.labels <- c(hor.labels, paste("m6 : slope", sep = ""))}
+        if(x$select[m] == 7){ hor.labels <- c(hor.labels, paste("m7 : intercept", sep = ""))}
+        if(x$select[m] == 8){ hor.labels <- c(hor.labels, paste("m8 : R²", sep = ""))}
+        if(x$select[m] == 9){ hor.labels <- c(hor.labels, paste("m9 : int. rate", sep = ""))}
+        if(x$select[m] == 10){ hor.labels <- c(hor.labels, paste("m10 : var. rate", sep = ""))}
+        if(x$select[m] == 11){ hor.labels <- c(hor.labels, paste("m11 : contrast", sep = ""))}
+        if(x$select[m] == 12){ hor.labels <- c(hor.labels, paste("m12 : tot var", sep = ""))}
+        if(x$select[m] == 13){ hor.labels <- c(hor.labels, paste("m13 : spikiness", sep = ""))}
+        if(x$select[m] == 14){ hor.labels <- c(hor.labels, paste("m14 : max f'", sep = ""))}
+        if(x$select[m] == 15){ hor.labels <- c(hor.labels, paste("m15 : min f'", sep = ""))}
+        if(x$select[m] == 16){ hor.labels <- c(hor.labels, paste("m16 : SD f'", sep = ""))}
+        if(x$select[m] == 17){ hor.labels <- c(hor.labels, paste("m17 : f' var. rate", sep = ""))}
+        if(x$select[m] == 18){ hor.labels <- c(hor.labels, paste("m18 : max f''", sep = ""))}
+        if(x$select[m] == 19){ hor.labels <- c(hor.labels, paste("m19 : min f''", sep = ""))}
+        if(x$select[m] == 20){ hor.labels <- c(hor.labels, paste("m20 : SD f''", sep = ""))}
+      }
+      
+      plot(
+        x = 0,
+        y = 0,
+        xlim = c(min(cl.medians), max(cl.medians)),
+        ylim = c(1,length(x$select)),
+        type = "n",
+        xlab = "",
+        ylab = "",
+        yaxt = "n",
+        main = "Standardized feature medians by clusters"
+      )
+      
+      axis(2,
+           at = seq_len(length(x$select)),
+           labels = rev(hor.labels),
+           las = 1)       # horizontal labels
+      
+      for(m in seq_len(length(x$select))){
+        lines(x = c(min(cl.medians), max(cl.medians)), y = c(m,m), col="gray")
         
-        plot(
-          x = 0,
-          y = 0,
-          xlim = c(min(cl.medians), max(cl.medians)),
-          ylim = c(0,2),
-          type = "n",
-          xlab = "",
-          ylab = "",
-          yaxt = "n",
-          main = main
-        )
-
         for(s in seq_len(x$nclusters)){
           lines(
             x = cl.medians[s, m],
-            y = 1,
+            y = rev(1:length(x$select))[m],
             type = "p",
             pch = s - 1,
             col = color.pal[s],
             bg = color.pal[s]
           )
         }
-        
-        usr <- par("usr")
-        
-        legend(x = usr[2],
-               y = usr[4],
-               legend = paste(seq_len(x$nclusters))[1:x$nclusters],
-               col = color.pal[1:x$nclusters],
-               lty = rep(0, x$nclusters),
-               pch = c(0:(x$nclusters - 1)))
       }
+      
+      
+      usr <- par("usr")
+      
+      legend(x = usr[2],
+             y = usr[4],
+             legend = paste(seq_len(x$nclusters))[1:x$nclusters],
+             col = color.pal[1:x$nclusters],
+             lty = rep(0, x$nclusters),
+             pch = c(0:(x$nclusters - 1)))
     }
-    
-    print("See also 'CVIplot' for a plot of the statistic used to determined the number of clusters (if applicable) and see 'scatterplots' for scatter plots of the measures involved in the clustering.")
-  }
+
+print("See also 'CVIplot' for a plot of the statistic used to determined the number of clusters (if applicable) and see 'scatterplots' for scatter plots of the measures involved in the clustering.")
+}
 #'@rdname plot.trajClusters
 #'
 #'@export
