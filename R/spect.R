@@ -13,7 +13,7 @@ spect <- function(x, k, nstart, fuzzy){
   K <- max(4, min(8, floor(n/(2*k)))) #number between 4 and 8
   S <- knn_adjacency(X = as.matrix(stats::dist(x)), K = K)
   Dsq.inv <- diag(1/sqrt(rowSums(S)))
-  L <- Matrix::as(Dsq.inv %*% S %*% Dsq.inv, "dgCMatrix") 
+  L <- methods::as(Dsq.inv %*% S %*% Dsq.inv, "dgCMatrix") 
   
   eigen_result <- RSpectra::eigs_sym(L,k)
   eigenvalues <- eigen_result$values
