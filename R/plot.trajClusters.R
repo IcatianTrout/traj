@@ -200,7 +200,7 @@ plot.trajClusters <-
         if(x$select[m] == 5){ hor.labels <- c(hor.labels, paste("m5 : SD", sep = ""))}
         if(x$select[m] == 6){ hor.labels <- c(hor.labels, paste("m6 : slope", sep = ""))}
         if(x$select[m] == 7){ hor.labels <- c(hor.labels, paste("m7 : intercept", sep = ""))}
-        if(x$select[m] == 8){ hor.labels <- c(hor.labels, paste("m8 : R²", sep = ""))}
+        if(x$select[m] == 8){ hor.labels <- c(hor.labels, paste("m8 : R^2", sep = ""))}
         if(x$select[m] == 9){ hor.labels <- c(hor.labels, paste("m9 : int. rate", sep = ""))}
         if(x$select[m] == 10){ hor.labels <- c(hor.labels, paste("m10 : var. rate", sep = ""))}
         if(x$select[m] == 11){ hor.labels <- c(hor.labels, paste("m11 : contrast", sep = ""))}
@@ -227,7 +227,7 @@ plot.trajClusters <-
         main = "Standardized feature medians by clusters"
       )
       
-      axis(2,
+      graphics::axis(2,
            at = seq_len(length(x$select)),
            labels = rev(hor.labels),
            las = 1)       # horizontal labels
@@ -357,7 +357,7 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
         if(colnames(selection.x0[m]) == "m5"){ main1 <- paste(colnames(selection.x0[m])," : SD", sep = "")}
         if(colnames(selection.x0[m]) == "m6"){ main1 <- paste(colnames(selection.x0[m])," : slope", sep = "")}
         if(colnames(selection.x0[m]) == "m7"){ main1 <- paste(colnames(selection.x0[m])," : intercept", sep = "")}
-        if(colnames(selection.x0[m]) == "m8"){ main1 <- paste(colnames(selection.x0[m])," : R²", sep = "")}
+        if(colnames(selection.x0[m]) == "m8"){ main1 <- paste(colnames(selection.x0[m])," : R^2", sep = "")}
         if(colnames(selection.x0[m]) == "m9"){ main1 <- paste(colnames(selection.x0[m])," : int. rate", sep = "")}
         if(colnames(selection.x0[m]) == "m10"){ main1 <- paste(colnames(selection.x0[m])," : var. rate", sep = "")}
         if(colnames(selection.x0[m]) == "m11"){ main1 <- paste(colnames(selection.x0[m])," : contrast", sep = "")}
@@ -377,7 +377,7 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
         if(colnames(selection.y0[n]) == "m5"){ main2 <- paste(colnames(selection.y0[n])," : SD", sep = "")}
         if(colnames(selection.y0[n]) == "m6"){ main2 <- paste(colnames(selection.y0[n])," : slope", sep = "")}
         if(colnames(selection.y0[n]) == "m7"){ main2 <- paste(colnames(selection.y0[n])," : intercept", sep = "")}
-        if(colnames(selection.y0[n]) == "m8"){ main2 <- paste(colnames(selection.y0[n])," : R²", sep = "")}
+        if(colnames(selection.y0[n]) == "m8"){ main2 <- paste(colnames(selection.y0[n])," : R^2", sep = "")}
         if(colnames(selection.y0[n]) == "m9"){ main2 <- paste(colnames(selection.y0[n])," : int. rate", sep = "")}
         if(colnames(selection.y0[n]) == "m10"){ main2 <- paste(colnames(selection.y0[n])," : var. rate", sep = "")}
         if(colnames(selection.y0[n]) == "m11"){ main2 <- paste(colnames(selection.y0[n])," : contrast", sep = "")}

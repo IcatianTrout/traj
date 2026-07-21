@@ -41,10 +41,11 @@ midpoint.}
 \item{midpoint}{specifies which column of \code{Time} to use as the midpoint
 in measure 11 Can be \code{NULL}, an integer or a vector of integers of length
 the number of rows in \code{Time}. The default is \code{NULL}, in which case the
-midpoint is the time closest to the median of the Time vector specific to
-each trajectory.}
+midpoint is the time closest to the middle of the interval from the first to the last
+observation time #'  specific to each trajectory.}
 
-\item{cap.outliers}{logical. If \code{TRUE}, extreme values of the measures will be capped. Defaults to \code{FALSE}.}
+\item{cap.outliers}{logical. If \code{TRUE}, extreme values of the measures will be capped.
+Defaults to \code{FALSE}.}
 
 \item{x}{object of class \code{trajMeasures}.}
 
@@ -98,8 +99,8 @@ to the 0.3\% probability threshold (see vignette for more details).
 data("trajdata")
 trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] #remove the Group column
 
-m1 = trajMeasures(trajdata.noGrp, ID = TRUE, measures = 19, midpoint = NULL)
-m2 = trajMeasures(trajdata.noGrp, ID = TRUE, measures = 19, midpoint = 3)
+m1 = trajMeasures(trajdata.noGrp, ID = TRUE, measures = 11, midpoint = NULL)
+m2 = trajMeasures(trajdata.noGrp, ID = TRUE, measures = 11, midpoint = 3)
 
 identical(m1$measures, m2$measures)
 }

@@ -12,6 +12,7 @@
 #'@param nstart The number of random starts. Defaults to \code{50}.
 #'@param x object of class \code{trajClusters}.
 #'@param object object of class \code{trajClusters}.
+#'@param top_p The \code{top_p} most discriminating measures for each cluster to be reported in the summary.
 #'@param ... further arguments passed to or from other methods.
 #'
 #'@details The spectral clustering algorithm presented in Meila (2005) is implemented in which the similarity matrix \eqn{S} is built from a binary K nearest neighbors similarity function (\eqn{S=(W+W^T)/2}, where \eqn{W_{ij}=1} if data point \eqn{j} is among the nearest points to data point \eqn{i} and \eqn{W_{ij}=0} otherwise). 
@@ -410,7 +411,7 @@ summary.trajClusters <- function(object, top_p = 3, ...) {
       if(colnames(ranks[m]) == "m5"){ measure.names[m]  <- paste(colnames(ranks[m])," (SD)", sep = "")}
       if(colnames(ranks[m]) == "m6"){ measure.names[m]  <- paste(colnames(ranks[m])," (slope)", sep = "")}
       if(colnames(ranks[m]) == "m7"){ measure.names[m]  <- paste(colnames(ranks[m])," (intercept)", sep = "")}
-      if(colnames(ranks[m]) == "m8"){ measure.names[m]  <- paste(colnames(ranks[m])," (R²)", sep = "")}
+      if(colnames(ranks[m]) == "m8"){ measure.names[m]  <- paste(colnames(ranks[m])," (R^2)", sep = "")}
       if(colnames(ranks[m]) == "m9"){ measure.names[m]  <- paste(colnames(ranks[m])," (int. rate)", sep = "")}
       if(colnames(ranks[m]) == "m10"){ measure.names[m]  <- paste(colnames(ranks[m])," (var. rate)", sep = "")}
       if(colnames(ranks[m]) == "m11"){ measure.names[m]  <- paste(colnames(ranks[m])," (contrast)", sep = "")}

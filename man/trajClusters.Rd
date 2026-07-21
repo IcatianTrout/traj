@@ -17,7 +17,7 @@ trajClusters(
 
 \method{print}{trajClusters}(x, ...)
 
-\method{summary}{trajClusters}(object, ...)
+\method{summary}{trajClusters}(object, top_p = 3, ...)
 }
 \arguments{
 \item{Measures}{object of class \code{trajMeasures} as returned by the function
@@ -39,39 +39,41 @@ measures to use in the clustering. Defaults to \code{NULL}, which uses all the m
 \item{...}{further arguments passed to or from other methods.}
 
 \item{object}{object of class \code{trajClusters}.}
+
+\item{top_p}{The \code{top_p} most discriminating measures for each cluster to be reported in the summary.}
 }
 \value{
-An object of class \code{trajClusters}; a list containing the result of the clustering, as well as a curated form of the arguments. If \code{nclusters} is set to \code{NULL}, clustering is carried out for each number \eqn{k} of clusters between 2 and (up to) 8 and a plot is produced representing the value of three internal cluster validity indices (C-index, Calinski-Harabasz, Wemmert-Gancarski) as a function of \eqn{k}. As in the 'KmL' package of Genolini et al., these validity indices are presented on a scale from 0 to 1, with 1 corresponding to the highest validity score and 0 corresponding to the lowest. From this, a "best" value of \eqn{k} is determined using a ranked voting system.
+An object of class \code{trajClusters}; a list containing the result of the clustering, as well as a curated form of the arguments.
 }
 \description{
 Classifies the trajectories by applying a nonparametric clustering algorithm to the measures computed by \code{trajMeasures()}.
 }
 \details{
 The spectral clustering algorithm presented in Meila (2005) is implemented in which the similarity matrix \eqn{S} is built from a binary K nearest neighbors similarity function (\eqn{S=(W+W^T)/2}, where \eqn{W_{ij}=1} if data point \eqn{j} is among the nearest points to data point \eqn{i} and \eqn{W_{ij}=0} otherwise).
+
+When \code{nclusters = NULL}, the function evaluates candidate clusterings with number of clusters \eqn{k} ranging from 2 to 8 using three internal validity indices: C-index, Calinski-Harabasz and Wemmert-Gançarski. These indices are normalized so that the highest value is 1 and the lowest is 0, and so that a high value is synonymous with high validity. The optimal number of clusters is determined according to a ranked voting system in which each index contributes a fractional vote according to its ranking of the candidate solutions. Specifically, each index casts a vote worth 1 in favor of \eqn{k} if it takes its greatest value when the number of groups is \eqn{k}, worth 5/6 if it takes its second greatest value when the number of groups is \eqn{k}, and so on down to a vote worth 0 if the index takes its smallest value when the number of groups is \eqn{k}. The favorability of \eqn{k} is the sum of the 3 votes.
 }
 \examples{
 \dontrun{
 data("trajdata")
 trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] # remove the Group column
 
-m = trajMeasures(trajdata.noGrp, ID = TRUE, measures = 1:19)
+m = trajMeasures(trajdata.noGrp, ID = TRUE, measures = 1:20)
 
 s2.3 <- trajClusters(m, nclusters = 3)
 plot(s2.3)
 
-#'s2.4 <- trajClusters(m, nclusters = 4)
+s2.4 <- trajClusters(m, nclusters = 4)
 plot(s2.4)
 
-#'s2.5 <- trajClusters(m, nclusters = 5)
+s2.5 <- trajClusters(m, nclusters = 5)
 plot(s2.5)
 
-groups <- s2.4 <- trajClusters(m, nclusters = 4)$partition
+groups <- trajClusters(m, nclusters = 4)$partition
 }
 
 
 }
 \references{
-Genolini, C. et al., kml: K-Means for Longitudinal Data, https://CRAN.R-project.org/package=kml
-
 Meila, M., Spectral Clustering. Handbook of Cluster Analysis, Chapter 7, Chapman and Hall/CRC, 2005.
 }

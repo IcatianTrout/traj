@@ -20,14 +20,17 @@ This function examines the effect of reducing the number of measures on which th
 }
 \details{
 The Rand index ranges from 0 to 1 with 0 indicating identical clusters and 1 indicating maximally different clusters. The normalized variation of information distance (nVId) and normalized split-join distance (nSJd) and have the opposite interpretation with 0 indicating maximally different clusters and 1 indicating identical clusters. Therefor, to facilitate comparison, we plot 1 - nVId (resp. 1 - nSJd) instead of nVId (resp. nSJd).
+
+The function runs the \code{\link[traj]{trajClusters}} function on every combination of \code{keep} measures and identifies the reduced representation yielding the clustering most similar to the (hard) clustering in \code{Clusters}. If the (hard) clustering in \code{Clusters} derives from a soft clustering, the iterations of \code{\link[traj]{trajClusters}}  will also be ran using \code{fuzzy = TRUE} and the corresponding hard clusterings will be used for comparison.
 }
 \examples{
 \dontrun{
 data("trajdata")
 trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] #remove the Group column
 
-m = trajMeasures(trajdata.noGrp, ID = TRUE)
-trajReduce(m)
+m = trajMeasures(trajdata.noGrp, ID = TRUE, measures = 1:20)
+s2.4 <- trajClusters(m, nclusters = 4)
+trajReduce(m, s2.4)
 }
 
 }

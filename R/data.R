@@ -4,13 +4,13 @@
 #'
 #' @format This data frame has 130 rows and the following 7 columns:
 #' \describe{
-#'   \item{ID}{An identification variable that runs from 1 to 130.}
+#'   \item{id}{An identification variable that runs from 1 to 130.}
 #'   \item{Group}{A character variable that's either "A", "B", "C" or "D" depending on which of the four data generating process the trajectory is coming from.}
-#'   \item{X1}{The observation of the trajectory at time t = 1.}
-#'   \item{X2}{The observation of the trajectory at time t = 2.}
-#'   \item{X3}{The observation of the trajectory at time t = 3.}
-#'   \item{X4}{The observation of the trajectory at time t = 4.}
-#'   \item{X5}{The observation of the trajectory at time t = 5.}
-#'   \item{X6}{The observation of the trajectory at time t = 6.}
+#'   \item{t1}{The observation of the trajectory at time t = 1.}
+#'   \item{t2}{The observation of the trajectory at time t = 2.}
+#'   \item{t3}{The observation of the trajectory at time t = 3.}
+#'   \item{t4}{The observation of the trajectory at time t = 4.}
+#'   \item{t5}{The observation of the trajectory at time t = 5.}
+#'   \item{t6}{The observation of the trajectory at time t = 6.}
 #' }
 "trajdata"

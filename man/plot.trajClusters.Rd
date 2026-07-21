@@ -28,12 +28,12 @@ plots will be displayed.}
 
 \item{...}{other parameters to be passed through to plotting functions.}
 
-\item{which.scatter}{either \code{NULL} or a vector of integers that is a subset of the \code{measure} argument used in function \code{trajClusters} to produce object \code{x}. If \code{NULL}, every available scatter plots are displayed. If a vector is supplied, only the corresponding plots will be displayed.}
+\item{which.scatter}{either \code{NULL} or a vector of integers that is a subset of the \code{measure} argument used in the function \code{trajClusters} to produce object \code{x}. If \code{NULL}, every available scatter plots are displayed. If a vector is supplied, only the corresponding plots will be displayed.}
 
-\item{N}{the maximum number of points present in each scatter plots. If a non \code{NULL} value is specified, N points are sampled randomly in a way that preserves the relative groups sizes. If \code{NULL} (the default), all the points are plotted.}
+\item{N}{the maximum number of points present in each scatter plots. If a non \code{NULL} value is specified, \code{N} points are sampled randomly in a way that preserves the relative groups sizes. If \code{NULL} (the default), all the points are plotted.}
 }
 \description{
-Plots the curves corresponding to (or closest to) the centroids of the clusters and plots a random sample from each groups.
+\code{plot()} sequentially plots (i) the clusters centroids, (ii) a random sample of trajectories from each cluster, and (iii) the median of each standardized measure by cluster. \code{(scatterplots()} displays the two dimensional projections of the standardized data in feature space for every pair of measures. \code{CVIplot()} graphs the internal cluster validity indices as a function of the number of clusters as well as the result of the ranked voting system for determining the optimal number of clusters.
 }
 \examples{
 \dontrun{
@@ -41,16 +41,14 @@ data("trajdata")
 trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] #remove the Group column
 
 m = trajMeasures(trajdata.noGrp, ID = TRUE)
+
 c3 = trajClusters(m, nclusters = 3)
 
-plot(c3)
+plot(c3, which.plots = 1, ask= FALSE) ## centroids
 
-#The pointwise mean trajectories correspond to the third and fourth displayed plots.
+plot(c3, which.plots = 2, ask= FALSE) ## sample trajectories
 
-c4 = trajClusters(m, nclusters = 4)
-
-plot(c4, which.plots = 3:4)
-
+plot(c3, which.plots = 3, ask= FALSE) ## median of standardized measures by cluster
 }
 
 

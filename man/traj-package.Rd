@@ -20,6 +20,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Laurence Boulanger \email{laurence.boulanger@umontreal.ca}
   \item Marie-Pierre Sylvestre \email{marie-pierre.sylvestre@umontreal.ca}
 }
 
