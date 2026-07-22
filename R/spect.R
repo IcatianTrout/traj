@@ -11,9 +11,9 @@ spect <- function(x, k, nstart, fuzzy){
   
   n <- nrow(x)
   K <- max(4, min(8, floor(n/(2*k)))) #number between 4 and 8
-  S <- knn_adjacency(X = as.matrix(stats::dist(x)), K = K)
-  Dsq.inv <- diag(1/sqrt(rowSums(S)))
-  L <- as(Dsq.inv %*% S %*% Dsq.inv, "dgCMatrix") 
+  S <- Matrix::Matrix(knn_adjacency(X = as.matrix(stats::dist(x)), K = K), sparse = TRUE)
+  Dsq.inv <- Matrix::Diagonal(x = 1/sqrt(Matrix::rowSums(S)))
+  L <- Dsq.inv %*% S %*% Dsq.inv
   
   eigen_result <- RSpectra::eigs_sym(L,k+5, which = "LA")
   eigenvalues <- eigen_result$values[1:k]
