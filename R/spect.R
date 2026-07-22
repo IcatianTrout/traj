@@ -15,9 +15,9 @@ spect <- function(x, k, nstart, fuzzy){
   Dsq.inv <- diag(1/sqrt(rowSums(S)))
   L <- methods::as(Dsq.inv %*% S %*% Dsq.inv, "dgCMatrix") 
   
-  eigen_result <- RSpectra::eigs_sym(L,k)
-  eigenvalues <- eigen_result$values
-  eigenvectors <- eigen_result$vectors
+  eigen_result <- RSpectra::eigs_sym(L,k+5, which = "LA")
+  eigenvalues <- eigen_result$values[1:k]
+  eigenvectors <- eigen_result$vectors[, 1:k]
   
   if(length(unique(eigenvectors[,1])) == 1){
     Y <- eigenvectors[, -1, drop = FALSE]
