@@ -23,7 +23,8 @@ Imports:
     igraph,
     e1071,
     RSpectra,
-    methods
+    methods, 
+    Matrix
 Depends: 
     R (>= 3.5.0)
 LazyData: true
