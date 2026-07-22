@@ -16,9 +16,9 @@ trajMeasures(
   cap.outliers = FALSE
 )
 
-\method{print}{trajMeasures}(x, ...)
+print.trajMeasures(x, ...)
 
-\method{summary}{trajMeasures}(object, ...)
+summary.trajMeasures(object, ...)
 }
 \arguments{
 \item{Data}{a matrix or data frame in which each row contains the longitudinal
