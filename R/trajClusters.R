@@ -230,9 +230,9 @@ trajClusters <-
     
     return(trajClusters)
   }
-#'@rdname trajClusters
-#'
-#'@export
+#' @rdname trajClusters
+#' @method print trajClusters
+#' @export
 print.trajClusters <- function(x, ...) {
   if(is.null(x$nclusters.input)){
     print(round(x$raw.cluster.validity.indices, 3))
@@ -291,9 +291,9 @@ print.trajClusters <- function(x, ...) {
     cat("From here, use the plot() function to see the centroid trajectories and a sample from each groups. For a better understanding of how the measures were used to discriminate amongst the groups, use scatterplot() for scatter plots of all the pairs of measures. To investigate the possibility of reducing the number of measures used in the classification (optional), use trajReduce().")
   }
 }
-#'@rdname trajClusters
-#'
-#'@export
+#' @rdname trajClusters
+#' @method summary trajClusters
+#' @export
 summary.trajClusters <- function(object, top_p = 3, ...) {
     
     if(!is.numeric(top_p)) stop(paste("top_p must be an integer greater than 1", sep = ""))
