@@ -785,11 +785,9 @@ trajMeasures <-
     )
     return(trajMeasures)
   }
-
-
-#'@rdname trajMeasures
-#'
-#'@export
+#' @rdname trajMeasures
+#' @method print trajMeasures
+#' @export
 print.trajMeasures <- function(x, ...) {
   
   cat("Description of the measures:\n")
@@ -827,10 +825,9 @@ print.trajMeasures <- function(x, ...) {
     print(measure.plus, row.names = FALSE)
   }
 }
-
-#'@rdname trajMeasures
-#'
-#'@export
+#' @rdname trajMeasures
+#' @method summary trajMeasures
+#' @export
 summary.trajMeasures <- function(object, ...) {
   
   cat("Description of the measures:\n")
