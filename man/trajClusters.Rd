@@ -15,9 +15,9 @@ trajClusters(
   nstart = 50
 )
 
-print.trajClusters(x, ...)
+\method{print}{trajClusters}(x, ...)
 
-summary.trajClusters(object, top_p = 3, ...)
+\method{summary}{trajClusters}(object, top_p = 3, ...)
 }
 \arguments{
 \item{Measures}{object of class \code{trajMeasures} as returned by the function
