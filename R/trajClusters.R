@@ -300,7 +300,7 @@ summary.trajClusters <- function(object, top_p = 3, ...) {
     if(!(length(top_p) == 1)) stop(paste("top_p must be an integer greater than 1", sep = ""))
     if(is.numeric(top_p) & !((top_p > 1) & (top_p %% 1 == 0))) stop(paste("top_p must be an integer greater than 1", sep = ""))
     
-    cat("Cluster frequencies:\n")
+    #cat("Cluster frequencies:\n")
     clust.dist <-
       data.frame(matrix(nrow = 2, ncol = (object$nclusters + 1)))
     clust.dist[1,] <-
@@ -315,10 +315,10 @@ summary.trajClusters <- function(object, top_p = 3, ...) {
       ), 2)
     rownames(clust.dist) <- c("Absolute", "Relative")
     colnames(clust.dist) <- c(1:object$nclusters, "Total")
-    print(clust.dist)
-    
-    cat("\n")
-    cat("Summary of selected measures by cluster:\n")
+    #print(clust.dist)
+
+    #cat("\n")
+    #cat("Summary of selected measures by cluster:\n")
     
     Q1 <- function(x) {
       return(quantile(x, probs = .25))
@@ -334,6 +334,9 @@ summary.trajClusters <- function(object, top_p = 3, ...) {
     
     cl.medians <- data.frame(matrix(NA, nrow = object$nclusters, ncol = length(object$select)))
     colnames(cl.medians) <- colnames(object$selection)[-1]
+    
+    groupwise.summaries <- list()
+    group.sizes <- c()
     
     for (i in seq_len(object$nclusters)) {
       measures.summary <-
@@ -360,17 +363,19 @@ summary.trajClusters <- function(object, top_p = 3, ...) {
       
       cl.medians[i, ] <- apply(object$standardized.data[which.i, ], 2, Q2)
       
-      cat(paste(
-        "Cluster ",
-        i,
-        " (size ",
-        object$partition.summary[i],
-        "):",
-        sep = ""
-      ))
-      cat("\n")
-      print(measures.summary)
-      cat("\n")
+      # cat(paste(
+      #   "Cluster ",
+      #   i,
+      #   " (size ",
+      #   object$partition.summary[i],
+      #   "):",
+      #   sep = ""
+      # ))
+      # cat("\n")
+      # print(measures.summary)
+      # cat("\n")
+      groupwise.summaries[[i]] <- measures.summary
+      group.sizes[i] <- object$partition.summary[i]
     }
     
     ranks <- dirs <- deltas <- cl.medians
@@ -437,9 +442,45 @@ summary.trajClusters <- function(object, top_p = 3, ...) {
       analysis[(i-1)*top_p + c(1:top_p), 5] <- unlist(deltas[i, w])
     }
     
-    cat("\n")
-    print(analysis)
-    cat("\n")
+    # cat("\n")
+    # print(analysis)
+    # cat("\n")
+    
+    structure(
+      list(
+        clust.dist = clust.dist,
+        groupwise.summaries = groupwise.summaries,
+        group.sizes = group.sizes,
+        analysis = analysis
+      ),
+      class = "summary.trajClusters"
+    )
 }
-
-
+#' @rdname trajMeasures
+#' @method print summary.trajClusters
+#' @export
+print.summary.trajClusters <- function(x, ...) {
+  cat("Cluster frequencies:\n")
+  print(x$clust.dist)
+  
+  cat("\n")
+  cat("Summary of selected measures by cluster:\n")
+  
+  for(i in seq_len(length(x$groupwise.summaries))){
+    cat(paste(
+      "Cluster ",
+      i,
+      " (size ",
+      x$group.sizes[i],
+      "):",
+      sep = ""
+    ))
+    cat("\n")
+    print(x$groupwise.summaries[[i]])
+    cat("\n")
+  }
+  
+  cat("\n")
+  print(x$analysis, rownames = FALSE)
+  cat("\n")
+}
