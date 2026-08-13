@@ -69,12 +69,14 @@ plot.trajClusters <-
     devAskNewPage(ask = ask)
 
     color.pal <- palette.colors(palette = "Polychrome 36", alpha = 1)[-2]
-    par(mfrow = c(1, 1))
+    
     
     if(is.null(which.plots) | 1 %in% which.plots){
       
       centroids.data <- x$data[x$data[, 1] %in% x$ID.centers, -1]
       
+      par(mfrow = c(1,1), mar = c(5, 5, 4, 5))
+     
       plot(
         x = 0,
         y = 0,
@@ -85,24 +87,35 @@ plot.trajClusters <-
         ylab = "",
         main = "Centroids"
       )
-      legend(
-        "topright",
-        col = color.pal[1:x$nclusters],
-        legend = paste(1:x$nclusters),
-        lty = rep(1, x$nclusters)
-      )
+      
+      grid(nx = NULL, ny = NULL,
+           lty = 2,      
+           col = "gray", 
+           lwd = 1)  
+      
+      par(xpd = TRUE)
+      usr <- par("usr")
+      
+      legend(x = usr[2],
+             y = usr[4],
+             legend = paste(seq_len(x$nclusters))[1:x$nclusters],
+             col = color.pal[seq_len(x$nclusters)],
+             lty = rep(0, x$nclusters),
+             pch = seq_len(x$nclusters) - 1)
+      
       
       for (j in 1:x$nclusters) {
         lines(
           x = x$time[which(x$time[, 1] == x$ID.centers[j]), -1],
           y = x$data[which(x$data[, 1] == x$ID.centers[j]), -1],
           type = "b",
-          pch = 16,
+          pch = (seq_len(x$nclusters) - 1)[j],
           col = color.pal[j]
         )
       }
-      
+      par(xpd = FALSE)
     }
+    
     
     if(is.null(which.plots) | 2 %in% which.plots){
       traj.by.clusters <- list()
@@ -152,7 +165,8 @@ plot.trajClusters <-
       smpl.traj <- smpl.traj[s, ]
       smpl.time <- smpl.time[s, ]
       
-      par(mfrow = c(1, 1))
+      # mar=c(bottom, left, top, right)
+      par(mfrow = c(1,1), mar = c(5, 5, 4, 5))
       
       plot(
         x = 0,
@@ -165,6 +179,11 @@ plot.trajClusters <-
         main = "Sample trajectories"
       )
       
+      grid(nx = NULL, ny = NULL,
+           lty = 2,      
+           col = "gray", 
+           lwd = 1)  
+      
       ## Plot the trajectories in a random order
       for(i in seq_len(nrow(smpl.traj))){
         k <- smpl.traj[i, ncol(smpl.traj)]
@@ -172,16 +191,22 @@ plot.trajClusters <-
         lines(
           x = smpl.time[i,],
           y = smpl.traj[i, -ncol(smpl.traj)],
-          type = "l",
-          col = color.pal[k]
+          type = "b",
+          col = color.pal[k],
+          pch = (seq_len(x$nclusters) - 1)[k]
         )
       }
-      legend(
-        "topright",
-        col = color.pal[seq_len(x$nclusters)],
-        legend = paste(seq_len(x$nclusters)),
-        lty = rep(1, x$nclusters)
-      )
+      par(xpd = TRUE)
+      usr <- par("usr")
+      
+      legend(x = usr[2],
+             y = usr[4],
+             legend = paste(seq_len(x$nclusters))[1:x$nclusters],
+             col = color.pal[seq_len(x$nclusters)],
+             lty = rep(0, x$nclusters),
+             pch = seq_len(x$nclusters) - 1)
+      
+      par(xpd = FALSE)
     }
     
     if(is.null(which.plots) | 3 %in% which.plots){
@@ -195,7 +220,7 @@ plot.trajClusters <-
       }
       
       # mar=c(bottom, left, top, right)
-      par(mfrow = c(1,1), mar = c(5, 8, 4, 5), xpd = TRUE)
+      par(mfrow = c(1,1), mar = c(5, 8, 4, 5))
       color.pal <- palette.colors(palette = "Polychrome 36", alpha = 1)[-2]
       
       hor.labels <- c()
@@ -209,9 +234,9 @@ plot.trajClusters <-
         if(x$select[m] == 7){ hor.labels <- c(hor.labels, paste("m7 : intercept", sep = ""))}
         if(x$select[m] == 8){ hor.labels <- c(hor.labels, paste("m8 : R^2", sep = ""))}
         if(x$select[m] == 9){ hor.labels <- c(hor.labels, paste("m9 : int. rate", sep = ""))}
-        if(x$select[m] == 10){ hor.labels <- c(hor.labels, paste("m10 : var. rate", sep = ""))}
+        if(x$select[m] == 10){ hor.labels <- c(hor.labels, paste("m10 : net vari", sep = ""))}
         if(x$select[m] == 11){ hor.labels <- c(hor.labels, paste("m11 : contrast", sep = ""))}
-        if(x$select[m] == 12){ hor.labels <- c(hor.labels, paste("m12 : tot var", sep = ""))}
+        if(x$select[m] == 12){ hor.labels <- c(hor.labels, paste("m12 : tot vari", sep = ""))}
         if(x$select[m] == 13){ hor.labels <- c(hor.labels, paste("m13 : spikiness", sep = ""))}
         if(x$select[m] == 14){ hor.labels <- c(hor.labels, paste("m14 : max f'", sep = ""))}
         if(x$select[m] == 15){ hor.labels <- c(hor.labels, paste("m15 : min f'", sep = ""))}
@@ -256,13 +281,14 @@ plot.trajClusters <-
       
       
       usr <- par("usr")
+      par(xpd = TRUE)
       
       legend(x = usr[2],
              y = usr[4],
              legend = paste(seq_len(x$nclusters))[1:x$nclusters],
              col = color.pal[1:x$nclusters],
              lty = rep(0, x$nclusters),
-             pch = c(0:(x$nclusters - 1)))
+             pch = seq_len(x$nclusters) - 1)
     }
 
 print("See also 'CVIplot' for a plot of the statistic used to determined the number of clusters (if applicable) and see 'scatterplots' for scatter plots of the measures involved in the clustering.")
@@ -371,9 +397,9 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
         if(colnames(selection.x0[m]) == "m7"){ main1 <- paste(colnames(selection.x0[m])," : intercept", sep = "")}
         if(colnames(selection.x0[m]) == "m8"){ main1 <- paste(colnames(selection.x0[m])," : R^2", sep = "")}
         if(colnames(selection.x0[m]) == "m9"){ main1 <- paste(colnames(selection.x0[m])," : int. rate", sep = "")}
-        if(colnames(selection.x0[m]) == "m10"){ main1 <- paste(colnames(selection.x0[m])," : var. rate", sep = "")}
+        if(colnames(selection.x0[m]) == "m10"){ main1 <- paste(colnames(selection.x0[m])," : net vari", sep = "")}
         if(colnames(selection.x0[m]) == "m11"){ main1 <- paste(colnames(selection.x0[m])," : contrast", sep = "")}
-        if(colnames(selection.x0[m]) == "m12"){ main1 <- paste(colnames(selection.x0[m])," : tot var", sep = "")}
+        if(colnames(selection.x0[m]) == "m12"){ main1 <- paste(colnames(selection.x0[m])," : tot vari", sep = "")}
         if(colnames(selection.x0[m]) == "m13"){ main1 <- paste(colnames(selection.x0[m])," : spikiness", sep = "")}
         if(colnames(selection.x0[m]) == "m14"){ main1 <- paste(colnames(selection.x0[m])," : max f'", sep = "")}
         if(colnames(selection.x0[m]) == "m15"){ main1 <- paste(colnames(selection.x0[m])," : min f'", sep = "")}
@@ -391,9 +417,9 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
         if(colnames(selection.y0[n]) == "m7"){ main2 <- paste(colnames(selection.y0[n])," : intercept", sep = "")}
         if(colnames(selection.y0[n]) == "m8"){ main2 <- paste(colnames(selection.y0[n])," : R^2", sep = "")}
         if(colnames(selection.y0[n]) == "m9"){ main2 <- paste(colnames(selection.y0[n])," : int. rate", sep = "")}
-        if(colnames(selection.y0[n]) == "m10"){ main2 <- paste(colnames(selection.y0[n])," : var. rate", sep = "")}
+        if(colnames(selection.y0[n]) == "m10"){ main2 <- paste(colnames(selection.y0[n])," : net vari", sep = "")}
         if(colnames(selection.y0[n]) == "m11"){ main2 <- paste(colnames(selection.y0[n])," : contrast", sep = "")}
-        if(colnames(selection.y0[n]) == "m12"){ main2 <- paste(colnames(selection.y0[n])," : tot var", sep = "")}
+        if(colnames(selection.y0[n]) == "m12"){ main2 <- paste(colnames(selection.y0[n])," : tot vari", sep = "")}
         if(colnames(selection.y0[n]) == "m13"){ main2 <- paste(colnames(selection.y0[n])," : spikiness", sep = "")}
         if(colnames(selection.y0[n]) == "m14"){ main2 <- paste(colnames(selection.y0[n])," : max f'", sep = "")}
         if(colnames(selection.y0[n]) == "m15"){ main2 <- paste(colnames(selection.y0[n])," : min f'", sep = "")}
@@ -452,7 +478,8 @@ CVIplot <- function(x, ...) {
   CVI <- x$cluster.validity.indices
   
   if (!is.null(CVI)) {
-    par(mfrow = c(2, 1))
+    # mar=c(bottom, left, top, right)
+    par(mfrow = c(2,1), mar = c(5, 5, 4, 8))
     color.pal <- palette.colors(palette = "Okabe-Ito", alpha = 1)
     plot(y = 0, x = 0, xlim = c(2, 1+ncol(CVI)), ylim = c(0,1), type = "n", xlab = "k", ylab="", main = "Scaled cluster validity indices")
     grid(nx = NULL, ny = NULL,
@@ -460,14 +487,20 @@ CVIplot <- function(x, ...) {
          col = "gray", 
          lwd = 1)      
     for(j in 1:nrow(CVI)){
-      lines(y = CVI[j, ], x = 2:(1+ncol(CVI)), type = "b", pch = 16, xlab = "k", main = "Scaled cluster validity indices", col = color.pal[j])
+      lines(y = CVI[j, ], x = 2:(1+ncol(CVI)), type = "b", pch = (seq_len(nrow(CVI)) - 1)[j], xlab = "k", main = "Scaled cluster validity indices", col = color.pal[j])
     }
-    legend(
-      "topright",
-      col = color.pal[1:nrow(CVI)],
-      legend = c("C-index", "C-H", "W-G"),
-      lty = rep(1, nrow(CVI))
-    )
+    
+    par(xpd = TRUE)
+    usr <- par("usr")
+    
+    legend(x = usr[2],
+           y = usr[4],
+           legend = c("C-index", "C-H", "W-G"),
+           col = color.pal[seq_len(nrow(CVI))],
+           lty = rep(1, nrow(CVI)),
+           pch = seq_len(nrow(CVI)) - 1)
+    
+    par(xpd = FALSE)
     
     RVR <- x$ranked.voting.results
     
