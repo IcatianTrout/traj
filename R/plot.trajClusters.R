@@ -57,10 +57,17 @@ plot.trajClusters <-
       which.plots <- which.plots[order(which.plots)]
     }
     
+    #restore graphical parameters and ask status on exit
     current.ask.status <- devAskNewPage(ask = NULL)
-    on.exit(devAskNewPage(ask = current.ask.status))  # Restore ask status on exit
-    devAskNewPage(ask = ask)
+    op <- par(no.readonly = TRUE)
     
+    on.exit({
+      devAskNewPage(ask = current.ask.status)
+      par(op)
+    })
+    
+    devAskNewPage(ask = ask)
+
     color.pal <- palette.colors(palette = "Polychrome 36", alpha = 1)[-2]
     par(mfrow = c(1, 1))
     
@@ -271,9 +278,14 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
     stop("'N' should be either NULL or a numerical integer smaller than the total number of admissible trajectories.")
   }
   
+  #restore graphical parameters and ask status on exit
   current.ask.status <- devAskNewPage(ask = NULL)
-  on.exit(devAskNewPage(ask = current.ask.status))  # Restore ask status on exit
-  devAskNewPage(ask = ask)
+  op <- par(no.readonly = TRUE)
+  
+  on.exit({
+    devAskNewPage(ask = current.ask.status)
+    par(op)
+  })
   
   color.pal <- palette.colors(palette = "Polychrome 36", alpha = 1)[-2]
   
@@ -432,6 +444,10 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
 #'@rdname plot.trajClusters
 #'@export
 CVIplot <- function(x, ...) {
+
+  #restore graphical parameters on exit
+  op <- par(no.readonly = TRUE)
+  on.exit(par(op))
   
   CVI <- x$cluster.validity.indices
   
