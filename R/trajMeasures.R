@@ -879,13 +879,12 @@ summary.trajMeasures <- function(object, ...) {
   
   structure(
     list(
-      measures = measures.summary,
+      measures.summary = measures.summary,
       outliers.pre = outliers.pre,
       outliers.post = outliers.post
     ),
     class = "summary.trajMeasures"
   )
-  
 }
 #' @rdname trajMeasures
 #' @method print summary.trajMeasures
@@ -918,7 +917,7 @@ print.summary.trajMeasures <- function(x, ...) {
   
   cat("Summary of measures:\n")
   
-  print(x$measures)
+  print(x$measures.summary)
 
   if(!is.null(x$outliers.pre)){
     cat("\n")
