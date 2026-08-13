@@ -4,6 +4,7 @@
 \alias{trajMeasures}
 \alias{print.trajMeasures}
 \alias{summary.trajMeasures}
+\alias{print.summary.trajMeasures}
 \title{Compute Measures for Identifying Patterns of Change in Longitudinal
 Data}
 \usage{
@@ -19,6 +20,8 @@ trajMeasures(
 \method{print}{trajMeasures}(x, ...)
 
 \method{summary}{trajMeasures}(object, ...)
+
+\method{print}{summary.trajMeasures}(x, ...)
 }
 \arguments{
 \item{Data}{a matrix or data frame in which each row contains the longitudinal

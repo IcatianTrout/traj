@@ -914,14 +914,14 @@ summary.trajMeasures <- function(object, ...) {
       measures = measures.summary,
       outliers = outliers.post
     ),
-    class = "summary.trajClusters"
+    class = "summary.trajMeasures"
   )
   
 }
 #' @rdname trajMeasures
-#' @method print summary.trajClusters
+#' @method print summary.trajMeasures
 #' @export
-print.summary.myclass <- function(x, ...) {
+print.summary.trajMeasures <- function(x, ...) {
 print(x$measures.summary)
   if(!is.null(x$outliers.post)){
     print(x$outliers.post, row.names = FALSE)
