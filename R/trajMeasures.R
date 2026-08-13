@@ -829,6 +829,68 @@ print.trajMeasures <- function(x, ...) {
 #' @method summary trajMeasures
 #' @export
 summary.trajMeasures <- function(object, ...) {
+
+  Q1 <- function(x) {
+    return(quantile(x , probs = c(.25)))
+  }
+  
+  Q2 <- function(x) {
+    return(quantile(x , probs = c(.5)))
+  }
+  
+  Q3 <- function(x) {
+    return(quantile(x , probs = c(.75)))
+  }
+  
+  measures.summary <-
+    data.frame(matrix(nrow = 6, ncol = ncol(object$measures) - 1))
+  rownames(measures.summary) <-
+    c("Min.", "1st Qu.", "Median", "Mean", "3rd Qu.", "Max.")
+  colnames(measures.summary) <- colnames(object$measures)[-1]
+  
+  measures.summary[1,] <- apply(object$measures, 2, min)[-1]
+  measures.summary[2,] <- apply(object$measures, 2, Q1)[-1]
+  measures.summary[3,] <- apply(object$measures, 2, Q2)[-1]
+  measures.summary[4,] <- apply(object$measures, 2, mean)[-1]
+  measures.summary[5,] <- apply(object$measures, 2, Q3)[-1]
+  measures.summary[6,] <- apply(object$measures, 2, max)[-1]
+  
+  outliers.post <- outliers.pre <- NULL
+  
+  if(!is.null(object$outliers)){
+
+    outliers <- object$outliers
+    outliers.pre <- outliers
+    outliers.pre[is.na(outliers.pre)] <- ""
+
+    if (!(nrow(outliers) == 0)) {
+      outliers.post <- outliers
+      for (j in seq_len(nrow(outliers))) {
+        for (k in 2:ncol(outliers)) {
+          if (is.na(outliers[j, k]) == FALSE) {
+            outliers.post[j, k] <-
+              signif(object$measures[object$measures$ID == outliers$ID[j], colnames(outliers)[k]], 3)
+          }
+        }
+      }
+      outliers.post[is.na(outliers.post)] <- ""
+    }
+  }
+  
+  structure(
+    list(
+      measures = measures.summary,
+      outliers.pre = outliers.pre,
+      outliers.post = outliers.post
+    ),
+    class = "summary.trajMeasures"
+  )
+  
+}
+#' @rdname trajMeasures
+#' @method print summary.trajMeasures
+#' @export
+print.summary.trajMeasures <- function(x, ...) {
   
   cat("Description of the measures:\n")
   cat("m1: Maximum\n")
@@ -856,74 +918,16 @@ summary.trajMeasures <- function(object, ...) {
   
   cat("Summary of measures:\n")
   
-  Q1 <- function(x) {
-    return(quantile(x , probs = c(.25)))
-  }
-  
-  Q2 <- function(x) {
-    return(quantile(x , probs = c(.5)))
-  }
-  
-  Q3 <- function(x) {
-    return(quantile(x , probs = c(.75)))
-  }
-  
-  measures.summary <-
-    data.frame(matrix(nrow = 6, ncol = ncol(object$measures) - 1))
-  rownames(measures.summary) <-
-    c("Min.", "1st Qu.", "Median", "Mean", "3rd Qu.", "Max.")
-  colnames(measures.summary) <- colnames(object$measures)[-1]
-  
-  measures.summary[1,] <- apply(object$measures, 2, min)[-1]
-  measures.summary[2,] <- apply(object$measures, 2, Q1)[-1]
-  measures.summary[3,] <- apply(object$measures, 2, Q2)[-1]
-  measures.summary[4,] <- apply(object$measures, 2, mean)[-1]
-  measures.summary[5,] <- apply(object$measures, 2, Q3)[-1]
-  measures.summary[6,] <- apply(object$measures, 2, max)[-1]
-  
-  outliers.post <- NULL
-  
-  if(!is.null(object$outliers)){
+  print(x$measures)
+
+  if(!is.null(x$outliers.pre)){
     cat("\n")
     
     cat("Outliers before capping:\n")
-    outliers <- object$outliers
-    outliers.pre <- outliers
-    outliers.pre[is.na(outliers.pre)] <- ""
-    print(outliers.pre, row.names = FALSE)
+    print(x$outliers.pre, row.names = FALSE)
     
     cat("Outliers after capping:\n")
-    if (nrow(outliers) == 0) {
-      print(outliers, row.names = FALSE)
-    } else{
-      outliers.post <- outliers
-      for (j in seq_len(nrow(outliers))) {
-        for (k in 2:ncol(outliers)) {
-          if (is.na(outliers[j, k]) == FALSE) {
-            outliers.post[j, k] <-
-              signif(object$measures[object$measures$ID == outliers$ID[j], colnames(outliers)[k]], 3)
-          }
-        }
-      }
-      outliers.post[is.na(outliers.post)] <- ""
-    }
-  }
-  
-  structure(
-    list(
-      measures = measures.summary,
-      outliers = outliers.post
-    ),
-    class = "summary.trajMeasures"
-  )
-  
-}
-#' @rdname trajMeasures
-#' @method print summary.trajMeasures
-#' @export
-print.summary.trajMeasures <- function(x, ...) {
-print(x$measures.summary)
-  if(!is.null(x$outliers.post)){
     print(x$outliers.post, row.names = FALSE)
+    
   }
 }
