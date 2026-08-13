@@ -881,8 +881,7 @@ summary.trajMeasures <- function(object, ...) {
   measures.summary[5,] <- apply(object$measures, 2, Q3)[-1]
   measures.summary[6,] <- apply(object$measures, 2, max)[-1]
   
-  print(measures.summary)
-  
+  outliers.post <- NULL
   
   if(!is.null(object$outliers)){
     cat("\n")
@@ -907,7 +906,24 @@ summary.trajMeasures <- function(object, ...) {
         }
       }
       outliers.post[is.na(outliers.post)] <- ""
-      print(outliers.post, row.names = FALSE)
     }
+  }
+  
+  structure(
+    list(
+      measures = measures.summary,
+      outliers = outliers.post
+    ),
+    class = "summary.trajClusters"
+  )
+  
+}
+#' @rdname trajMeasures
+#' @method print summary.trajClusters
+#' @export
+print.summary.myclass <- function(x, ...) {
+print(x$measures.summary)
+  if(!is.null(x$outliers.post)){
+    print(x$outliers.post, row.names = FALSE)
   }
 }
