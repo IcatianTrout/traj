@@ -256,7 +256,7 @@ plot.trajClusters <-
         xlab = "",
         ylab = "",
         yaxt = "n",
-        main = "Standardized feature medians by clusters"
+        main = "Standardized feature medians by cluster"
       )
       
       graphics::axis(2,
@@ -517,4 +517,3 @@ CVIplot <- function(x, ...) {
     print("There are no cluster validity indices to plot.")
   }
 }
-#'@rdname plot.trajClusters

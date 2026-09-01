@@ -460,6 +460,31 @@ summary.trajClusters <- function(object, top_p = 3, ...) {
 #' @method print summary.trajClusters
 #' @export
 print.summary.trajClusters <- function(x, ...) {
+  
+  cat("Description of the measures:\n")
+  cat("m1: Maximum\n")
+  cat("m2: Minimum\n")
+  cat("m3: Range\n")
+  cat("m4: Mean\n")
+  cat("m5: Standard deviation\n")
+  cat("m6: Slope of the affine approximation\n")
+  cat("m7: Intercept of the affine approximation\n")
+  cat("m8: Proportion of variance explained by the affine approximation\n")
+  cat("m9: Rate of intersection with the best affine approximation\n")
+  cat("m10: Net variation per unit of time\n")
+  cat("m11: Late variation to early variation contrast\n")
+  cat("m12: Total variation per unit of time\n")
+  cat("m13: Spikiness\n")
+  cat("m14: Maximum of the first derivative\n")
+  cat("m15: Minimum of the first derivative\n")
+  cat("m16: Standard deviation of the first derivative\n")
+  cat("m17: First derivative's net variation per unit of time\n")
+  cat("m18: Maximum  of the second derivative\n")
+  cat("m19: Minimum  of the second derivative\n")
+  cat("m20: Standard deviation of the second derivative\n")
+  
+  cat("\n")
+  
   cat("Cluster frequencies:\n")
   print(x$clust.dist)
   

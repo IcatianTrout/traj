@@ -26,7 +26,9 @@ Authors:
 
 Other contributors:
 \itemize{
-  \item Gillis Delmas Tchouangue Dinkou [contributor]
+  \item Jean-Benoit Bergeron [contributor]
+  \item Gillis Delmas [contributor]
+  \item Tchouangue Dinkou [contributor]
   \item Dan Vatnik [contributor]
 }
 
