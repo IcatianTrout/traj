@@ -98,9 +98,9 @@ trajMeasures <-
     
     measures.arg <- measures
     
-    ###############################################################
-    ##         Perform checks and uniformization of data         ##
-    ###############################################################
+    ###############################################################################
+    ##   Perform checks on the Data and Time arguments and uniformize the data   ##
+    ###############################################################################
     
     if (is.null(Time)) {
       if (ID == TRUE) {
@@ -141,7 +141,7 @@ trajMeasures <-
       data2 <- data
       time2 <- time
       
-      #if either data of time has an NA at [i,j], do the same for the other
+      # If either data of time has an NA at [i,j], do the same for the other
       for(i in seq_len(nrow(data2))) {
         for(j in seq_len(ncol(data2))) {
           if(is.na(data2[i,j])){
@@ -160,14 +160,7 @@ trajMeasures <-
         w <- unname(which(NA.str_i == FALSE))
         if (length(w) < 3) {
           rows.rmv <- c(rows.rmv, i)
-          warning (
-            paste(
-              "Row ",
-              i,
-              " of Data contains less than 3 observations; it has been removed.",
-              sep = ""
-            )
-          )
+          warning (paste("Row ", i, " of Data contains less than 3 observations; it has been removed.", sep = ""))
         }
       }
       
@@ -178,7 +171,7 @@ trajMeasures <-
       }
       
       for(i in seq_len(nrow(data2))) {
-        NA.str_i <- is.na(data2)[i,]
+        NA.str_i <- is.na(data2)[i, ]
         w <- unname(which(NA.str_i == FALSE))
         v <- rep(NA, ncol(data2))
         v[seq_len(length(w))] <- data2[i, w]
@@ -191,27 +184,13 @@ trajMeasures <-
       time <- time2
       
       for (i in seq_len(nrow(data))) {
-        w2 <- unname(which(!is.na(time)[i,]))
+        w2 <- unname(which(!is.na(time)[i, ]))
         non.NA <- unname(unlist(time[i, w2]))
         if (!length(unique(non.NA)) == length(non.NA)) {
-          stop(
-            paste(
-              "Line ",
-              i,
-              " of Time contains duplicates. The rows of Time should be strictly increasing sequences.",
-              sep = ""
-            )
-          )
+          stop(paste("Line ", i, " of Time contains duplicates. The rows of Time should be strictly increasing sequences.", sep = ""))
         }
         if (!identical(w2, order(non.NA))) {
-          stop(
-            paste(
-              "The elements in row ",
-              i,
-              " of Time are not ordered chronologically.",
-              sep = ""
-            )
-          )
+          stop(paste("The elements in row ", i, " of Time are not ordered chronologically.", sep = ""))
         }
       }
       
@@ -221,9 +200,7 @@ trajMeasures <-
         stop("If Time is supplied as a vector, it must not contain NA.")
       }
       if (!length(unique(time)) == length(time)) {
-        stop(
-          "The Time vector contains duplicates. The elements of Time should form a strictly increasing sequence."
-        )
+        stop("The Time vector contains duplicates. The elements of Time should form a strictly increasing sequence.")
       }
       if (!identical(order(time), seq_len(length(time)))) {
         stop("The elements of Time are not ordered chronologically.")
@@ -235,18 +212,11 @@ trajMeasures <-
       data2 <- data
       rmv <- c()
       for (i in seq_len(nrow(data))) {
-        NA.str_i <- is.na(data)[i,]
+        NA.str_i <- is.na(data)[i, ]
         w <- unname(which(NA.str_i == FALSE))
         if (length(w) < 3) {
           rmv <- c(rmv, i)
-          warning(
-            paste(
-              "Row ",
-              i,
-              " of Data contains less than 3 observations; it has been removed.",
-              sep = ""
-            )
-          )
+          warning(paste("Row ", i, " of Data contains less than 3 observations; it has been removed.", sep = ""))
         }
       }
       if (length(rmv) > 0) {
@@ -257,14 +227,8 @@ trajMeasures <-
       }
       data <- data2
       
-      data2 <-
-        unname(data.frame(matrix(
-          NA, ncol = ncol(data), nrow = nrow(data)
-        )))
-      time2 <-
-        unname(data.frame(matrix(
-          NA, ncol = ncol(data), nrow = nrow(data)
-        )))
+      data2 <-unname(data.frame(matrix(NA, ncol = ncol(data), nrow = nrow(data))))
+      time2 <-unname(data.frame(matrix(NA, ncol = ncol(data), nrow = nrow(data))))
       
       for (i in seq_len(nrow(data))) {
         w <- which(!is.na(data[i,]))
@@ -279,9 +243,9 @@ trajMeasures <-
     }
     
     
-    ######################################################
-    ##         Construct vector of "mid points"         ##
-    ######################################################
+    ##################################################################################################
+    ##   Perform checks on the midpoint argument and construct vector of "mid points" if required   ##
+    ##################################################################################################
     
     if (TRUE %in% (11 %in% measures)) {
       mid.position <- c()
@@ -308,24 +272,10 @@ trajMeasures <-
             Lines <- IDvector[flag]
           }
           if (length(Lines) == 1) {
-            warning(
-              paste(
-                "When left blank, the 'midpoint' argument defaults to the observation time closests to the average 0.5*(max(Time) + min(Time)), but this can't be either the first or last observation time. As a result, row ",
-                Lines,
-                " has been removed. To avoid this, consider excluding measure 11 from the analysis or providing custom 'midpoint' values.",
-                sep = ""
-              )
-            )
+            warning(paste("When left blank, the 'midpoint' argument defaults to the observation time closests to the average 0.5*(max(Time) + min(Time)), but this can't be either the first or last observation time. As a result, row ", Lines, " has been removed. To avoid this, consider excluding measure 11 from the analysis or providing custom 'midpoint' values.", sep = ""))
           }
           if (length(Lines) > 1) {
-            warning(
-              paste(
-                "When left blank, the 'midpoint' argument defaults to the observation time closests to the average time 0.5*(max(Time) + min(Time)), but this can't be either the first or last observation time. As a result, rows ",
-                noquote(paste(Lines, collapse = ", ")),
-                " have been removed. To avoid this, consider excluding measure 11 from the analysis or providing custom 'midpoint' values.",
-                sep = ""
-              )
-            )
+            warning(paste("When left blank, the 'midpoint' argument defaults to the observation time closests to the average time 0.5*(max(Time) + min(Time)), but this can't be either the first or last observation time. As a result, rows ", noquote(paste(Lines, collapse = ", ")), " have been removed. To avoid this, consider excluding measure 11 from the analysis or providing custom 'midpoint' values.", sep = ""))
           }
           
           IDvector <- IDvector[-flag]
@@ -345,36 +295,23 @@ trajMeasures <-
           stop("'midpoint' does not have the correct format.")
         }
       }
+      
       # Check to see if the midpoints are all greater than 1 but less than the number of observations
       for (i in seq_len(nrow(data))) {
         v <- time[i,][!is.na(time[i, ])]
         if (mid.position[i] <= 1) {
-          stop(
-            paste(
-              "Error in 'midpoint' for subject ",
-              i,
-              "; 'midpoint' must be greater than 1.",
-              sep = ""
-            )
-          )
+          stop(paste("Error in 'midpoint' for subject ", i, "; 'midpoint' must be greater than 1.", sep = ""))
         } else if (mid.position[i] >= length(v)) {
-          stop(
-            paste(
-              "Error in 'midpoint' for subject ",
-              i,
-              "; 'midpoint' must be less than the number of observations.",
-              sep = ""
-            )
-          )
+          stop(paste("Error in 'midpoint' for subject ", i, "; 'midpoint' must be less than the number of observations.", sep = ""))
         }
       }
     } else{
       mid.position <- NULL
     }
     
-    ##########################################################################################
-    ##         Initialize main output data frame and compute the requested measures         ##
-    ##########################################################################################
+    ##############################################################################
+    ##   Initialize main output data frame and compute the requested measures   ##
+    ##############################################################################
     
     output <-
       data.frame(matrix(ncol = 1 + length(measures), nrow = nrow(data)))
@@ -449,16 +386,16 @@ trajMeasures <-
         tsqbar <- c()
         deltat <-  c()
         
-        for(j in 1:(length(x)-1)){
-          ybar[j] <- (y[j]+y[j+1])/2
-          tybar[j] <- (y[j]*x[j]+y[j+1]*x[j+1])/2
-          tbar[j] <- (x[j]+x[j+1])/2
-          tsqbar[j] <- (x[j]^2+x[j+1]^2)/2
-          deltat[j] <- x[j+1]-x[j]
+        for(j in seq_len(length(x) - 1)){
+          ybar[j] <- (y[j] + y[j + 1]) / 2
+          tybar[j] <- (y[j] * x[j] + y[j + 1] * x[j + 1]) / 2
+          tbar[j] <- (x[j] + x[j + 1]) / 2
+          tsqbar[j] <- (x[j]^2 + x[j + 1]^2) / 2
+          deltat[j] <- x[j + 1] - x[j]
         }
         
-        m6[i] <- (sum(tybar*deltat) - 1/(x[length(x)]-x[1])*(sum(tbar*deltat))*(sum(ybar*deltat)))/(sum(tsqbar*deltat) - 1/(x[length(x)]-x[1])*(sum(tbar*deltat))^2)
-        m7[i] <- 1/(x[length(x)]-x[1])*sum((ybar-m6[i]*tbar)*deltat)
+        m6[i] <- (sum(tybar * deltat) - 1 / (x[length(x)] - x[1]) * (sum(tbar * deltat)) * (sum(ybar * deltat))) / (sum(tsqbar * deltat) - 1/(x[length(x)] - x[1]) * (sum(tbar * deltat))^2)
+        m7[i] <- 1 / (x[length(x)] - x[1]) * sum((ybar - m6[i] * tbar) * deltat)
         
       }
       if (6 %in% measures) {
@@ -473,7 +410,6 @@ trajMeasures <-
       }
     }
     
-    
     # proportion of variance explained by the affine approximation
     if (8 %in% measures) {
       for (i in seq_len(nrow(data))) {
@@ -483,7 +419,7 @@ trajMeasures <-
         if(m5[i] == 0){
           output$m8[i] <- 1
         } else {
-          output$m8[i] <- FctMean(x=x, y=(m6[i]*x + m7[i] - m4[i])^2)/(m5[i]^2)
+          output$m8[i] <- FctMean(x=x, y=(m6[i] * x + m7[i] - m4[i])^2) / (m5[i]^2)
           }
       }
     }
@@ -497,14 +433,14 @@ trajMeasures <-
         
         r <- c()
         for(j in seq_along(y)){
-          r[j] <- y[j] - (m6[i]*x[j] + m7[i])
+          r[j] <- y[j] - (m6[i] * x[j] + m7[i])
         }
         
         intersection.count[i] <- 0
         for(k in seq_along(r)[-length(r)]){
-          w <- which(sign(r[k] * r[(k+1):length(r)]) !=0)
+          w <- which(sign(r[k] * r[(k + 1):length(r)]) !=0)
           if(length(w) > 0){
-            if(sign(r[k] * r[(k+1):length(r)])[w[1]] == -1){
+            if(sign(r[k] * r[(k + 1):length(r)])[w[1]] == -1){
               intersection.count[i] <- intersection.count[i] + 1 
             }
           }
@@ -514,7 +450,7 @@ trajMeasures <-
       }
     }
     
-    # net variation per unit of time.
+    # net variation per unit of time
     if (10 %in% measures) { 
       for (i in seq_len(nrow(data))) {
         y <- data[i, complete.cases(data[i, ])]
@@ -540,7 +476,7 @@ trajMeasures <-
         x <- time[i, complete.cases(time[i, ])]
         
         V <- c()
-        for(j in 1:(length(y) - 1)){
+        for(j in seq_len(length(y) - 1)){
           V[j] <- abs(y[j + 1] - y[j])
         }
         
@@ -548,7 +484,6 @@ trajMeasures <-
       }
     }
     
-
     # spikiness
     if (13 %in% measures) {
       for (i in seq_len(nrow(data))) {
@@ -561,13 +496,13 @@ trajMeasures <-
         if(length(wb > 0)){
           for (k in wb) {
             if(k == 1){
-              blue.time <- blue.time + 0.5*(x[k+1] - x[k])
+              blue.time <- blue.time + 0.5*(x[k + 1] - x[k])
             }
             if (! (k %in% c(1, length(x)))) {
-              blue.time <- blue.time + 0.5*(x[k+1] - x[k-1])
+              blue.time <- blue.time + 0.5*(x[k + 1] - x[k - 1])
             }
             if(k == length(x)){
-              blue.time <- blue.time + 0.5*(x[k] - x[k-1])
+              blue.time <- blue.time + 0.5*(x[k] - x[k - 1])
             }
           }
         }
@@ -577,13 +512,13 @@ trajMeasures <-
         if(length(wr > 0)){
           for (k in wr) {
             if(k == 1){
-              red.time <- red.time + 0.5*(x[k+1] - x[k])
+              red.time <- red.time + 0.5*(x[k + 1] - x[k])
             }
             if (! (k %in% c(1, length(x)))) {
-              red.time <- red.time + 0.5*(x[k+1] - x[k-1])
+              red.time <- red.time + 0.5*(x[k + 1] - x[k - 1])
             }
             if(k == length(x)){
-              red.time <- red.time + 0.5*(x[k] - x[k-1])
+              red.time <- red.time + 0.5*(x[k] - x[k - 1])
             }
           }
         }
@@ -597,7 +532,7 @@ trajMeasures <-
     }
     
     
-    ### Measures on y'(t) ###
+    ### Measures on f'(t) ###
     
     # If a measure involving the speed or the acceleration was requested, compute the derivative:
     if (sum(measures %in% 14:20) > 0) {
@@ -644,9 +579,9 @@ trajMeasures <-
       }
     }
     
-    ### Measures on y''(t) ###
+    ### Measures on f''(t) ###
     
-    #if a measure involving the acceleration was requested, compute the derivative of the derivative:
+    # If a measure involving the acceleration was requested, compute the derivative of the derivative:
 
     if (sum(measures %in% 18:20) > 0) {
       accel.data <- speed.data
@@ -683,10 +618,10 @@ trajMeasures <-
     }
     
     
-    
-    ######################################
-    ##         Cap the outliers         ##
-    ######################################
+
+    ##############################################################
+    ##   Cap the outliers, provided that cap.outliers == TRUE   ##
+    ##############################################################
  
     outliers <- NULL
     
@@ -708,7 +643,7 @@ trajMeasures <-
         
         if (length(y.TRUE) > 2) {
           top <-
-            rev(order(abs(y.TRUE - median(y.TRUE))))[1:ceiling(n * 0.01)] #  if n < 100, remove 1 element, so this is never empty
+            rev(order(abs(y.TRUE - median(y.TRUE))))[1:ceiling(n * 0.01)]  #  If n < 100, remove 1 element, so this is never empty
           y.TRUE <- y.TRUE[-top]
         }
         
@@ -716,37 +651,29 @@ trajMeasures <-
         sigma <- sd(y.TRUE)
         
         k_Cheb <-
-          sqrt(100 / 0.3) #  The classical Chebychev bound. Approximately 18.26.
+          sqrt(100 / 0.3) ##  The classical Chebychev bound; approximately 18.26
         k <- seq(from = 0.1, to = 18.26, by = 0.1)
         M <- c()
         for (i in seq(length(k))) {
           max.left <-
             max(density(
               y.TRUE,
-              from = (mu - 18.3 * sigma),
-              to = (mu + 18.3 * sigma)
-            )$y[density(y.TRUE,
-                        from = (mu - 18.3 * sigma),
-                        to = (mu + 18.3 * sigma))$x > mu + k[i] * sigma])
+              from = (mu - 18.26 * sigma),
+              to = (mu + 18.26 * sigma)
+            )$y[density(y.TRUE, from = (mu - 18.26 * sigma), to = (mu + 18.26 * sigma))$x > mu + k[i] * sigma])
           max.right <-
             max(density(
               y.TRUE,
-              from = (mu - 18.3 * sigma),
-              to = (mu + 18.3 * sigma)
-            )$y[density(y.TRUE,
-                        from = (mu - 18.3 * sigma),
-                        to = (mu + 18.3 * sigma))$x < mu - k[i] * sigma])
+              from = (mu - 18.26 * sigma),
+              to = (mu + 18.26 * sigma)
+            )$y[density(y.TRUE, from = (mu - 18.26 * sigma), to = (mu + 18.26 * sigma))$x < mu - k[i] * sigma])
           M[i] <- max(max.left, max.right)
         }
         
         p <- 2 * pi * k ^ 2 * (exp(1) - 2 * pi / 3)
-        q <-
-          2 * (2 * pi * k) ^ 3 / 27 - (2 * pi) ^ 2 * k ^ 3 * exp(1) / 3 - 2 * pi * exp(1) /
-          (sigma * M)
+        q <- 2 * (2 * pi * k) ^ 3 / 27 - (2 * pi) ^ 2 * k ^ 3 * exp(1) / 3 - 2 * pi * exp(1) / (sigma * M)
         
-        root <-
-          CubeRoot(-q / 2 + sqrt(q ^ 2 / 4 + p ^ 3 / 27)) + CubeRoot(-q / 2 - sqrt(q ^
-                                                                                     2 / 4 + p ^ 3 / 27)) + 2 * pi * k / 3
+        root <- CubeRoot(-q / 2 + sqrt(q ^ 2 / 4 + p ^ 3 / 27)) + CubeRoot(-q / 2 - sqrt(q ^ 2 / 4 + p ^ 3 / 27)) + 2 * pi * k / 3
         
         w <- which(root * sigma * M < 0.3 / 100)
         if (length(w) > 0) {
@@ -830,18 +757,16 @@ print.trajMeasures <- function(x, ...) {
 #' @export
 summary.trajMeasures <- function(object, ...) {
 
+  # Define first and third quantile functions
   Q1 <- function(x) {
     return(quantile(x , probs = c(.25)))
   }
-  
-  Q2 <- function(x) {
-    return(quantile(x , probs = c(.5)))
-  }
-  
+
   Q3 <- function(x) {
     return(quantile(x , probs = c(.75)))
   }
   
+  # Construct main summary table
   measures.summary <-
     data.frame(matrix(nrow = 6, ncol = ncol(object$measures) - 1))
   rownames(measures.summary) <-
@@ -850,13 +775,14 @@ summary.trajMeasures <- function(object, ...) {
   
   measures.summary[1,] <- apply(object$measures, 2, min)[-1]
   measures.summary[2,] <- apply(object$measures, 2, Q1)[-1]
-  measures.summary[3,] <- apply(object$measures, 2, Q2)[-1]
+  measures.summary[3,] <- apply(object$measures, 2, median)[-1]
   measures.summary[4,] <- apply(object$measures, 2, mean)[-1]
   measures.summary[5,] <- apply(object$measures, 2, Q3)[-1]
   measures.summary[6,] <- apply(object$measures, 2, max)[-1]
   
   outliers.post <- outliers.pre <- NULL
   
+  # If there are outliers, construct tables of outliers pre and post imputation
   if(!is.null(object$outliers)){
 
     outliers <- object$outliers

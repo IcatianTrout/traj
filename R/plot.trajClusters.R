@@ -241,7 +241,7 @@ plot.trajClusters <-
         if(x$select[m] == 14){ hor.labels <- c(hor.labels, paste("m14 : max f'", sep = ""))}
         if(x$select[m] == 15){ hor.labels <- c(hor.labels, paste("m15 : min f'", sep = ""))}
         if(x$select[m] == 16){ hor.labels <- c(hor.labels, paste("m16 : SD f'", sep = ""))}
-        if(x$select[m] == 17){ hor.labels <- c(hor.labels, paste("m17 : f' var. rate", sep = ""))}
+        if(x$select[m] == 17){ hor.labels <- c(hor.labels, paste("m17 : f' net vari", sep = ""))}
         if(x$select[m] == 18){ hor.labels <- c(hor.labels, paste("m18 : max f''", sep = ""))}
         if(x$select[m] == 19){ hor.labels <- c(hor.labels, paste("m19 : min f''", sep = ""))}
         if(x$select[m] == 20){ hor.labels <- c(hor.labels, paste("m20 : SD f''", sep = ""))}
@@ -404,7 +404,7 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
         if(colnames(selection.x0[m]) == "m14"){ main1 <- paste(colnames(selection.x0[m])," : max f'", sep = "")}
         if(colnames(selection.x0[m]) == "m15"){ main1 <- paste(colnames(selection.x0[m])," : min f'", sep = "")}
         if(colnames(selection.x0[m]) == "m16"){ main1 <- paste(colnames(selection.x0[m])," : SD f'", sep = "")}
-        if(colnames(selection.x0[m]) == "m17"){ main1 <- paste(colnames(selection.x0[m])," : f' var. rate", sep = "")}
+        if(colnames(selection.x0[m]) == "m17"){ main1 <- paste(colnames(selection.x0[m])," : f' net vari", sep = "")}
         if(colnames(selection.x0[m]) == "m18"){ main1 <- paste(colnames(selection.x0[m])," : max f''", sep = "")}
         if(colnames(selection.x0[m]) == "m19"){ main1 <- paste(colnames(selection.x0[m])," : min f''", sep = "")}
         if(colnames(selection.x0[m]) == "m20"){ main1 <- paste(colnames(selection.x0[m])," : SD f''", sep = "")}
@@ -424,7 +424,7 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
         if(colnames(selection.y0[n]) == "m14"){ main2 <- paste(colnames(selection.y0[n])," : max f'", sep = "")}
         if(colnames(selection.y0[n]) == "m15"){ main2 <- paste(colnames(selection.y0[n])," : min f'", sep = "")}
         if(colnames(selection.y0[n]) == "m16"){ main2 <- paste(colnames(selection.y0[n])," : SD f'", sep = "")}
-        if(colnames(selection.y0[n]) == "m17"){ main2 <- paste(colnames(selection.y0[n])," : f' var. rate", sep = "")}
+        if(colnames(selection.y0[n]) == "m17"){ main2 <- paste(colnames(selection.y0[n])," : f' net vari", sep = "")}
         if(colnames(selection.y0[n]) == "m18"){ main2 <- paste(colnames(selection.y0[n])," : max f''", sep = "")}
         if(colnames(selection.y0[n]) == "m19"){ main2 <- paste(colnames(selection.y0[n])," : min f''", sep = "")}
         if(colnames(selection.y0[n]) == "m20"){ main2 <- paste(colnames(selection.y0[n])," : SD f''", sep = "")}

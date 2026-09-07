@@ -1,4 +1,9 @@
+# Function that approximates the mean of a function using the mean of the left and right Riemann sums
+
 FctMean <- function (x, y) {
+  
+  # Here x and y are vectors, and y is interpreted as f(x) for the function f that we're trying to approximate the mean of
+  
   if (!length(y) == length(x)) {
     stop("y and x must be vectors of the same length.")
   }
