@@ -52,6 +52,7 @@
 #'@rdname trajClusters
 #'
 #'@export
+
 trajClusters <-
   function (Measures,
             select = NULL,
@@ -111,7 +112,7 @@ trajClusters <-
       warning(paste("Being constant, measures ", noquote(paste(meas.rmv, collapse = ", ")), " have been removed.", sep = ""))
       dat <- dat[, -w, drop = FALSE]
     } 
-
+    
     # Standardize the measures to be clustered
     dat <- data.frame(apply(dat, 2, scale))
     
@@ -157,9 +158,9 @@ trajClusters <-
       bins <- rep(0, ncol(ICV))
       names(bins) <- paste("k=", 2:k.max, sep = "")
       
-      for(i in 1:nrow(ICV)){
-        for(j in 1:ncol(ICV)){
-          bins[order(ICV[i, ], decreasing = T)[j]] <- bins[order(ICV[i, ], decreasing = T)[j]] + 1 - (j - 1)/(ncol(ICV) - 1)
+      for(i in seq_len(nrow(ICV))){
+        for(j in seq_len(ncol(ICV))){
+          bins[order(ICV[i, ], decreasing = T)[j]] <- bins[order(ICV[i, ], decreasing = T)[j]] + 1 - (j - 1) / (ncol(ICV) - 1)
         }
       }
       
@@ -180,7 +181,16 @@ trajClusters <-
     
     # Re-label the groups from largest in size to smallest
     decr.order <- rev(order(summary(factor(partition))))
-    partition <- decr.order[partition]
+    
+    w <- list()
+    for (g in seq_len(nclusters)) {
+      w[[g]] <- which(partition == g)
+    }
+    
+    for (g in seq_len(nclusters)) {
+      partition[w[[decr.order[g]]]] <- g
+    }
+    
     row.centers <- row.centers[decr.order] ## Reorder the centers to match the new labeling
     if(fuzzy == TRUE){
       fuzzy.partition <- fuzzy.partition[, decr.order]
