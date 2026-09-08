@@ -46,6 +46,8 @@ plot.trajClusters <-
            which.plots = NULL,
            ...
   ) {
+    
+    # Run checks on the 'which.plots' argument
     if (!is.null(which.plots) &
         (!is.numeric(which.plots) | !is.vector(which.plots))) {
       stop(
@@ -57,7 +59,7 @@ plot.trajClusters <-
       which.plots <- which.plots[order(which.plots)]
     }
     
-    #restore graphical parameters and ask status on exit
+    # Restore graphical parameters and ask status on exit
     current.ask.status <- devAskNewPage(ask = NULL)
     op <- par(no.readonly = TRUE)
     
@@ -67,13 +69,12 @@ plot.trajClusters <-
     })
     
     devAskNewPage(ask = ask)
-
     color.pal <- palette.colors(palette = "Polychrome 36", alpha = 1)[-2]
     
-    
+    # Centroids plot
     if(is.null(which.plots) | 1 %in% which.plots){
       
-      centroids.data <- x$data[x$data[, 1] %in% x$ID.centers, -1]
+      centroids.data <- x$data[x$data[, 1] %in% x$ID.centers, -1] ## The centroids
       
       par(mfrow = c(1,1), mar = c(5, 5, 4, 5))
      
@@ -93,6 +94,7 @@ plot.trajClusters <-
            col = "gray", 
            lwd = 1)  
       
+      # Set up the legend outside the box
       par(xpd = TRUE)
       usr <- par("usr")
       
@@ -104,7 +106,7 @@ plot.trajClusters <-
              pch = seq_len(x$nclusters) - 1)
       
       
-      for (j in 1:x$nclusters) {
+      for (j in seq_len(x$nclusters)) {
         lines(
           x = x$time[which(x$time[, 1] == x$ID.centers[j]), -1],
           y = x$data[which(x$data[, 1] == x$ID.centers[j]), -1],
@@ -116,28 +118,27 @@ plot.trajClusters <-
       par(xpd = FALSE)
     }
     
-    
+    # Sample trajectories plot
     if(is.null(which.plots) | 2 %in% which.plots){
+      
       traj.by.clusters <- list()
+      
       for (k in seq_len(x$nclusters)) {
-        traj.by.clusters[[k]] <-
-          x$data[which(x$partition[, 2] == k), -c(1), drop = FALSE]
+        traj.by.clusters[[k]] <- x$data[which(x$partition[, 2] == k), -1, drop = FALSE] 
       }
       
       time.by.clusters <- list()
       for (k in 1:x$nclusters) {
         time.by.clusters[[k]] <-
-          x$time[which(x$partition[, 2] == k),-c(1), drop = FALSE]
+          x$time[which(x$partition[, 2] == k), -1, drop = FALSE]
       }
       
-      ## Plot (max) sample.size random trajectories from each group
+      ## Plot a number of random trajectories from each group determined by the 'sample.size' argument 
       smpl.traj.by.clusters <- list()
       smpl.time.by.clusters <- list()
       
-      smpl.traj <-
-        matrix(nrow = 0, ncol = ncol(x$data))
-      smpl.time <-
-        matrix(nrow = 0, ncol = ncol(x$time) - 1)
+      smpl.traj <- matrix(nrow = 0, ncol = ncol(x$data))
+      smpl.time <- matrix(nrow = 0, ncol = ncol(x$time) - 1)
       
       size <- c()
       
@@ -145,27 +146,27 @@ plot.trajClusters <-
         if(!is.null(sample.size)){
           size[k] <- min(sample.size, nrow(traj.by.clusters[[k]]))
         } else{
-          size[k] <- nrow(traj.by.clusters[[k]])
+          size[k] <- nrow(traj.by.clusters[[k]]) ## If sample.size = NULL, plot all the trajectories
         }
-        smpl <-
-          sample(x = seq_len(nrow(traj.by.clusters[[k]])),
-                 size = size[k],
-                 replace = FALSE)
-        smpl <- smpl[order(smpl)]
         
-        smpl.traj.by.clusters[[k]] <- cbind(traj.by.clusters[[k]][smpl, , drop = FALSE],k)
+        # Randomly pick the trajectories to be plotted
+        smpl <- sample(x = seq_len(nrow(traj.by.clusters[[k]])),
+                       size = size[k],
+                       replace = FALSE)
+        
+        smpl.traj.by.clusters[[k]] <- cbind(traj.by.clusters[[k]][smpl, , drop = FALSE], k)
         smpl.time.by.clusters[[k]] <- time.by.clusters[[k]][smpl, , drop = FALSE]
         
         smpl.traj <- rbind(smpl.traj, smpl.traj.by.clusters[[k]])
         smpl.time <- rbind(smpl.time, smpl.time.by.clusters[[k]])
       }
       
-      ## Shuffle the rows
+      # We want to add the trajectories to the plot in a random order so we shuffle the rows
       s <- sample(seq_len(nrow(smpl.traj)), nrow(smpl.traj), replace = FALSE)
       smpl.traj <- smpl.traj[s, ]
       smpl.time <- smpl.time[s, ]
       
-      # mar=c(bottom, left, top, right)
+      # mar = c(bottom, left, top, right)
       par(mfrow = c(1,1), mar = c(5, 5, 4, 5))
       
       plot(
@@ -184,24 +185,26 @@ plot.trajClusters <-
            col = "gray", 
            lwd = 1)  
       
-      ## Plot the trajectories in a random order
+      # Plot the trajectories
       for(i in seq_len(nrow(smpl.traj))){
-        k <- smpl.traj[i, ncol(smpl.traj)]
+        k <- smpl.traj[i, ncol(smpl.traj)] ## The cluster to which the trajectory in row i belongs
         
         lines(
-          x = smpl.time[i,],
+          x = smpl.time[i, ],
           y = smpl.traj[i, -ncol(smpl.traj)],
           type = "b",
           col = color.pal[k],
           pch = (seq_len(x$nclusters) - 1)[k]
         )
       }
+      
+      # Set up the legend outside the box
       par(xpd = TRUE)
       usr <- par("usr")
       
       legend(x = usr[2],
              y = usr[4],
-             legend = paste(seq_len(x$nclusters))[1:x$nclusters],
+             legend = paste(seq_len(x$nclusters)),
              col = color.pal[seq_len(x$nclusters)],
              lty = rep(0, x$nclusters),
              pch = seq_len(x$nclusters) - 1)
@@ -209,20 +212,23 @@ plot.trajClusters <-
       par(xpd = FALSE)
     }
     
+    # Medians plot
     if(is.null(which.plots) | 3 %in% which.plots){
       
+      # Initiate the cluster median table
       cl.medians <- data.frame(matrix(NA, nrow = x$nclusters, ncol = length(x$select)))
       colnames(cl.medians) <- colnames(x$selection)[-1]
       
-      for (i in seq_len(x$nclusters)) {
-        which.i <- which(x$partition[, 2] == i)
-        cl.medians[i, ] <- apply(x$standardized.data[which.i, ], 2, median)
+      for (k in seq_len(x$nclusters)) {
+        which.k <- which(x$partition[, 2] == k)
+        cl.medians[k, ] <- apply(x$standardized.data[which.k, ], 2, median)
       }
       
       # mar=c(bottom, left, top, right)
       par(mfrow = c(1,1), mar = c(5, 8, 4, 5))
       color.pal <- palette.colors(palette = "Polychrome 36", alpha = 1)[-2]
       
+      # Set up the tick labels of the y axis
       hor.labels <- c()
       for(m in seq_len(length(x$select))){
         if(x$select[m] == 1){ hor.labels <- c(hor.labels, paste("m1 : max", sep = ""))}
@@ -259,18 +265,21 @@ plot.trajClusters <-
         main = "Standardized feature medians by cluster"
       )
       
+      # Add the tick labels of the y axis horizontally 
       graphics::axis(2,
            at = seq_len(length(x$select)),
            labels = rev(hor.labels),
-           las = 1)       # horizontal labels
+           las = 1)       
       
       for(m in seq_len(length(x$select))){
-        lines(x = c(min(cl.medians), max(cl.medians)), y = c(m,m), col="gray")
+        lines(x = c(min(cl.medians), max(cl.medians)), 
+              y = c(m,m), 
+              col = "gray")
         
         for(s in seq_len(x$nclusters)){
           lines(
             x = cl.medians[s, m],
-            y = rev(1:length(x$select))[m],
+            y = rev(seq_along(x$select))[m],
             type = "p",
             pch = s - 1,
             col = color.pal[s],
@@ -279,14 +288,14 @@ plot.trajClusters <-
         }
       }
       
-      
+      # Set up the legend outside the box
       usr <- par("usr")
       par(xpd = TRUE)
       
       legend(x = usr[2],
              y = usr[4],
-             legend = paste(seq_len(x$nclusters))[1:x$nclusters],
-             col = color.pal[1:x$nclusters],
+             legend = paste(seq_len(x$nclusters)),
+             col = color.pal[seq_len(x$nclusters)],
              lty = rep(0, x$nclusters),
              pch = seq_len(x$nclusters) - 1)
     }
@@ -297,14 +306,23 @@ print("See also 'CVIplot' for a plot of the statistic used to determined the num
 #'
 #'@export
 scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
+
+  nb.measures <- ncol(x$selection) - 1
   
-  if( (!is.null(which.scatter)) & (sum(!(which.scatter %in% x$select)) > 0) ){stop("The argument which.scatter should be a subset of the measure argument used in function trajClusters.")}
+  # Run checks on the arguments
+  if(nb.measures < 2){
+    stop("Since only one measure participated in the clustering there are no scatter plots to display.")
+  }
+  
+  if( (!is.null(which.scatter)) & (sum(!(which.scatter %in% x$select)) > 0) ){
+    stop("The argument which.scatter should be a subset of the measure argument used in function trajClusters.")
+    }
   
   if ( !is.null(N) && !( ( is.numeric(N) && (length(N) == 1)) && (N %in% seq_len(nrow(x$selection))) ) ){
     stop("'N' should be either NULL or a numerical integer smaller than the total number of admissible trajectories.")
   }
   
-  #restore graphical parameters and ask status on exit
+  # Restore graphical parameters and ask status on exit
   current.ask.status <- devAskNewPage(ask = NULL)
   op <- par(no.readonly = TRUE)
   
@@ -312,20 +330,33 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
     devAskNewPage(ask = current.ask.status)
     par(op)
   })
+
+  # Set up the most compact grid depending on the number of selected measures
+  X <- sqrt(nb.measures - 1)
   
-  color.pal <- palette.colors(palette = "Polychrome 36", alpha = 1)[-2]
+  int.X <- floor(X)
+  frac.X <- X - int.X
   
-  nb.measures <- ncol(x$selection) - 1
-  scatter.condition <- (nb.measures > 1)
+  if (frac.X == 0) {
+    good.grid <- c(int.X, int.X)
+  }
   
-  if (scatter.condition) {
-    
-    if(is.null(which.scatter)){
-      v <- c(1:nb.measures)
-    } else{
-      v <- c(1:length(which.scatter))
-    }
-    
+  if ((frac.X > 0) & (frac.X < 0.5)) {
+    good.grid <- c(int.X, int.X + 1)
+  }
+  
+  if (frac.X >= 0.5) {
+    good.grid <- c(int.X + 1, int.X + 1)
+  }
+  
+  color.pal <- palette.colors(palette = "Polychrome 36", alpha = 1)[-2]  
+  
+  # mar=c(bottom, left, top, right)
+  par(mfrow = good.grid, 
+      mar = c(5, 5, 4, 5), 
+      xpd = TRUE)
+  
+  grps <- x$partition[, 2]
     
     selection.y <- x$standardized.data
     
@@ -335,35 +366,14 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
       selection.x <- selection.y
     }
     
-    # Set up the most compact grid depending on the number of selected measures
-    X <- sqrt(nb.measures - 1)
-    
-    int.X <- floor(X)
-    frac.X <- X - int.X
-    
-    
-    if (frac.X == 0) {
-      good.grid <- c(int.X, int.X)
-    }
-    
-    if ((frac.X > 0) & (frac.X < 0.5)) {
-      good.grid <- c(int.X, int.X + 1)
-    }
-    
-    if (frac.X >= 0.5) {
-      good.grid <- c(int.X + 1, int.X + 1)
-    }
-    
-    
     selection.x0 <- selection.x
     selection.y0 <- selection.y
-    
-    grps <- x$partition[, 2]
-    
+
+    # If the 'N' argument is non NULL, take a subset of the data is size N while preserving the relative cluster sizes
     if(!is.null(N)){
       selection.x.new <- selection.x[0, , drop = FALSE]
       selection.y.new <- selection.y[0, , drop = FALSE]
-      new.grp.size <- round(N*x$partition.summary/sum(x$partition.summary))
+      new.grp.size <- round(N * x$partition.summary / sum(x$partition.summary)) 
       grps <- c()
       for(k in seq_len(x$nclusters)){
         s <- sample(seq_len(x$partition.summary[k]), size = new.grp.size[k], replace = FALSE)
@@ -377,17 +387,23 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
       selection.y <- selection.y.new
     }
     
+    # Define a vector v that indexes the plot number
+    if(is.null(which.scatter)){
+      v <- seq_len(nb.measures)
+    } else{
+      v <- seq_along(which.scatter)
+    }
+    
+    
     for (m in v) {
       if(!is.null(which.scatter)){
         w <- which(x$select == which.scatter[m])
       } else {
         w <- m
       }
-      
-      # mar=c(bottom, left, top, right)
-      par(mfrow = good.grid, mar = c(5, 5, 4, 5), xpd = TRUE)
-      
+
       for (n in seq_len(nb.measures)[-w]) {
+        # Define the title of the n-th plot displyed on the m-th page
         if(colnames(selection.x0[m]) == "m1"){ main1 <- paste(colnames(selection.x0[m])," : max", sep = "")}
         if(colnames(selection.x0[m]) == "m2"){ main1 <- paste(colnames(selection.x0[m])," : min", sep = "")}
         if(colnames(selection.x0[m]) == "m3"){ main1 <- paste(colnames(selection.x0[m])," : range", sep = "")}
@@ -440,7 +456,8 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
           main = paste(main1,main2, sep = "\n")
         )
         
-        S <- sample(seq_len(nrow(selection.x)), nrow(selection.x), replace = FALSE) #randomize
+        # We want to randomize the order in which the points are added to the plot
+        S <- sample(seq_len(nrow(selection.x)), nrow(selection.x), replace = FALSE) 
         
         for(s in S){
           lines(
@@ -453,43 +470,63 @@ scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
           )
         }
         
+        # Set up the legend outside the box
         usr <- par("usr")
         
         legend(x = usr[2],
                y = usr[4],
-               legend = paste(seq_len(x$nclusters))[1:x$nclusters],
-               col = color.pal[1:x$nclusters],
+               legend = paste(seq_len(x$nclusters)),
+               col = color.pal[seq_len(x$nclusters)],
                lty = rep(0, x$nclusters),
-               pch = c(0:(x$nclusters-1)))
+               pch = seq_len(x$nclusters) - 1)
       }
     }
-  } else{
-    print("Since only one measure participated in the clustering there are no scatter plots to display.")
-  }
 }
 #'@rdname plot.trajClusters
 #'@export
 CVIplot <- function(x, ...) {
 
+  CVI <- x$cluster.validity.indices
+  
+  if(is.null(CVI)){
+    stop("There are no cluster validity indices to plot.")
+  }
+  
   #restore graphical parameters on exit
   op <- par(no.readonly = TRUE)
   on.exit(par(op))
-  
-  CVI <- x$cluster.validity.indices
-  
-  if (!is.null(CVI)) {
-    # mar=c(bottom, left, top, right)
-    par(mfrow = c(2,1), mar = c(5, 5, 4, 8))
-    color.pal <- palette.colors(palette = "Okabe-Ito", alpha = 1)
-    plot(y = 0, x = 0, xlim = c(2, 1+ncol(CVI)), ylim = c(0,1), type = "n", xlab = "k", ylab="", main = "Scaled cluster validity indices")
+
+  color.pal <- palette.colors(palette = "Okabe-Ito", alpha = 1)
+  # mar = c(bottom, left, top, right)
+  par(mfrow = c(2,1), mar = c(5, 5, 4, 8))
+
+  # First plot - CVI values
+    plot(y = 0, 
+         x = 0, 
+         xlim = 1 + c(1, ncol(CVI)), 
+         ylim = c(0, 1), 
+         type = "n", 
+         xlab = "k", 
+         ylab = "", 
+         main = "Scaled cluster validity indices")
+    
     grid(nx = NULL, ny = NULL,
          lty = 2,      
          col = "gray", 
          lwd = 1)      
-    for(j in 1:nrow(CVI)){
-      lines(y = CVI[j, ], x = 2:(1+ncol(CVI)), type = "b", pch = (seq_len(nrow(CVI)) - 1)[j], xlab = "k", main = "Scaled cluster validity indices", col = color.pal[j])
+    
+    for(j in seq_len(nrow(CVI))){
+      
+      lines(y = CVI[j, ], 
+            x = 1 + seq_len(ncol(CVI)),
+            type = "b", 
+            pch = (seq_len(nrow(CVI)) - 1)[j], 
+            xlab = "k", 
+            main = "Scaled cluster validity indices", 
+            col = color.pal[j])
     }
     
+    # Set up the legend outside the box
     par(xpd = TRUE)
     usr <- par("usr")
     
@@ -502,18 +539,25 @@ CVIplot <- function(x, ...) {
     
     par(xpd = FALSE)
     
+    # Second plot - ranked voting results
     RVR <- x$ranked.voting.results
     
-    plot(y = 0, x = 0, xlim = c(2,(1+length(RVR))), ylim = c(0,3), type = "n", xlab = "k", ylab="", main = "Ranked voting results")
+    plot(y = 0, 
+         x = 0, 
+         xlim = 1 + c(1, length(RVR)),
+         ylim = c(0, 3), 
+         type = "n", 
+         xlab = "k", 
+         ylab = "", 
+         main = "Ranked voting results")
+    
     grid(nx = NULL, ny = NULL,
          lty = 2,      
          col = "gray", 
          lwd = 1)      
     
-    lines(y = RVR, x = 2:(1+length(RVR)), type = "b", pch = 16)
-    
-    
-  } else {
-    print("There are no cluster validity indices to plot.")
-  }
+    lines(y = RVR, 
+          x = 1 + seq_along(RVR),
+          type = "b", 
+          pch = 16)
 }

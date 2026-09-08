@@ -706,10 +706,9 @@ trajMeasures <-
       data = cbind(ID, data),
       time = cbind(ID, time),
       cap.outliers = cap.outliers,
-      measures.arg = measures.arg
-    ),
-    class = "trajMeasures"
-    )
+      measures.arg = measures.arg),
+    class = "trajMeasures")
+    
     return(trajMeasures)
   }
 #' @rdname trajMeasures

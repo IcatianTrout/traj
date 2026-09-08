@@ -39,53 +39,58 @@ trajReduce <-
     
     if(is.null(Clusters$nclusters)){
       stop("The 'Clusters' argument must be the output of the 'trajClusters' function in which the 'nclusters' argument is not 'NULL'.")
-    } else {
+    }
       
+    # Function that inputs a list of vectors and outputs a new list containing every vector obtained by removing one element at a time from each vector in the input list
       useful.fct <- function(list_of_vectors){
         output.list <- list()
-        N <- length(list_of_vectors)
-        for(i in 1:N){
+        
+        for(i in seq_along(list_of_vectors)){
           ith.vector <- list_of_vectors[[i]]
           n.i <- length(ith.vector)
-          for(j in 1:n.i){
-            output.list[[length(output.list)+1]] <- ith.vector[-j]
+          
+          for(j in seq_len(n.i)){
+            output.list[[length(output.list) + 1]] <- ith.vector[-j]
           }
         }
+        
         return(output.list)
       }
       
-      traj <- as.factor(Clusters$partition[,"Cluster"])
-      nCluster <- Clusters$nclusters
-      n <- nrow(Clusters$partition)
+      traj <- as.factor(Clusters$partition[, "Cluster"]) ## The clustering in the 'Clusters' argument
+      nCluster <- Clusters$nclusters ## The number of clusters
+      n <- nrow(Clusters$partition) ## The sample size
       
-      list.of.tables <- list()
-      
-      par(mar=c(5.1, 5.1, 4.1, 2.1), lwd = 3, cex.axis = 2, cex.lab = 2, cex.main = 2, bty = "o", fg = "black") 
-      par(mfrow = c(1, length(index)))
-      
-      combin <- utils::combn(Clusters$select, keep)
+      combin <- utils::combn(Clusters$select, keep) ## All subsets of keep elements among Clusters$select
       
       criterion.v <- c()
       
-      for(i in 1:(ncol(combin))){
-        s3.i = quiet(trajClusters(Measures, select = combin[, i], fuzzy = Clusters$fuzzy, nclusters =  Clusters$nclusters))
+      ## Run trajClusters() on each combination of measures and compute the similarity index of the resulting clustering with the original clustering  
+      for(i in seq_len(ncol(combin))){
+        s3.i <- quiet(trajClusters(Measures, 
+                                   select = combin[, i], 
+                                   fuzzy = Clusters$fuzzy, 
+                                   nclusters =  Clusters$nclusters))
         
-        traj.i <- as.factor(s3.i$partition[,"Cluster"])
+        traj.i <- as.factor(s3.i$partition[, "Cluster"])
         
         if (index == "ARI") {
           criterion.v <- c(criterion.v, igraph::compare(traj, traj.i, method = "adjusted.rand"))
         }
         if (index == "nVId") {
-          criterion.v <- c(criterion.v, 1-igraph::compare(traj, traj.i, method = "vi")/(2*log(nCluster)))
+          criterion.v <- c(criterion.v, 1 - igraph::compare(traj, traj.i, method = "vi") / (2 * log(nCluster)))
         }
         if (index == "nSJd") {
-          criterion.v <- c(criterion.v, 1-igraph::compare(traj, traj.i, method = "split.join") / (2*nCluster*(n/nCluster - ceiling(n/(nCluster^2)))) )
+          criterion.v <- c(criterion.v, 1 - igraph::compare(traj, traj.i, method = "split.join") / (2 * nCluster * (n / nCluster - ceiling(n / (nCluster^2)))) )
         }
       }
       
-      w <- which(criterion.v == max(criterion.v))[1]
+      w <- which(criterion.v == max(criterion.v))[1] ## The simplest combination of measure for which the similarity index is maximal
       
-      Clusters.red <- quiet(trajClusters(Measures, select = combin[, w], fuzzy = Clusters$fuzzy, nclusters = Clusters$nclusters))
+      Clusters.red <- quiet(trajClusters(Measures, 
+                                         select = combin[, w], 
+                                         fuzzy = Clusters$fuzzy, 
+                                         nclusters = Clusters$nclusters))
       
       traj.red <- as.factor(Clusters.red$partition[, "Cluster"])
       
@@ -97,5 +102,4 @@ trajReduce <-
       )
       
       return(output)
-    }
   }
