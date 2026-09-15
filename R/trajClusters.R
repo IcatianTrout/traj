@@ -30,23 +30,18 @@
 #'Meila, M., Spectral Clustering. Handbook of Cluster Analysis, Chapter 7, Chapman and Hall/CRC, 2005.
 #'
 #' @examples
-#' \dontrun{
-#'data("trajdata")
-#'trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] # remove the Group column
+#' 
+#'data(trajdata)
 #'
-#'m = trajMeasures(trajdata.noGrp, ID = TRUE, measures = 1:20)
+#'dat <- trajdata[, -2] #remove the Group column
 #'
-#'s2.3 <- trajClusters(m, nclusters = 3)
-#'plot(s2.3)
+#'m <- trajMeasures(dat, ID = TRUE, measures = c(1:20))
 #'
-#'s2.4 <- trajClusters(m, nclusters = 4)
-#'plot(s2.4)
+#'s <- trajClusters(m, nclusters = 4)
+#'plot(s, which.plots = 2, ask = FALSE)
 #'
-#'s2.5 <- trajClusters(m, nclusters = 5)
-#'plot(s2.5)
-#'
-#'groups <- trajClusters(m, nclusters = 4)$partition
-#'}
+#'dat$clusters <- s$partition[match(trajdata$id, s$partition[, 1]), 2]
+#'tail(dat)
 #'
 #'
 #'@rdname trajClusters

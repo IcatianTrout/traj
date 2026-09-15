@@ -75,15 +75,15 @@
 #'  https://doi.org/10.48550/arXiv.1808.10770
 #'
 #'@examples
-#'\dontrun{
-#'data("trajdata")
-#'trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] #remove the Group column
 #'
-#'m1 = trajMeasures(trajdata.noGrp, ID = TRUE, measures = 11, midpoint = NULL)
-#'m2 = trajMeasures(trajdata.noGrp, ID = TRUE, measures = 11, midpoint = 3)
+#'data(trajdata)
+#'dat <- trajdata[, -2] #remove the Group column
+#'
+#'m1 <- trajMeasures(dat, ID = TRUE, measures = 11, midpoint = NULL)
+#'m2 <- trajMeasures(dat, ID = TRUE, measures = 11, midpoint = 3)
 #'
 #'identical(m1$measures, m2$measures)
-#'}
+#'
 #'
 #'@rdname trajMeasures
 #'

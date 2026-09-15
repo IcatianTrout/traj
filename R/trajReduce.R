@@ -22,13 +22,16 @@
 #'  
 #'
 #' @examples
-#' \dontrun{
-#'data("trajdata")
-#'trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] #remove the Group column
+#' \donttest{
+#'data(trajdata)
 #'
-#'m = trajMeasures(trajdata.noGrp, ID = TRUE, measures = 1:20)
-#'s2.4 <- trajClusters(m, nclusters = 4)
-#'trajReduce(m, s2.4)
+#'dat <- trajdata[, -2] #remove the Group column
+#'
+#'m <- trajMeasures(dat, ID = TRUE, measures = c(1:20))
+#'
+#'s <- trajClusters(m, nclusters = 4)
+#'
+#'r <- trajReduce(m, s, keep = 2)
 #'}
 #'
 #'@rdname trajReduce
