@@ -1,8 +1,8 @@
-#' trajdata
+#' Example Longitudinal Trajectory Data
 #'
 #' @description An artificially created data set with 130 trajectories split into four groups, labelled A, B, C, D according to the data generating process.
 #'
-#' @format This data frame has 130 rows and the following 7 columns:
+#' @format This data frame has 130 rows and the following 8 columns:
 #' \describe{
 #'   \item{id}{An identification variable that runs from 1 to 130.}
 #'   \item{Group}{A character variable that's either "A", "B", "C" or "D" depending on which of the four data generating process the trajectory is coming from.}

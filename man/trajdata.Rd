@@ -3,9 +3,9 @@
 \docType{data}
 \name{trajdata}
 \alias{trajdata}
-\title{trajdata}
+\title{Example Longitudinal Trajectory Data}
 \format{
-This data frame has 130 rows and the following 7 columns:
+This data frame has 130 rows and the following 8 columns:
 \describe{
 \item{id}{An identification variable that runs from 1 to 130.}
 \item{Group}{A character variable that's either "A", "B", "C" or "D" depending on which of the four data generating process the trajectory is coming from.}
