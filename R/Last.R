@@ -1,5 +1,7 @@
-# Function that returns the last non-NA value of a vector
-
+#'@title Function that returns the last non-NA value of a vector
+#'
+#'@param x vector of real numbers
+#'
 Last <- function(v) {
   if (!(FALSE %in% is.na(v))) {
     stop("Argument must contain at least one non-NA entry.")

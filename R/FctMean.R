@@ -1,5 +1,8 @@
-# Function that approximates the mean of a function using the mean of the left and right Riemann sums
-
+#'@title Function that approximates the mean of a function using the mean of the left and right Riemann sums
+#'
+#'@param x vector of strictly increasing real numbers
+#'@param y vector of strictly increasing real numbers corresponding to f(x)
+#'
 FctMean <- function (x, y) {
   
   # Here x and y are vectors, and y is interpreted as f(x) for the function f that we're trying to approximate the mean of

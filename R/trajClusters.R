@@ -238,7 +238,15 @@ print.trajClusters <- function(x, ...) {
     
     cat("\n")
     
-    cat("From here, use the plot() function to see the centroid trajectories and a sample from each groups. Use CVIplot() for a graphical representation of the internal cluster validity indices used to determine the number of groups. For a better understanding of how the measures were used to discriminate amongst the groups, use trajScatter() for scatter plots of all the pairs of measures. To investigate the possibility of reducing the number of measures used in the classification (optional), use trajReduce().", "\n")
+    cat("From here, you can use \n
+        - CVIplot() for a graphical representation of the internal cluster validity indices used to determine the number of groups;\n
+        - trajPartition() to extract the partition;\n
+        - trajFuzzyPartition() to extract the fuzzy partition (if applicable);\n
+        - trajClusterSummary() for the cluster-wise summaries of the measures;\n
+        - trajAnalysis() for order analysis on the cluster-wise medians;\n
+        - plot() to see the centroid trajectories and a sample from each groups;\n
+        - trajScatter() for scatter plots of all the pairs of measures;\n
+        - trajReduce() to investigate the possibility of reducing the number of measures used in the classification (optional).","\n")
   } else{
     
     cat(paste("The clusters are labeled ", paste( names(x$partition.summary), collapse = ", ", sep = ""), " and are of respective size ", paste(x$partition.summary, collapse = ", ", sep = ""), ". The exact clustering is as follows.\n\n", sep = ""))

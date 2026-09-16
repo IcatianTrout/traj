@@ -1,17 +1,14 @@
-# Function that approximates the derivative of a function as a weighted average of the left and right derivatives
+#'@title Function that approximates the derivative of a function as a weighted average of the left and right derivatives
+#'
+#'@param x vector of strictly increasing real numbers
+#'@param y vector of strictly increasing real numbers corresponding to f(x)
+#'
 Der <- function(x, y) {
   
   # Here x and y are vectors, and y is interpreted as f(x) for the function f that we're trying to approximate the derivative of
-  
-  if (!length(y) == length(x)) {
-    stop("y and x must be vectors of the same length.")
-  }
-  
+
   m <- length(x)
-  
-  if (!identical(order(x), c(1:m))) {
-    stop("The elements of the 'x' vector must be strictly increasing.")
-  }
+
   DR <- rep(NA, m)
   DL <- rep(NA, m)
   D <- c()

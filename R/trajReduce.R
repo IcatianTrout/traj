@@ -101,12 +101,25 @@ trajReduce <-
       
       traj.red <- as.factor(Clusters.red$partition[, "Cluster"])
       
-      output <- list(
-        reduced.list = combin[, w],
-        index.value = criterion.v[w][1],
-        partition.red = traj.red,
-        fuzzy.partition.red = Clusters.red$fuzzy.partition
-      )
+      trajReduce <-
+        structure(
+          list(
+            reduced.list = combin[, w],
+            index.value = criterion.v[w][1],
+            partition.red = traj.red,
+            fuzzy.partition.red = Clusters.red$fuzzy.partition,
+            keep = keep
+          ),
+          class = "trajClusters"
+        )
       
-      return(output)
+      return(trajReduce)
   }
+#' @rdname trajReduce
+#' @method print trajReduce
+#' @export
+print.trajReduce <- function(x, ...) {
+  
+    cat(paste("Of all the combinations of", x$keep, "measures, the one optmizing the index is", paste( x$reduced.list, collapse = ", ", sep = ", "), "with index value", x$index.value, "."), sep="")
+
+}

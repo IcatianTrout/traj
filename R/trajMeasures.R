@@ -725,7 +725,7 @@ print.trajMeasures <- function(x, ...) {
     colnames(measure.plus)[1:2] <- c("ID", "mid time")
     print(measure.plus, row.names = FALSE)
   }
-  cat("\n")
+  cat("\n\n")
   cat("The list of measures can be accessed with ?trajMeasures.\n")
 }
 #' @rdname trajMeasures
@@ -733,15 +733,6 @@ print.trajMeasures <- function(x, ...) {
 #' @export
 summary.trajMeasures <- function(object, ...) {
 
-  # Define first and third quantile functions
-  Q1 <- function(x) {
-    return(quantile(x , probs = c(.25)))
-  }
-
-  Q3 <- function(x) {
-    return(quantile(x , probs = c(.75)))
-  }
-  
   # Construct main summary table
   measures.summary <-
     data.frame(matrix(nrow = 6, ncol = ncol(object$measures) - 1))
@@ -805,6 +796,6 @@ print.summary.trajMeasures <- function(x, ...) {
     cat("Outliers after capping:\n")
     print(x$outliers.post, row.names = FALSE)
   }
-  cat("\n")
+  cat("\n\n")
   cat("The list of measures can be accessed with ?trajMeasures.\n")
 }

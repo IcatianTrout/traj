@@ -1,17 +1,12 @@
-# Function that creates a sparse similarity matrix and applies to it the spectral clustering algorithm described in Meila (2005)
-
+#'@title Implements spectral clustering
+#'
+#'@description Create a sparse similarity matrix and applies to it the spectral clustering algorithm described in Meila (2005)
+#'
+#'@param x trajectories to be clustered
+#'@param k number of clusters
+#'@param nstart how many random starts to use in the underlying k-means algorithm
+#'@param fuzzy logical; TRUE if fuzzy k-means is to be used instead of ordinary k-means, so as to yield a fuzzy partition.
 spect <- function(x, k, nstart, fuzzy){ 
-  
-  # Define a function that construct an adjacency matrix (aka similarity matrix) based on the K-nearest neighbor (KNN) principle. It takes as input a matrix X of "distances" between points as well as the number K of neighbors to consider and outputs a sparse matrix where cell (i,j) is 0 if neither point i nor point j is among the KNN of the other, 1 if i is among the KNN of j and vice versa, and 1/2 otherwise (i.e. if i is among the KNN of j *or* vice versa, but not both)
-  knn_adjacency <- function(X, K){
-    W <- matrix(0, nrow = nrow(X), ncol = nrow(X)) 
-    for(i in seq_len(nrow(X))){
-      knn <- order(X[i, ])[-which(order(X[i, ]) == i)][seq_len(K)] ## Find the K nearest neighbors to the ith data point, excluding the ith data point itself
-      W[i, knn] <- 1
-    }
-    return((W + t(W)) / 2)
-  }
-  
   n <- nrow(x)
   K <- max(4, min(8, floor(n / (2 * k)))) ## The number of nearest neighbors to consider is a number between 4 and 8 depending on the sample size n and the number of clusters k 
   S <- Matrix::Matrix(knn_adjacency(X = as.matrix(stats::dist(x)), K = K), sparse = TRUE) ## The similarity matrix
