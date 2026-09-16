@@ -120,6 +120,6 @@ trajReduce <-
 #' @export
 print.trajReduce <- function(x, ...) {
   
-    cat(paste("Of all the combinations of", x$keep, "measures, the one optmizing the index is", paste( x$reduced.list, collapse = ", ", sep = ", "), "with index value", x$index.value, "."), sep="")
+    cat(paste("Of all the combinations of ", x$keep, " measures, the one optmizing the index is ", paste( x$reduced.list, collapse = ", ", sep = ", "), " with index value ", x$index.value, ".", sep=""))
 
 }
