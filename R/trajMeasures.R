@@ -725,6 +725,7 @@ print.trajMeasures <- function(x, ...) {
     colnames(measure.plus)[1:2] <- c("ID", "mid time")
     print(measure.plus, row.names = FALSE)
   }
+  cat("\n")
   cat("The list of measures can be accessed with ?trajMeasures.\n")
 }
 #' @rdname trajMeasures
@@ -804,5 +805,6 @@ print.summary.trajMeasures <- function(x, ...) {
     cat("Outliers after capping:\n")
     print(x$outliers.post, row.names = FALSE)
   }
+  cat("\n")
   cat("The list of measures can be accessed with ?trajMeasures.\n")
 }
