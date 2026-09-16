@@ -260,7 +260,7 @@ print.trajClusters <- function(x, ...) {
 #' @rdname trajClusters
 #' @method summary trajClusters
 #' @export
-summary.trajClusters <- function(object) {
+summary.trajClusters <- function(object, ...) {
     
     # Construct a table 'clust.dist' containing the cluster frequencies, both absolute and relative
     clust.dist <- data.frame(matrix(nrow = 2, ncol = (object$nclusters + 1)))

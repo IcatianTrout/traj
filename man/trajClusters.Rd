@@ -4,7 +4,7 @@
 \alias{trajClusters}
 \alias{print.trajClusters}
 \alias{summary.trajClusters}
-\title{Classify the Longitudinal Data Based on the Measures.}
+\title{Classify the Longitudinal Data Based on the Measures}
 \usage{
 trajClusters(
   Measures,
@@ -17,7 +17,7 @@ trajClusters(
 
 \method{print}{trajClusters}(x, ...)
 
-\method{summary}{trajClusters}(object, top_p = 3, ...)
+\method{summary}{trajClusters}(object, ...)
 }
 \arguments{
 \item{Measures}{object of class \code{trajMeasures} as returned by the function
@@ -39,8 +39,6 @@ measures to use in the clustering. Defaults to \code{NULL}, which uses all the m
 \item{...}{further arguments passed to or from other methods.}
 
 \item{object}{object of class \code{trajClusters}.}
-
-\item{top_p}{The \code{top_p} most discriminating measures for each cluster to be reported in the summary.}
 }
 \value{
 An object of class \code{trajClusters}; a list containing the result of the clustering, as well as a curated form of the arguments.
@@ -54,23 +52,18 @@ The spectral clustering algorithm presented in Meila (2005) is implemented in wh
 When \code{nclusters = NULL}, the function evaluates candidate clusterings with number of clusters \eqn{k} ranging from 2 to 8 using three internal validity indices: C-index, Calinski-Harabasz and Wemmert-Gançarski. These indices are normalized so that the highest value is 1 and the lowest is 0, and so that a high value is synonymous with high validity. The optimal number of clusters is determined according to a ranked voting system in which each index contributes a fractional vote according to its ranking of the candidate solutions. Specifically, each index casts a vote worth 1 in favor of \eqn{k} if it takes its greatest value when the number of groups is \eqn{k}, worth 5/6 if it takes its second greatest value when the number of groups is \eqn{k}, and so on down to a vote worth 0 if the index takes its smallest value when the number of groups is \eqn{k}. The favorability of \eqn{k} is the sum of the 3 votes.
 }
 \examples{
-\dontrun{
-data("trajdata")
-trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] # remove the Group column
 
-m = trajMeasures(trajdata.noGrp, ID = TRUE, measures = 1:20)
+data(trajdata)
 
-s2.3 <- trajClusters(m, nclusters = 3)
-plot(s2.3)
+dat <- trajdata[, -2] #remove the Group column
 
-s2.4 <- trajClusters(m, nclusters = 4)
-plot(s2.4)
+m <- trajMeasures(dat, ID = TRUE, measures = c(1:20))
 
-s2.5 <- trajClusters(m, nclusters = 5)
-plot(s2.5)
+s <- trajClusters(m, nclusters = 4)
+plot(s, which.plots = 2, ask = FALSE)
 
-groups <- trajClusters(m, nclusters = 4)$partition
-}
+dat$clusters <- s$partition[match(trajdata$id, s$partition[, 1]), 2]
+tail(dat)
 
 
 }

@@ -2,13 +2,13 @@
 % Please edit documentation in R/plot.trajClusters.R
 \name{plot.trajClusters}
 \alias{plot.trajClusters}
-\alias{scatterplots}
+\alias{trajScatter}
 \alias{CVIplot}
 \title{Plot \code{trajClusters} object}
 \usage{
 \method{plot}{trajClusters}(x, sample.size = 5, ask = TRUE, which.plots = NULL, ...)
 
-scatterplots(x, ask = TRUE, which.scatter = NULL, N = NULL, ...)
+trajScatter(x, ask = TRUE, which.scatter = NULL, N = NULL, ...)
 
 CVIplot(x, ...)
 }
@@ -33,7 +33,7 @@ plots will be displayed.}
 \item{N}{the maximum number of points present in each scatter plots. If a non \code{NULL} value is specified, \code{N} points are sampled randomly in a way that preserves the relative groups sizes. If \code{NULL} (the default), all the points are plotted.}
 }
 \description{
-\code{plot()} sequentially plots (i) the clusters centroids, (ii) a random sample of trajectories from each cluster, and (iii) the median of each standardized measure by cluster. \code{(scatterplots()} displays the two dimensional projections of the standardized data in feature space for every pair of measures. \code{CVIplot()} graphs the internal cluster validity indices as a function of the number of clusters as well as the result of the ranked voting system for determining the optimal number of clusters.
+\code{plot()} sequentially plots (i) the clusters centroids, (ii) a random sample of trajectories from each cluster, and (iii) the median of each standardized measure by cluster. \code{(trajScatter()} displays the two dimensional projections of the standardized data in feature space for every pair of measures. \code{CVIplot()} graphs the internal cluster validity indices as a function of the number of clusters as well as the result of the ranked voting system for determining the optimal number of clusters.
 }
 \examples{
 \dontrun{

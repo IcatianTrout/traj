@@ -24,13 +24,16 @@ The Rand index ranges from 0 to 1 with 0 indicating identical clusters and 1 ind
 The function runs the \code{\link[traj]{trajClusters}} function on every combination of \code{keep} measures and identifies the reduced representation yielding the clustering most similar to the (hard) clustering in \code{Clusters}. If the (hard) clustering in \code{Clusters} derives from a soft clustering, the iterations of \code{\link[traj]{trajClusters}}  will also be ran using \code{fuzzy = TRUE} and the corresponding hard clusterings will be used for comparison.
 }
 \examples{
-\dontrun{
-data("trajdata")
-trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] #remove the Group column
+\donttest{
+data(trajdata)
 
-m = trajMeasures(trajdata.noGrp, ID = TRUE, measures = 1:20)
-s2.4 <- trajClusters(m, nclusters = 4)
-trajReduce(m, s2.4)
+dat <- trajdata[, -2] #remove the Group column
+
+m <- trajMeasures(dat, ID = TRUE, measures = c(1:20))
+
+s <- trajClusters(m, nclusters = 4)
+
+r <- trajReduce(m, s, keep = 2)
 }
 
 }
