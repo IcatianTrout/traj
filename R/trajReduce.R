@@ -43,6 +43,10 @@ trajReduce <-
     if(is.null(Clusters$nclusters)){
       stop("The 'Clusters' argument must be the output of the 'trajClusters' function in which the 'nclusters' argument is not 'NULL'.")
     }
+    
+    if(keep > length(Clusters$select)){
+      stop("The argument 'keep' must be an integer no greater than the number of measures used to cluster the trajectories in trajClusters().")
+    }
       
     # Function that inputs a list of vectors and outputs a new list containing every vector obtained by removing one element at a time from each vector in the input list
       useful.fct <- function(list_of_vectors){

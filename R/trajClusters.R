@@ -1,4 +1,4 @@
-#'@title Classify the Longitudinal Data Based on the Measures.
+#'@title Classify the Longitudinal Data Based on the Measures
 #'
 #'@description Classifies the trajectories by applying a nonparametric clustering algorithm to the measures computed by \code{trajMeasures()}.
 #'
@@ -12,7 +12,6 @@
 #'@param nstart The number of random starts. Defaults to \code{50}.
 #'@param x object of class \code{trajClusters}.
 #'@param object object of class \code{trajClusters}.
-#'@param top_p The \code{top_p} most discriminating measures for each cluster to be reported in the summary.
 #'@param ... further arguments passed to or from other methods.
 #'
 #'@details The spectral clustering algorithm presented in Meila (2005) is implemented in which the similarity matrix \eqn{S} is built from a binary K nearest neighbors similarity function (\eqn{S=(W+W^T)/2}, where \eqn{W_{ij}=1} if data point \eqn{j} is among the nearest points to data point \eqn{i} and \eqn{W_{ij}=0} otherwise). 
@@ -239,7 +238,7 @@ print.trajClusters <- function(x, ...) {
     
     cat("\n")
     
-    cat("From here, use the plot() function to see the centroid trajectories and a sample from each groups. Use CVIplot() for a graphical representation of the internal cluster validity indices used to determine the number of groups. For a better understanding of how the measures were used to discriminate amongst the groups, use scatterplot() for scatter plots of all the pairs of measures. To investigate the possibility of reducing the number of measures used in the classification (optional), use trajReduce().")
+    cat("From here, use the plot() function to see the centroid trajectories and a sample from each groups. Use CVIplot() for a graphical representation of the internal cluster validity indices used to determine the number of groups. For a better understanding of how the measures were used to discriminate amongst the groups, use trajScatter() for scatter plots of all the pairs of measures. To investigate the possibility of reducing the number of measures used in the classification (optional), use trajReduce().", "\n")
   } else{
     
     cat(paste("The clusters are labeled ", paste( names(x$partition.summary), collapse = ", ", sep = ""), " and are of respective size ", paste(x$partition.summary, collapse = ", ", sep = ""), ". The exact clustering is as follows.\n\n", sep = ""))
@@ -248,183 +247,30 @@ print.trajClusters <- function(x, ...) {
     
     cat("\n")
     
-    cat("From here, use the plot() function to see the centroid trajectories and a sample from each groups. For a better understanding of how the measures were used to discriminate amongst the groups, use scatterplot() for scatter plots of all the pairs of measures. To investigate the possibility of reducing the number of measures used in the classification (optional), use trajReduce().")
+    cat("From here, you can use \n
+        - trajPartition() to extract the partition;\n
+        - trajFuzzyPartition() to extract the fuzzy partition (if applicable);\n
+        - trajClusterSummary() for the cluster-wise summaries of the measures;\n
+        - trajAnalysis() for order analysis on the cluster-wise medians;\n
+        - plot() to see the centroid trajectories and a sample from each groups;\n
+        - trajScatter() for scatter plots of all the pairs of measures;\n
+        - trajReduce() to investigate the possibility of reducing the number of measures used in the classification (optional).","\n")
   }
 }
 #' @rdname trajClusters
 #' @method summary trajClusters
 #' @export
-summary.trajClusters <- function(object, top_p = 3, ...) {
-    
-    # Perform various checks on the top_p argument
-    if(!is.numeric(top_p)) stop(paste("top_p must be an integer greater than 1", sep = ""))
-    if(!(length(top_p) == 1)) stop(paste("top_p must be an integer greater than 1", sep = ""))
-    if(!((top_p > 1) & (top_p %% 1 == 0))) stop(paste("top_p must be an integer greater than 1", sep = ""))
+summary.trajClusters <- function(object) {
     
     # Construct a table 'clust.dist' containing the cluster frequencies, both absolute and relative
     clust.dist <- data.frame(matrix(nrow = 2, ncol = (object$nclusters + 1)))
     clust.dist[1,] <- signif(c(object$partition.summary, sum(object$partition.summary)))
     clust.dist[2,] <- signif(c(object$partition.summary / sum(object$partition.summary), sum(object$partition.summary) / sum(object$partition.summary)), 2)
     rownames(clust.dist) <- c("Absolute", "Relative")
-    colnames(clust.dist) <- c(1:object$nclusters, "Total")
+    colnames(clust.dist) <- c(seq_len(object$nclusters), "Total")
 
-    # Construct cluster-specific summary tables of measures and store them in a list called 'groupwise.summaries'. Separately, construct a table 'cl.medians' of cluster-wise medians for each measures.
-    Q1 <- function(x) {
-      return(quantile(x, probs = .25))
-    }
-
-    Q3 <- function(x) {
-      return(quantile(x, probs = .75))
-    }
-    
-    cl.medians <- data.frame(matrix(NA, nrow = object$nclusters, ncol = length(object$select)))
-    colnames(cl.medians) <- colnames(object$selection)[-1]
-    
-    groupwise.summaries <- list()
-    group.sizes <- c()
-    
-    for (i in seq_len(object$nclusters)) {
-      measures.summary <- data.frame(matrix(nrow = 6, ncol = ncol(object$selection) - 1))
-      rownames(measures.summary) <- c("Min.", "1st Qu.", "Median", "Mean", "3rd Qu.", "Max.")
-      colnames(measures.summary) <- colnames(object$selection)[-1]
-      
-      which.id.i <- object$partition[which(object$partition[, 2] == i), 1]
-      which.i <- which(object$partition[, 2] == i)
-      
-      selection.cluster.i <- object$selection[which(object$selection$ID %in% which.id.i), ]
-      
-      measures.summary[1, ] <- apply(selection.cluster.i[, -1], 2, min)
-      measures.summary[2, ] <- apply(selection.cluster.i[, -1], 2, Q1)
-      measures.summary[3, ] <- apply(selection.cluster.i[, -1], 2, median)
-      measures.summary[4, ] <- apply(selection.cluster.i[, -1], 2, mean)
-      measures.summary[5, ] <- apply(selection.cluster.i[, -1], 2, Q3)
-      measures.summary[6, ] <- apply(selection.cluster.i[, -1], 2, max)
-      
-      cl.medians[i, ] <- apply(object$standardized.data[which.i, ], 2, median)
-      
-      groupwise.summaries[[i]] <- measures.summary
-      group.sizes[i] <- object$partition.summary[i]
-    }
-    
-    # Initialize tables 'ranks', 'dirs' and 'deltas' of the same dimensions as cl.medians. Here, 'dirs' stand for directions; 'deltas' stands for the difference between a group's median and median of all the group medians; 'ranks' stands for where the group's median ranks from most extreme (largest absolute value of delta) to least extreme (smallest absolute value of delta)
-    ranks <- cl.medians
-    ranks[seq_len(nrow(ranks)), seq_len(ncol(ranks))] <- NA
-    deltas <- dirs <- ranks
-    
-    for(j in seq_len(ncol(ranks))){
-      
-      median.j <- median(cl.medians[, j]) ## The median of the group medians
-      
-      deltas[, j] <- round(cl.medians[, j] - median.j, 4)
-      abs.deltas <- abs(deltas[, j])
-      n.unique <- length(unique(abs.deltas))
-      
-      # There might be multiple groups whose abs.deltas are the same. In this case, we give them all the same rank
-      for(k in seq_len(n.unique)){
-        w <- which(abs.deltas == unique(abs.deltas)[order(unique(abs.deltas), decreasing = TRUE)[k]])
-        ranks[w, j] <- k
-      }
-      
-      for(i in seq_len(nrow(ranks))){
-        if((ranks[i, j] > 1) & (deltas[i, j] > 0)){dirs[i, j] <- "large"} ## large means delta > 0 but also rank > 1 so it's not the largest
-        if((ranks[i, j] > 1) & (deltas[i, j] < 0)){dirs[i, j] <- "small"} ## small means delta < 0 but also rank > 1 so it's not the smallest
-        if(cl.medians[i, j] == max(cl.medians[, j])){dirs[i, j] <- "largest"} 
-        if(cl.medians[i, j] == min(cl.medians[, j])){dirs[i, j] <- "smallest"} 
-        if(deltas[i, j] == 0){dirs[i, j] <- " "; ranks[i, j] <- 9999}} ## If delta = 0, there's no direction to speak of so we put " ". 
-    }
-    
-    # Construct a table 'analysis' that reports, for each group, the top_p measures assuming the highest ranks, along with those measure's directions and deltas
-    analysis <- data.frame(matrix(NA, ncol = 5, nrow = top_p * object$nclusters))
-    colnames(analysis) <- c("cluster", "measure", "rank", "direction", "delta")
-    
-    measure.names <- colnames(ranks)
-    for(m in seq_len(length(measure.names))){
-      if(colnames(ranks[m]) == "m1"){ measure.names[m]  <- paste(colnames(ranks[m])," (max)", sep = "")}
-      if(colnames(ranks[m]) == "m2"){ measure.names[m]  <- paste(colnames(ranks[m])," (min)", sep = "")}
-      if(colnames(ranks[m]) == "m3"){ measure.names[m]  <- paste(colnames(ranks[m])," (range)", sep = "")}
-      if(colnames(ranks[m]) == "m4"){ measure.names[m]  <- paste(colnames(ranks[m]),": mean)", sep = "")}
-      if(colnames(ranks[m]) == "m5"){ measure.names[m]  <- paste(colnames(ranks[m])," (SD)", sep = "")}
-      if(colnames(ranks[m]) == "m6"){ measure.names[m]  <- paste(colnames(ranks[m])," (slope)", sep = "")}
-      if(colnames(ranks[m]) == "m7"){ measure.names[m]  <- paste(colnames(ranks[m])," (intercept)", sep = "")}
-      if(colnames(ranks[m]) == "m8"){ measure.names[m]  <- paste(colnames(ranks[m])," (R^2)", sep = "")}
-      if(colnames(ranks[m]) == "m9"){ measure.names[m]  <- paste(colnames(ranks[m])," (int. rate)", sep = "")}
-      if(colnames(ranks[m]) == "m10"){ measure.names[m]  <- paste(colnames(ranks[m])," (net vari)", sep = "")}
-      if(colnames(ranks[m]) == "m11"){ measure.names[m]  <- paste(colnames(ranks[m])," (contrast)", sep = "")}
-      if(colnames(ranks[m]) == "m12"){ measure.names[m]  <- paste(colnames(ranks[m])," (tot vari)", sep = "")}
-      if(colnames(ranks[m]) == "m13"){ measure.names[m]  <- paste(colnames(ranks[m])," (spikiness)", sep = "")}
-      if(colnames(ranks[m]) == "m14"){ measure.names[m]  <- paste(colnames(ranks[m])," (max f')", sep = "")}
-      if(colnames(ranks[m]) == "m15"){ measure.names[m]  <- paste(colnames(ranks[m])," (min f')", sep = "")}
-      if(colnames(ranks[m]) == "m16"){ measure.names[m]  <- paste(colnames(ranks[m])," (SD f')", sep = "")}
-      if(colnames(ranks[m]) == "m17"){ measure.names[m]  <- paste(colnames(ranks[m])," (f' net vari)", sep = "")}
-      if(colnames(ranks[m]) == "m18"){ measure.names[m]  <- paste(colnames(ranks[m])," (max f'')", sep = "")}
-      if(colnames(ranks[m]) == "m19"){ measure.names[m]  <- paste(colnames(ranks[m])," (min f'')", sep = "")}
-      if(colnames(ranks[m]) == "m20"){ measure.names[m]  <- paste(colnames(ranks[m])," (SD f'')", sep = "")}
-    }
-    
-    for(i in seq_len(object$nclusters)){
-      # For a given cluster, order the measures by increasing value of rank and, among measures of a given rank, by decreasing absolute value of delta
-      w <- order(unlist(ranks[i, ]), -unlist(abs(deltas[i, ])))[1:top_p]
-      
-      analysis[(i-1)*top_p + c(1:top_p), 1] <- i
-      analysis[(i-1)*top_p + c(1:top_p), 2] <- measure.names[w]
-      analysis[(i-1)*top_p + c(1:top_p), 3] <- unlist(ranks[i, w])
-      analysis[(i-1)*top_p + c(1:top_p), 4] <- unlist(dirs[i, w])
-      analysis[(i-1)*top_p + c(1:top_p), 5] <- unlist(deltas[i, w])
-    }
-    
-    structure(
-      list(
-        clust.dist = clust.dist,
-        groupwise.summaries = groupwise.summaries,
-        group.sizes = group.sizes,
-        analysis = analysis
-      ),
-      class = "summary.trajClusters"
-    )
-}
-#' @rdname trajMeasures
-#' @method print summary.trajClusters
-#' @export
-print.summary.trajClusters <- function(x, ...) {
-  
-  cat("Description of the measures:\n")
-  cat("m1: Maximum\n")
-  cat("m2: Minimum\n")
-  cat("m3: Range\n")
-  cat("m4: Mean\n")
-  cat("m5: Standard deviation\n")
-  cat("m6: Slope of the affine approximation\n")
-  cat("m7: Intercept of the affine approximation\n")
-  cat("m8: Proportion of variance explained by the affine approximation\n")
-  cat("m9: Rate of intersection with the best affine approximation\n")
-  cat("m10: Net variation per unit of time\n")
-  cat("m11: Late variation to early variation contrast\n")
-  cat("m12: Total variation per unit of time\n")
-  cat("m13: Spikiness\n")
-  cat("m14: Maximum of the first derivative\n")
-  cat("m15: Minimum of the first derivative\n")
-  cat("m16: Standard deviation of the first derivative\n")
-  cat("m17: First derivative's net variation per unit of time\n")
-  cat("m18: Maximum  of the second derivative\n")
-  cat("m19: Minimum  of the second derivative\n")
-  cat("m20: Standard deviation of the second derivative\n")
-  
-  cat("\n")
-  
-  cat("Cluster frequencies:\n")
-  print(x$clust.dist)
-  
-  cat("\n")
-  cat("Summary of selected measures by cluster:\n")
-  
-  for(i in seq_len(length(x$groupwise.summaries))){
-    cat(paste("Cluster ", i, " (size ", x$group.sizes[i], "):", sep = ""))
     cat("\n")
-    print(x$groupwise.summaries[[i]])
-    cat("\n")
-  }
-  
-  cat("\n")
-  print(x$analysis, rownames = FALSE)
-  cat("\n")
+    
+    cat("Cluster frequencies:\n")
+    print(clust.dist)
 }

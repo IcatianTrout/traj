@@ -1,3 +1,9 @@
+# traj 3.1.1
+
+- Added the extractor functions `trajPartition()`, `trajFuzzyPartition()`, `trajClusterSummary()` and `trajAnalaysis()` acting on a `trajClusters` object to extract respectively the partition, the fuzzy partition, the cluster-wise summaries of the measures and an order analysis on the cluster-wise medians.
+- Simplified the structure and output of `summary()` acting on a `trajClusters` object.
+- Renamed the `scatterplots()` function to `trajScatter()` for uniformity
+
 # traj 3.1.0
 
 -   Changed the eigensolver from `eigen` to `eigs_sym` (package RSpectra) to speed up `trajClusters()`.

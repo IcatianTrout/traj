@@ -1,6 +1,6 @@
 #'@title Plot \code{trajClusters} object
 #'
-#'@description \code{plot()} sequentially plots (i) the clusters centroids, (ii) a random sample of trajectories from each cluster, and (iii) the median of each standardized measure by cluster. \code{(scatterplots()} displays the two dimensional projections of the standardized data in feature space for every pair of measures. \code{CVIplot()} graphs the internal cluster validity indices as a function of the number of clusters as well as the result of the ranked voting system for determining the optimal number of clusters.
+#'@description \code{plot()} sequentially plots (i) the clusters centroids, (ii) a random sample of trajectories from each cluster, and (iii) the median of each standardized measure by cluster. \code{(trajScatter()} displays the two dimensional projections of the standardized data in feature space for every pair of measures. \code{CVIplot()} graphs the internal cluster validity indices as a function of the number of clusters as well as the result of the ranked voting system for determining the optimal number of clusters.
 #'
 #'@param x object of class \code{trajClusters} as returned by the function
 #'  \code{trajClusters()}.
@@ -300,12 +300,12 @@ plot.trajClusters <-
              pch = seq_len(x$nclusters) - 1)
     }
 
-print("See also 'CVIplot' for a plot of the statistic used to determined the number of clusters (if applicable) and see 'scatterplots' for scatter plots of the measures involved in the clustering.")
+print("See also 'CVIplot()' for a plot of the statistic used to determined the number of clusters (if applicable) and see 'trajScatter()' for scatter plots of the measures involved in the clustering.")
 }
 #'@rdname plot.trajClusters
 #'
 #'@export
-scatterplots <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
+trajScatter <- function(x, ask = TRUE, which.scatter = NULL, N = NULL, ...) {
 
   nb.measures <- ncol(x$selection) - 1
   
@@ -489,7 +489,7 @@ CVIplot <- function(x, ...) {
   CVI <- x$cluster.validity.indices
   
   if(is.null(CVI)){
-    stop("There are no cluster validity indices to plot.")
+    stop("There are no cluster validity indices to plot because the 'nclusters' argument in trajClusters() was not NULL.")
   }
   
   #restore graphical parameters on exit
