@@ -113,7 +113,7 @@ trajReduce <-
             fuzzy.partition.red = Clusters.red$fuzzy.partition,
             keep = keep
           ),
-          class = "trajClusters"
+          class = "trajReduce"
         )
       
       return(trajReduce)
