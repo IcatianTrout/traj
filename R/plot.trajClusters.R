@@ -20,20 +20,18 @@
 #'@importFrom stats dist
 #'
 #'@examples
-#' \dontrun{
-#'data("trajdata")
-#'trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] #remove the Group column
+#'data(trajdata)
 #'
-#'m = trajMeasures(trajdata.noGrp, ID = TRUE)
+#'m = trajMeasures(trajdata[, -2], ID = TRUE)
 #'
 #'c3 = trajClusters(m, nclusters = 3)
 #'
-#'plot(c3, which.plots = 1, ask= FALSE) ## centroids
+#'plot(c3, which.plots = 1, ask = FALSE) ## centroids
 #'
-#'plot(c3, which.plots = 2, ask= FALSE) ## sample trajectories
+#'plot(c3, which.plots = 2, ask = FALSE) ## sample trajectories
 #'
-#'plot(c3, which.plots = 3, ask= FALSE) ## median of standardized measures by cluster
-#'}
+#'plot(c3, which.plots = 3, ask = FALSE) ## median of standardized measures by cluster
+#'
 #'
 #'
 #'@rdname plot.trajClusters
