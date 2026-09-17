@@ -2,9 +2,12 @@
 % Please edit documentation in R/trajReduce.R
 \name{trajReduce}
 \alias{trajReduce}
+\alias{print.trajReduce}
 \title{Select a Subset of the Measures Using a Similarity Index on the Set of Clusterings}
 \usage{
 trajReduce(Measures, Clusters, index = "ARI", keep = 3)
+
+\method{print}{trajReduce}(x, ...)
 }
 \arguments{
 \item{Measures}{object of class \code{trajMeasures} as returned by \code{\link[traj]{trajMeasures}}.}

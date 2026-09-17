@@ -6,10 +6,13 @@
 #'@param Clusters object of class \code{trajClusters} as returned by \code{\link[traj]{trajClusters}}.
 #'@param index The similarity index. Either "ARI" for the Adjusted Rand Index of Hubert and Arabie (1985), "nVId" for the normalized variation of information distance (eg. Meila (2007)) or "nSJd" for the normalized split/joint distance of van Dongen (2000).
 #'@param keep The number of measures to keep. Defaults to 3.
+#'@param x object of class \code{trajReduce}.
 #'
 #'@details The Rand index ranges from 0 to 1 with 0 indicating identical clusters and 1 indicating maximally different clusters. The normalized variation of information distance (nVId) and normalized split-join distance (nSJd) and have the opposite interpretation with 0 indicating maximally different clusters and 1 indicating identical clusters. Therefor, to facilitate comparison, we plot 1 - nVId (resp. 1 - nSJd) instead of nVId (resp. nSJd).
 #'
 #'The function runs the \code{\link[traj]{trajClusters}} function on every combination of \code{keep} measures and identifies the reduced representation yielding the clustering most similar to the (hard) clustering in \code{Clusters}. If the (hard) clustering in \code{Clusters} derives from a soft clustering, the iterations of \code{\link[traj]{trajClusters}}  will also be ran using \code{fuzzy = TRUE} and the corresponding hard clusterings will be used for comparison.
+#'
+#'@return An object of class \code{trajReduce}; a list containing the reduced list of measures, the corresponding reduced clustering (and fuzzy clustering if applicable) as well as the value of the similarity between the reduced clustering and the initial clustering.
 #'
 #'@importFrom igraph compare
 #'
