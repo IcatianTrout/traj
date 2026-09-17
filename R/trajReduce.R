@@ -109,9 +109,9 @@ trajReduce <-
           list(
             reduced.list = combin[, w],
             crit.value = criterion.v[w][1],
-            partition.red = traj.red,
+            keep = keep,
             fuzzy.partition.red = Clusters.red$fuzzy.partition,
-            keep = keep
+            partition.red = traj.red
           ),
           class = "trajReduce"
         )
