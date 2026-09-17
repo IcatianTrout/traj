@@ -41,7 +41,7 @@
 #'
 #'@export
 trajReduce <-
-  function (Measures, Clusters, index = "ARI", keep = 3) {
+  function (Measures, Clusters, crit = "ARI", keep = 3) {
     
     if(is.null(Clusters$nclusters)){
       stop("The 'Clusters' argument must be the output of the 'trajClusters' function in which the 'nclusters' argument is not 'NULL'.")
@@ -84,13 +84,13 @@ trajReduce <-
         
         traj.i <- as.factor(s3.i$partition[, "Cluster"])
         
-        if (index == "ARI") {
+        if (crit == "ARI") {
           criterion.v <- c(criterion.v, igraph::compare(traj, traj.i, method = "adjusted.rand"))
         }
-        if (index == "nVId") {
+        if (crit == "nVId") {
           criterion.v <- c(criterion.v, 1 - igraph::compare(traj, traj.i, method = "vi") / (2 * log(nCluster)))
         }
-        if (index == "nSJd") {
+        if (crit == "nSJd") {
           criterion.v <- c(criterion.v, 1 - igraph::compare(traj, traj.i, method = "split.join") / (2 * nCluster * (n / nCluster - ceiling(n / (nCluster^2)))) )
         }
       }
@@ -108,7 +108,7 @@ trajReduce <-
         structure(
           list(
             reduced.list = combin[, w],
-            index.value = criterion.v[w][1],
+            crit.value = criterion.v[w][1],
             partition.red = traj.red,
             fuzzy.partition.red = Clusters.red$fuzzy.partition,
             keep = keep
@@ -123,6 +123,6 @@ trajReduce <-
 #' @export
 print.trajReduce <- function(x, ...) {
   
-    cat(paste("Of all the combinations of ", x$keep, " measures, the one optmizing the index is ", paste( x$reduced.list, collapse = ", ", sep = ", "), " with index value ", x$index.value, ".", sep=""))
+    cat(paste("Of all the combinations of ", x$keep, " measures, the one optmizing the comparison criterion is ", paste( x$reduced.list, collapse = ", ", sep = ", "), " with value ", x$crit.value, ".", sep=""))
 
 }
