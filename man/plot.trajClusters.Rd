@@ -36,20 +36,18 @@ plots will be displayed.}
 \code{plot()} sequentially plots (i) the clusters centroids, (ii) a random sample of trajectories from each cluster, and (iii) the median of each standardized measure by cluster. \code{(trajScatter()} displays the two dimensional projections of the standardized data in feature space for every pair of measures. \code{CVIplot()} graphs the internal cluster validity indices as a function of the number of clusters as well as the result of the ranked voting system for determining the optimal number of clusters.
 }
 \examples{
-\dontrun{
-data("trajdata")
-trajdata.noGrp <- trajdata[, -which(colnames(trajdata) == "Group")] #remove the Group column
+data(trajdata)
 
-m = trajMeasures(trajdata.noGrp, ID = TRUE)
+m = trajMeasures(trajdata[, -2], ID = TRUE)
 
 c3 = trajClusters(m, nclusters = 3)
 
-plot(c3, which.plots = 1, ask= FALSE) ## centroids
+plot(c3, which.plots = 1, ask = FALSE) ## centroids
 
-plot(c3, which.plots = 2, ask= FALSE) ## sample trajectories
+plot(c3, which.plots = 2, ask = FALSE) ## sample trajectories
 
-plot(c3, which.plots = 3, ask= FALSE) ## median of standardized measures by cluster
-}
+plot(c3, which.plots = 3, ask = FALSE) ## median of standardized measures by cluster
+
 
 
 }
