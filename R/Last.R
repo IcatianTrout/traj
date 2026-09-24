@@ -1,6 +1,6 @@
 #'@title Function that returns the last non-NA value of a vector
 #'
-#'@param x vector of real numbers
+#'@param v vector of real numbers
 #'
 Last <- function(v) {
   if (!(FALSE %in% is.na(v))) {

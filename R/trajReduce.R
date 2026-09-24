@@ -1,10 +1,10 @@
-#'@title Select a Subset of the Measures Using a Similarity Index on the Set of Clusterings
+#'@title Select a Subset of the Measures Using a Similarity Criterion on the Set of Clusterings
 #'
-#'@description This function examines the effect of reducing the number of measures on which the trajectories are clustered. Specifically, starting from a clustering \eqn{C} in the form of an object of class \code{trajClusters} and a choice of a similarity index to compare clusterings, this function finds the subset of measures which results in the clustering most similar to \eqn{C}.
+#'@description This function examines the effect of reducing the number of measures on which the trajectories are clustered. Specifically, starting from a clustering \eqn{C} in the form of an object of class \code{trajClusters} and a choice of a similarity criterion to compare clusterings, this function finds the subset of measures which results in the clustering most similar to \eqn{C}.
 #'
 #'@param Measures object of class \code{trajMeasures} as returned by \code{\link[traj]{trajMeasures}}.
 #'@param Clusters object of class \code{trajClusters} as returned by \code{\link[traj]{trajClusters}}.
-#'@param index The similarity index. Either "ARI" for the Adjusted Rand Index of Hubert and Arabie (1985), "nVId" for the normalized variation of information distance (eg. Meila (2007)) or "nSJd" for the normalized split/joint distance of van Dongen (2000).
+#'@param crit The similarity criterion Either "ARI" for the Adjusted Rand Index of Hubert and Arabie (1985), "nVId" for the normalized variation of information distance (eg. Meila (2007)) or "nSJd" for the normalized split/joint distance of van Dongen (2000).
 #'@param keep The number of measures to keep. Defaults to 3.
 #'@param x object of class \code{trajReduce}.
 #'
@@ -75,7 +75,7 @@ trajReduce <-
       
       criterion.v <- c()
       
-      ## Run trajClusters() on each combination of measures and compute the similarity index of the resulting clustering with the original clustering  
+      ## Run trajClusters() on each combination of measures and compute the similarity criterion of the resulting clustering with the original clustering  
       for(i in seq_len(ncol(combin))){
         s3.i <- quiet(trajClusters(Measures, 
                                    select = combin[, i], 
@@ -95,7 +95,7 @@ trajReduce <-
         }
       }
       
-      w <- which(criterion.v == max(criterion.v))[1] ## The simplest combination of measure for which the similarity index is maximal
+      w <- which(criterion.v == max(criterion.v))[1] ## The simplest combination of measure for which the similarity criterion is maximal
       
       Clusters.red <- quiet(trajClusters(Measures, 
                                          select = combin[, w], 
