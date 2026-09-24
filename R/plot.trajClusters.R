@@ -298,7 +298,7 @@ plot.trajClusters <-
              pch = seq_len(x$nclusters) - 1)
     }
 
-print("See also 'CVIplot()' for a plot of the statistic used to determined the number of clusters (if applicable) and see 'trajScatter()' for scatter plots of the measures involved in the clustering.")
+cat("See also 'CVIplot()' for a plot of the statistic used to determined the number of clusters (if applicable) and see 'trajScatter()' for scatter plots of the measures involved in the clustering.\n")
 }
 #'@rdname plot.trajClusters
 #'
