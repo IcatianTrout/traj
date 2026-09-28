@@ -59,7 +59,11 @@ plot.trajClusters <-
     
     # Restore graphical parameters and ask status on exit
     current.ask.status <- devAskNewPage(ask = NULL)
-    op <- par(no.readonly = TRUE)
+    op <- list(
+      mfrow = par("mfrow"),
+      mar   = par("mar"),
+      xpd   = par("xpd")
+    )
     
     on.exit({
       devAskNewPage(ask = current.ask.status)
@@ -296,7 +300,11 @@ plot.trajClusters <-
              col = color.pal[seq_len(x$nclusters)],
              lty = rep(0, x$nclusters),
              pch = seq_len(x$nclusters) - 1)
+      
+      par(xpd = FALSE)
     }
+    
+      
 
 cat("See also 'CVIplot()' for a plot of the statistic used to determined the number of clusters (if applicable) and see 'trajScatter()' for scatter plots of the measures involved in the clustering.\n")
 }
