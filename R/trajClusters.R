@@ -260,7 +260,8 @@ print.trajClusters <- function(x, ...) {
         - trajFuzzyPartition() to extract the fuzzy partition (if applicable);\n
         - trajClusterSummary() for the cluster-wise summaries of the measures;\n
         - trajAnalysis() for order analysis on the cluster-wise medians;\n
-        - plot() to see the centroid trajectories and a sample from each groups;\n
+        - trajMouseover() to inspect the clusters;\n
+        - plot() to see the centroid trajectories, a sample from each groups and/or standardized feature medians by clusters;\n
         - trajScatter() for scatter plots of all the pairs of measures;\n
         - trajReduce() to investigate the possibility of reducing the number of measures used in the classification (optional).","\n")
   }
