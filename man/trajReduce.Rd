@@ -19,6 +19,8 @@ trajReduce(Measures, Clusters, crit = "ARI", keep = 3)
 \item{keep}{The number of measures to keep. Defaults to 3.}
 
 \item{x}{object of class \code{trajReduce}.}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 An object of class \code{trajReduce}; a list containing the reduced list of measures, the corresponding reduced clustering (and fuzzy clustering if applicable) as well as the value of the similarity between the reduced clustering and the initial clustering.

@@ -7,6 +7,7 @@
 #'@param crit The similarity criterion Either "ARI" for the Adjusted Rand Index of Hubert and Arabie (1985), "nVId" for the normalized variation of information distance (eg. Meila (2007)) or "nSJd" for the normalized split/joint distance of van Dongen (2000).
 #'@param keep The number of measures to keep. Defaults to 3.
 #'@param x object of class \code{trajReduce}.
+#'@param ... further arguments passed to or from other methods.
 #'
 #'@details The Rand index ranges from 0 to 1 with 0 indicating identical clusters and 1 indicating maximally different clusters. The normalized variation of information distance (nVId) and normalized split-join distance (nSJd) and have the opposite interpretation with 0 indicating maximally different clusters and 1 indicating identical clusters. Therefor, to facilitate comparison, we plot 1 - nVId (resp. 1 - nSJd) instead of nVId (resp. nSJd).
 #'
@@ -121,7 +122,7 @@ trajReduce <-
 #' @rdname trajReduce
 #' @method print trajReduce
 #' @export
-print.trajReduce <- function(x) {
+print.trajReduce <- function(x, ...) {
   
     cat(paste("Of all the combinations of ", x$keep, " measures, the one optmizing the comparison criterion is ", paste(x$reduced.list, collapse = ", ", sep = ", "), " with value ", round(x$crit.value,2), ".", sep=""))
 
