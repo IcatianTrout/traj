@@ -79,7 +79,7 @@ trajMouseover <- function(x) {
       zoomType = "xy"
     ) |>
     highcharter::hc_title(
-      text = "Trajectories by Cluster"
+      text = "Trajectories by clusters"
     ) |>
     highcharter::hc_subtitle(
       text = paste(
