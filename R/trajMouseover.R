@@ -30,6 +30,7 @@
 
 trajMouseover <- function(x) {
   
+  # Add 'Cluster' column to the data
   dataM <- merge(x$partition, x$data, by = "ID", all.x = TRUE)
   colnames(dataM)[-c(1:2)] <- seq_along(colnames(dataM)[-c(1:2)])
   
@@ -95,7 +96,13 @@ trajMouseover <- function(x) {
       title = list(text = "")
     ) |>
     highcharter::hc_tooltip(
-      pointFormat = ""
+      formatter = highcharter::JS(
+        "function () {
+           return '<b>ID:</b> ' + this.series.userOptions.trajectoryID +
+                  '<br><b>Time:</b> ' + this.x +
+                  '<br><b>Value:</b> ' + this.y;
+         }"
+      )
     ) |>
     highcharter::hc_plotOptions(
       series = list(
@@ -111,7 +118,7 @@ trajMouseover <- function(x) {
       )
     )
   
-  # AdataM trajectories
+  # Add trajectories
   for (i in seq_len(nrow(dataM))) {
     
     cluster <- dataM$Cluster[i]
@@ -136,11 +143,11 @@ trajMouseover <- function(x) {
     # JavaScript events
     series_events <- list(
       
-      # Hover: highlight ONLY the trajectory being hovered over
+      # Hover: highlight only the trajectory being hovered over
       mouseOver = highcharter::JS(
         "function () {
            var hovered = this;
-           
+
            this.chart.series.forEach(function (s) {
              if (s === hovered) {
                s.setState('hover');
@@ -151,7 +158,7 @@ trajMouseover <- function(x) {
          }"
       ),
       
-      # Stop highlighting when the mouse leaves
+      # Restore normal appearance when the mouse leaves
       mouseOut = highcharter::JS(
         "function () {
            this.chart.series.forEach(function (s) {
@@ -161,28 +168,28 @@ trajMouseover <- function(x) {
       )
     )
     
-    # Clicking the legend entry toggles the visibility
-    # of all trajectories belonging to that cluster
+    # Clicking the legend entry toggles visibility of the entire cluster
     if (first_in_cluster) {
       
       series_events$legendItemClick <- highcharter::JS(
         "function () {
            var cluster = this.userOptions.clusterGroup;
            var newVisibility = !this.visible;
-           
+
            this.chart.series.forEach(function (s) {
              if (s.userOptions.clusterGroup === cluster) {
                s.setVisible(newVisibility, false);
              }
            });
-           
+
            this.chart.redraw();
-           
+
            return false;
          }"
       )
     }
     
+    # Add trajectory to chart
     p <- p |>
       highcharter::hc_add_series(
         data = trajectory,
@@ -192,6 +199,7 @@ trajMouseover <- function(x) {
         showInLegend = first_in_cluster,
         legendIndex = cluster_index,
         clusterGroup = paste0("cluster_", cluster),
+        trajectoryID = dataM$ID[i],
         lineWidth = 1,
         marker = list(
           enabled = FALSE
