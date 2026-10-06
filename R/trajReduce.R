@@ -121,7 +121,7 @@ trajReduce <-
 #' @rdname trajReduce
 #' @method print trajReduce
 #' @export
-print.trajReduce <- function(x, ...) {
+print.trajReduce <- function(x) {
   
     cat(paste("Of all the combinations of ", x$keep, " measures, the one optmizing the comparison criterion is ", paste(x$reduced.list, collapse = ", ", sep = ", "), " with value ", round(x$crit.value,2), ".", sep=""))
 

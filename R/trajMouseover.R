@@ -89,10 +89,10 @@ trajMouseover <- function(x) {
       )
     ) |>
     highcharter::hc_xAxis(
-      title = list(text = "Time")
+      title = list(text = "")
     ) |>
     highcharter::hc_yAxis(
-      title = list(text = "Value")
+      title = list(text = "")
     ) |>
     highcharter::hc_tooltip(
       pointFormat = ""

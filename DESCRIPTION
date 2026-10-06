@@ -25,7 +25,8 @@ Imports:
     igraph,
     e1071,
     RSpectra,
-    Matrix
+    Matrix,
+    highcharter
 Depends: 
     R (>= 3.5.0)
 LazyData: true
