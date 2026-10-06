@@ -13,6 +13,7 @@ export(trajClusterSummary)
 export(trajClusters)
 export(trajFuzzyPartition)
 export(trajMeasures)
+export(trajMouseover)
 export(trajPartition)
 export(trajReduce)
 export(trajScatter)
@@ -31,6 +32,17 @@ importFrom(graphics,
   legend,
   lines,
   par
+)
+importFrom(highcharter,
+  JS,
+  hc_add_series,
+  hc_chart,
+  hc_plotOptions,
+  hc_title,
+  hc_tooltip,
+  hc_xAxis,
+  hc_yAxis,
+  highchart
 )
 importFrom(igraph,compare)
 importFrom(stats,

@@ -3,7 +3,7 @@
 \name{trajReduce}
 \alias{trajReduce}
 \alias{print.trajReduce}
-\title{Select a Subset of the Measures Using a Similarity Index on the Set of Clusterings}
+\title{Select a Subset of the Measures Using a Similarity Criterion on the Set of Clusterings}
 \usage{
 trajReduce(Measures, Clusters, crit = "ARI", keep = 3)
 
@@ -14,17 +14,17 @@ trajReduce(Measures, Clusters, crit = "ARI", keep = 3)
 
 \item{Clusters}{object of class \code{trajClusters} as returned by \code{\link[traj]{trajClusters}}.}
 
+\item{crit}{The similarity criterion Either "ARI" for the Adjusted Rand Index of Hubert and Arabie (1985), "nVId" for the normalized variation of information distance (eg. Meila (2007)) or "nSJd" for the normalized split/joint distance of van Dongen (2000).}
+
 \item{keep}{The number of measures to keep. Defaults to 3.}
 
 \item{x}{object of class \code{trajReduce}.}
-
-\item{index}{The similarity index. Either "ARI" for the Adjusted Rand Index of Hubert and Arabie (1985), "nVId" for the normalized variation of information distance (eg. Meila (2007)) or "nSJd" for the normalized split/joint distance of van Dongen (2000).}
 }
 \value{
 An object of class \code{trajReduce}; a list containing the reduced list of measures, the corresponding reduced clustering (and fuzzy clustering if applicable) as well as the value of the similarity between the reduced clustering and the initial clustering.
 }
 \description{
-This function examines the effect of reducing the number of measures on which the trajectories are clustered. Specifically, starting from a clustering \eqn{C} in the form of an object of class \code{trajClusters} and a choice of a similarity index to compare clusterings, this function finds the subset of measures which results in the clustering most similar to \eqn{C}.
+This function examines the effect of reducing the number of measures on which the trajectories are clustered. Specifically, starting from a clustering \eqn{C} in the form of an object of class \code{trajClusters} and a choice of a similarity criterion to compare clusterings, this function finds the subset of measures which results in the clustering most similar to \eqn{C}.
 }
 \details{
 The Rand index ranges from 0 to 1 with 0 indicating identical clusters and 1 indicating maximally different clusters. The normalized variation of information distance (nVId) and normalized split-join distance (nSJd) and have the opposite interpretation with 0 indicating maximally different clusters and 1 indicating identical clusters. Therefor, to facilitate comparison, we plot 1 - nVId (resp. 1 - nSJd) instead of nVId (resp. nSJd).

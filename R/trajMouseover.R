@@ -25,7 +25,7 @@
 #'trajMouseover(c3)
 #'
 #' @importFrom highcharter highchart hc_chart hc_title hc_xAxis hc_yAxis
-#'   hc_tooltip hc_plotOptions hc_adataM_series JS
+#'   hc_tooltip hc_plotOptions hc_add_series JS
 #' @export
 
 trajMouseover <- function(x) {

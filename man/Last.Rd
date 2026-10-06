@@ -7,7 +7,7 @@
 Last(v)
 }
 \arguments{
-\item{x}{vector of real numbers}
+\item{v}{vector of real numbers}
 }
 \description{
 Function that returns the last non-NA value of a vector
