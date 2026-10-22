@@ -533,14 +533,14 @@ trajMeasures <-
     
     
     ### Measures on f'(t) ###
-    
-    # If a measure involving the speed or the acceleration was requested, compute the derivative:
-    if (sum(measures %in% 14:20) > 0) {
+
+    # If a measure involving the speed was requested, compute the derivative:
+    if (sum(measures %in% 14:17) > 0) {
       speed.data <- data
       for (i in seq_len(nrow(data))) {
         y <- data[i, complete.cases(data[i, ])]
         x <- time[i, complete.cases(time[i, ])]
-        speed.data[i, complete.cases(speed.data[i, ])] <- Der(x, y)
+        speed.data[i, complete.cases(speed.data[i, ])] <- Der(x, y, which = 1)
       }
     }
     
@@ -581,17 +581,16 @@ trajMeasures <-
     
     ### Measures on f''(t) ###
     
-    # If a measure involving the acceleration was requested, compute the derivative of the derivative:
-
+    # If a measure involving the acceleration was requested, compute it: 
     if (sum(measures %in% 18:20) > 0) {
-      accel.data <- speed.data
-      for (i in seq_len(nrow(accel.data))) {
-        y <- speed.data[i, complete.cases(speed.data[i, ])]
+      accel.data <- data
+      for (i in seq_len(nrow(data))) {
+        y <- data[i, complete.cases(data[i, ])]
         x <- time[i, complete.cases(time[i, ])]
-        accel.data[i, complete.cases(accel.data[i, ])] <- Der(x, y)
+        accel.data[i, complete.cases(accel.data[i, ])] <- Der(x, y, which = 2)
       }
     }
-    
+
     # max f''
     if (18 %in% measures) {
       for (i in seq_len(nrow(accel.data))) {

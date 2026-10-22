@@ -1,37 +1,60 @@
-#'@title Function that approximates the derivative of a function as a weighted average of the left and right derivatives
+#'@title Function that approximates the first and second derivative of a function.
 #'
 #'@param x vector of strictly increasing real numbers
-#'@param y vector of strictly increasing real numbers corresponding to f(x)
+#'@param y vector of real numbers corresponding to f(x)
+#'@param which vector containing 1 to signal that the first derivative is required and 2 to signal that the second derivative is required 
 #'
-Der <- function(x, y) {
+#'@return If the \code{which} argument contains both 1 and 2, then the function returns a matrix whose first row is the first derivative and the second row is the second derivative. If the \code{which} argument contains only 1 or only 2, the function returns a vector containing the approximate values of the first and second derivative respectively.
+#'
+#'@details At the interior points, the standard three-point finite-difference formula for unequally spaced observations is used. At the boundary, the first derivative is approximated directly from one-sided derivatives. Likewise, the second derivative at the boundary points is approximated from the one-sided derivatives of the first derivative.
+#'
+Der <- function(x, y, which = c(1, 2)) {
   
-  # Here x and y are vectors, and y is interpreted as f(x) for the function f that we're trying to approximate the derivative of
-
+  ## Compute derivative at the boundary
   m <- length(x)
-
-  DR <- rep(NA, m)
-  DL <- rep(NA, m)
+  
   D <- c()
   
-  for (i in 1:(m - 1)) {
-    DR[i] <- (y[i + 1] - y[i]) / (x[i + 1] - x[i]) ## Approximate the right derivative
-  }
+  D[1] <- (y[2] - y[1]) / (x[2] - x[1])
+  D[m] <- (y[m - 1] - y[m]) / (x[m - 1] - x[m])
   
-  for (i in 2:m) {
-    DL[i] <- (y[i - 1] - y[i]) / (x[i - 1] - x[i]) ## Approximate the left derivative
-  }
-  
-  D[1] <- DR[1]
-  D[m] <- DL[m]
-  
-  wL <- rep(NA, m)
-  wR <- rep(NA, m)
+  ## Compute derivative at the interior points from the standard three-point finite-difference formula for unequally spaced observations
   
   for (i in 2:(m - 1)) {
-    wL[i] <- (x[i + 1] - x[i]) / (x[i + 1] - x[i - 1]) ## Weight for the left derivative
-    wR[i] <- 1 - wL[i] ## Weight for the right derivative
-    D[i] <- wL[i] * DL[i] + wR[i] * DR[i] ## The approximation is the weighted average of the left and right derivatives
+    hm <- x[i] - x[i - 1]
+    hp <- x[i + 1] - x[i]
+    
+    D[i] <- (-hp * y[i - 1]) / (hm * (hm + hp)) + ((hp - hm) * y[i]) / (hm * hp) + (hm * y[i + 1]) / (hp * (hm + hp)) 
   }
   
-  return(D)
+  if(2 %in% which){
+    
+    ## Compute second derivative at the boundary
+    A <- c()
+    
+    A[1] <- (D[2] - D[1]) / (x[2] - x[1])
+    A[m] <- (D[m - 1] - D[m]) / (x[m - 1] - x[m])
+    
+    ## Compute derivative at the interior points from the standard three-point finite-difference formula for unequally spaced observations
+    
+    for (i in 2:(m - 1)) {
+      hm <- x[i] - x[i - 1]
+      hp <- x[i + 1] - x[i]
+      
+      A[i] <- 2 / (hm + hp) * ((y[i + 1] - y[i]) / hp - (y[i] - y[i - 1]) / hm)
+    }
+  }
+  
+  if(which == 1){
+    return(D)
+  }
+  if(which == 2){
+    return(A)
+  }
+  if(which == c(1,2)){
+    return(rbind(D,A))
+  }
 }
+
+
+
