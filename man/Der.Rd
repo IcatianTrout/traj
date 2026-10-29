@@ -2,15 +2,15 @@
 % Please edit documentation in R/Der.R
 \name{Der}
 \alias{Der}
-\title{Function that approximates the derivative of a function as a weighted average of the left and right derivatives}
+\title{Function that approximates the  derivative of a function from a three-point finite-difference formula for unequally spaced observations}
 \usage{
 Der(x, y)
 }
 \arguments{
 \item{x}{vector of strictly increasing real numbers}
 
-\item{y}{vector of strictly increasing real numbers corresponding to f(x)}
+\item{y}{vector of real numbers corresponding to f(x)}
 }
 \description{
-Function that approximates the derivative of a function as a weighted average of the left and right derivatives
+Function that approximates the  derivative of a function from a three-point finite-difference formula for unequally spaced observations
 }

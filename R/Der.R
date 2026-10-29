@@ -1,18 +1,22 @@
-#'@title Function that approximates the first and second derivative of a function.
+#'@title Function that approximates the derivative of a function as a weighted average of the left and right derivatives
 #'
 #'@param x vector of strictly increasing real numbers
 #'@param y vector of real numbers corresponding to f(x)
-#'@param which vector containing 1 to signal that the first derivative is required and 2 to signal that the second derivative is required 
-#'
-#'@return If the \code{which} argument contains both 1 and 2, then the function returns a matrix whose first row is the first derivative and the second row is the second derivative. If the \code{which} argument contains only 1 or only 2, the function returns a vector containing the approximate values of the first and second derivative respectively.
-#'
-#'@details At the interior points, the standard three-point finite-difference formula for unequally spaced observations is used. At the boundary, the first derivative is approximated directly from one-sided derivatives. Likewise, the second derivative at the boundary points is approximated from the one-sided derivatives of the first derivative.
-#'
-Der <- function(x, y, which = c(1, 2)) {
+Der <- function(x, y) {
   
-  ## Compute derivative at the boundary
+  # Here x and y are vectors, and y is interpreted as f(x) for the function f that we're trying to approximate the derivative of
+  
+  if (!length(y) == length(x)) {
+    stop("y and x must be vectors of the same length.")
+  }
+  
   m <- length(x)
   
+  if (!identical(order(x), c(1:m))) {
+    stop("The elements of the 'x' vector must be strictly increasing.")
+  }
+  DR <- rep(NA, m)
+  DL <- rep(NA, m)
   D <- c()
   
   D[1] <- (y[2] - y[1]) / (x[2] - x[1])
